@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aspiring red team operator portfolio for UTSA student and security club member." />
+  <title>moriz82 | Aspiring Red Team Operator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">&#x25A3;</div>
+      <a href="#home" class="logo-type">moriz<span>82</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="#home">Home</a>
+      <a href="#projects">Projects</a>
+      <a href="#ctf">CTF Writeups</a>
+      <a href="#htb">HTB Logs</a>
+      <a href="#clubs">Clubs &amp; Teams</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="section hero" aria-label="Hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Aspiring Red Team Operator</p>
+        <h1>Hi, I&apos;m <span class="accent">moriz</span>.</h1>
+        <p class="lead">20-year-old offensive security student at UTSA, building adversarial tradecraft, automation, and purple team empathy.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#projects">View projects</a>
+          <a class="button ghost" href="#contact">Engage me</a>
+        </div>
+        <dl class="hero-meta">
+          <div>
+            <dt>Focus</dt>
+            <dd>Adversary emulation, automation, detection bypass</dd>
+          </div>
+          <div>
+            <dt>Clubs</dt>
+            <dd>Rowdy Security Association, Collegiate Cyber Defense</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Open to red team internships &amp; collabs</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="hero-terminal" role="img" aria-label="Terminal window placeholder">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="terminal-body">
+          <pre><code class="typewriter" data-lines='[
+  "moriz@utsa:~$ whoami",
+  "redteam-operator-in-training",
+  "moriz@utsa:~$ current_mission",
+  "{\"project\": \"purple bridge\", \"status\": \"iterating\"}",
+  "moriz@utsa:~$" ]'></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <div class="section-heading">
+        <h2 id="projects-title">Projects</h2>
+        <p>Ops tooling and research experiments tuned for real-world adversary tradecraft.</p>
+      </div>
+      <div class="grid cards">
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Project Alpha Recon</h3>
+            <p>Low-noise recon automation with modular fingerprinting and graph pivots. Drop notes here.</p>
+            <ul class="tag-list">
+              <li>Go</li>
+              <li>GraphQL</li>
+              <li>Recon</li>
+            </ul>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Payload Lab</h3>
+            <p>Obfuscated implant playground for bypassing EDR. Summarize the outcomes and lessons learned.</p>
+            <ul class="tag-list">
+              <li>C#</li>
+              <li>Tradecraft</li>
+              <li>EDR</li>
+            </ul>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Adversary Notes</h3>
+            <p>Knowledge base that maps detections to operator workflows. Use for quick threat simulation references.</p>
+            <ul class="tag-list">
+              <li>Research</li>
+              <li>Threat Intel</li>
+              <li>Automation</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="ctf" class="section" aria-labelledby="ctf-title">
+      <div class="section-heading">
+        <h2 id="ctf-title">CTF Writeups</h2>
+        <p>Highlight the events, solves, and techniques that flex exploitation fundamentals.</p>
+      </div>
+      <div class="timeline">
+        <article class="timeline-item">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <span class="timeline-meta">2024 · DEF CON Quals</span>
+            <h3>Binary Exploitation &mdash; `malloc_madness`</h3>
+            <p>Drop a short teaser of the chain, then link out to the full writeup.</p>
+            <a class="inline-link" href="#">Full writeup →</a>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <span class="timeline-meta">2023 · UTSA CTF</span>
+            <h3>Web · `encrypted-echo`</h3>
+            <p>Jot the key vuln, payload idea, and lessons. Replace placeholder copy.</p>
+            <a class="inline-link" href="#">Full writeup →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="htb" class="section" aria-labelledby="htb-title">
+      <div class="section-heading">
+        <h2 id="htb-title">Hack The Box Logs</h2>
+        <p>Snapshot each HTB engagement with privesc paths, AV evasion tactics, and post-ex loot.</p>
+      </div>
+      <div class="grid cards">
+        <article class="card compact">
+          <div class="card-body">
+            <div class="badge">Pro Lab</div>
+            <h3>APT Matrix</h3>
+            <p>Talk about foothold, lateral moves, key takeaways, and the tooling you used.</p>
+            <a class="inline-link" href="#">Read log →</a>
+          </div>
+        </article>
+        <article class="card compact">
+          <div class="card-body">
+            <div class="badge">Fortress</div>
+            <h3>Injection</h3>
+            <p>Pin down exploit chain, privesc vector, and containment notes for the blue team.</p>
+            <a class="inline-link" href="#">Read log →</a>
+          </div>
+        </article>
+        <article class="card compact">
+          <div class="card-body">
+            <div class="badge">Retired</div>
+            <h3>MonitorsTwo</h3>
+            <p>Give the TL;DR to tease the full entry. Mention pivot or key commands.</p>
+            <a class="inline-link" href="#">Read log →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="clubs" class="section" aria-labelledby="clubs-title">
+      <div class="section-heading">
+        <h2 id="clubs-title">Clubs &amp; Teams</h2>
+        <p>Capture the crews that sharpen your offensive skills and keep defenses honest.</p>
+      </div>
+      <div class="grid clubs">
+        <article class="club-card">
+          <div class="club-header">
+            <div class="club-logo" aria-hidden="true"></div>
+            <div>
+              <h3>Rowdy Security Association</h3>
+              <p class="club-role">Offensive Research Lead</p>
+            </div>
+          </div>
+          <p>Summarize your role, key initiatives, and what you&apos;re teaching peers.</p>
+        </article>
+        <article class="club-card">
+          <div class="club-header">
+            <div class="club-logo" aria-hidden="true"></div>
+            <div>
+              <h3>UTSA Collegiate Cyber Defense</h3>
+              <p class="club-role">Red Cell Operator</p>
+            </div>
+          </div>
+          <p>Share the highlights, attack plans, and how you support the blue teams.</p>
+        </article>
+        <article class="club-card">
+          <div class="club-header">
+            <div class="club-logo" aria-hidden="true"></div>
+            <div>
+              <h3>Bug Bounty Collective</h3>
+              <p class="club-role">Member</p>
+            </div>
+          </div>
+          <p>List current bounty platforms, favorite vulns, or collaborative wins.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <div class="section-heading">
+        <h2 id="contact-title">Signal Me</h2>
+        <p>Drop your best channel so we can plan the next adversarial engagement.</p>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <ul class="contact-list">
+            <li>
+              <span class="contact-label">Email</span>
+              <a href="mailto:YOUR.EMAIL@utsa.edu">YOUR.EMAIL@utsa.edu</a>
+            </li>
+            <li>
+              <span class="contact-label">LinkedIn</span>
+              <a href="https://www.linkedin.com/in/YOUR-HANDLE" target="_blank" rel="noopener">linkedin.com/in/YOUR-HANDLE</a>
+            </li>
+            <li>
+              <span class="contact-label">GitHub</span>
+              <a href="https://github.com/moriz82" target="_blank" rel="noopener">github.com/moriz82</a>
+            </li>
+            <li>
+              <span class="contact-label">PGP</span>
+              <code>fingerprint-goes-here</code>
+            </li>
+          </ul>
+        </div>
+        <form class="contact-form" action="#" method="post">
+          <label for="contact-name">Alias</label>
+          <input id="contact-name" name="contact-name" type="text" placeholder="ShadowFox" required />
+
+          <label for="contact-email">Return channel</label>
+          <input id="contact-email" name="contact-email" type="email" placeholder="shadow@opsec.io" required />
+
+          <label for="contact-message">Intel</label>
+          <textarea id="contact-message" name="contact-message" rows="4" placeholder="Let&apos;s plan an engagement." required></textarea>
+
+          <button type="submit" class="button primary disabled" disabled>Send Signal (coming soon)</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> moriz82 · Crafted with intent in San Antonio, TX.</p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
