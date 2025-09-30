@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contact Will DeDominico (moriz82) for red team collaborations, internships, or security research partnerships." />
+  <title>Contact | moriz82</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">&#x25A3;</div>
+      <a href="index.html#home" class="logo-type">moriz<span>82</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="index.html#home">Home</a>
+      <a href="index.html#experience">Experience</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#github">GitHub</a>
+      <a href="index.html#ctf">CTFs</a>
+      <a href="index.html#htb">HTB</a>
+      <a href="index.html#clubs">Clubs</a>
+      <a href="index.html#education">Education</a>
+      <a href="#contact" class="is-active">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="contact" class="section contact-hero" aria-labelledby="contact-title">
+      <div class="section-heading">
+        <p class="eyebrow">Engage the Operator</p>
+        <h1 id="contact-title">Contact Will DeDominico</h1>
+        <p class="lead">Whether it&apos;s an internship, red team contract, workshop, or CTF collaboration, I respond within one business day.</p>
+      </div>
+      <div class="contact-grid contact-page-grid">
+        <div class="contact-info">
+          <ul class="contact-list contact-page-list">
+            <li>
+              <span class="contact-label">Email</span>
+              <a href="mailto:willdedominico@proton.me">willdedominico@proton.me</a>
+            </li>
+            <li>
+              <span class="contact-label">LinkedIn</span>
+              <a href="https://www.linkedin.com/in/wdedo" target="_blank" rel="noopener">linkedin.com/in/wdedo</a>
+            </li>
+            <li>
+              <span class="contact-label">GitHub</span>
+              <a href="https://github.com/moriz82" target="_blank" rel="noopener">github.com/moriz82</a>
+            </li>
+            <li>
+              <span class="contact-label">Location</span>
+              San Antonio, Texas · Remote friendly
+            </li>
+            <li>
+              <span class="contact-label">Availability</span>
+              24-hour response · Open for Summer/Fall 2025 internships
+            </li>
+          </ul>
+          <div class="contact-availability">
+            <h2>Signals I&apos;m Tracking</h2>
+            <ul>
+              <li>Red team internships &amp; co-ops</li>
+              <li>Operator tooling collaborations</li>
+              <li>Guest talks or workshops for security orgs</li>
+              <li>CTF team-ups or Hack The Box squads</li>
+            </ul>
+          </div>
+        </div>
+        <div class="contact-form-card">
+          <form class="contact-form" data-mailto="willdedominico@proton.me">
+            <label for="cf-name">Alias</label>
+            <input id="cf-name" name="contact-name" type="text" placeholder="Your handle" required />
+
+            <label for="cf-email">Return channel</label>
+            <input id="cf-email" name="contact-email" type="email" placeholder="you@domain.com" required />
+
+            <label for="cf-message">Intel</label>
+            <textarea id="cf-message" name="contact-message" rows="5" placeholder="Let me know what you&apos;d like to collaborate on." required></textarea>
+
+            <div class="contact-form-actions">
+              <button type="submit" class="button primary">Launch email draft</button>
+              <p class="contact-form-note">Opening your default mail client with the details pre-filled. Update the message and hit send.</p>
+              <p class="contact-form-status" data-mailto-status hidden>Launching email client…</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> moriz82 · Crafted with intent in San Antonio, TX.</p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
