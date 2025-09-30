@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How Melody Match pairs an ESP8266 wearable with a Swift app and on-device ML to deliver adaptive music therapy." />
+  <title>Melody Match: Pairing Biometrics with Music Therapy | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#blog" class="is-active">Blog</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">Melody Match: Pairing Biometrics with Music Therapy</h1>
+        <div class="post-meta">
+          <time datetime="2024-12-03">December 3, 2024</time>
+          <span>7 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">Swift</span>
+            <span class="post-tag">ESP8266</span>
+            <span class="post-tag">Machine Learning</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" />
+        <figcaption>The pilot wearable streams heart-rate variability into a SwiftUI dashboard that adapts playlists on the fly.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p>Melody Match watches heart rate, skin temperature, and accelerometer data to infer stress levels. When readings spike, the app fades in a curated playlist and pushes breathing cues. Everything runs on-device to keep personal data offline.</p>
+
+        <h2>Hardware Stack</h2>
+        <p>The wearable uses an ESP8266 dev board paired with a MAX30102 pulse sensor. A LiPo pack plus charging circuit keeps the footprint small enough to sit under a wrist strap.</p>
+
+        <div class="content-card">
+          <h3>Workflow Loop</h3>
+          <p>Firmware samples biometrics → MQTT over TLS → CoreBluetooth bridge → Swift Combine pipeline → on-device Core ML classifier.</p>
+        </div>
+
+        <div class="callout callout--info" data-label="Privacy first">
+          <p>Personal metrics never leave the device cluster. The Core ML model runs offline and the only cloud connection is an optional backup of anonymised session summaries.</p>
+        </div>
+
+        <h2>SwiftUI Control Room</h2>
+        <p>The app exposes a dashboard for operators (therapists, caretakers, or the wearer) to see state changes and override the playlist. The entire UI updates reactively through Combine publishers.</p>
+
+        <pre><code class="language-swift">struct SessionView: View {
+  @ObservedObject var session: BioFeedbackSession
+
+  var body: some View {
+    VStack(spacing: 24) {
+      Gauge(value: session.hrvScore, in: 0...100) {
+        Text("Resilience")
+      }
+      .tint(Gradient(colors: [.blue, .purple]))
+
+      Chart(session.recentReadings) { reading in
+        LineMark(
+          x: .value("Timestamp", reading.timestamp),
+          y: .value("BPM", reading.bpm)
+        )
+        .interpolationMethod(.monotone)
+      }
+
+      Button("Trigger Calm Playlist") {
+        session.playlist.enqueue(.calm)
+      }
+      .buttonStyle(.borderedProminent)
+    }
+    .padding(24)
+  }
+}</code></pre>
+
+        <h2>Classifying Stress On-Device</h2>
+        <p>The Core ML model is a tiny gradient boosted tree exported from Create ML. It looks for short-term HRV drops paired with stillness—if both conditions hit, the app crossfades in a decompression track.</p>
+
+        <figure>
+          <img src="../assets/img/placeholder-card.svg" alt="Stylised app dashboard placeholder" />
+          <figcaption>Prototype dashboard showing HRV, BPM, and the currently queued intervention track.</figcaption>
+        </figure>
+
+        <div class="callout callout--warning" data-label="Calibration">
+          <p>Run a 7-day baseline capture before enabling automations. Without enough rest-state data the model assumes you&apos;re stressed 24/7.</p>
+        </div>
+
+        <h2>Roadmap</h2>
+        <p>I&apos;m layering in voice guidance, RAG-powered journaling prompts, and a second wearable that tracks galvanic skin response to tighten prediction accuracy.</p>
+      </div>
+
+      <footer class="post-footer">
+        <p>Have ideas for additional biometric signals or accessibility improvements? Send me a note and let&apos;s experiment together.</p>
+        <a class="button ghost" href="../index.html#blog">Back to Blog Dispatches</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

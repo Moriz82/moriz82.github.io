@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "cyber-range-homelab",
+    "title": "Building a Cyber Range Homelab",
+    "summary": "How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.",
+    "date": "2025-02-10",
+    "readTime": "8 min",
+    "hero": "assets/img/homelab.jpg",
+    "heroAlt": "Server racks lit with violet accent lights representing a homelab cluster",
+    "tags": ["Proxmox", "Cisco", "OffSec"]
+  },
+  {
+    "slug": "3d-printed-satellite-antenna",
+    "title": "Printing a Satellite Antenna for NOAA & GOES",
+    "summary": "Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.",
+    "date": "2025-01-18",
+    "readTime": "6 min",
+    "hero": "assets/img/antenna.jpg",
+    "heroAlt": "Hand-built helical antenna pointed at the sky for satellite downlink",
+    "tags": ["SDR", "RF", "Python"]
+  },
+  {
+    "slug": "melody-match",
+    "title": "Melody Match: Pairing Biometrics with Music Therapy",
+    "summary": "An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.",
+    "date": "2024-12-03",
+    "readTime": "7 min",
+    "hero": "assets/img/melody.jpg",
+    "heroAlt": "Person testing a wearable device and companion mobile app",
+    "tags": ["Swift", "ESP8266", "ML"]
+  }
+]
