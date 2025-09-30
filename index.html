@@ -25,7 +25,7 @@
     <nav id="site-nav" class="site-nav" aria-expanded="false">
       <a href="#home">Home</a>
       <a href="#experience">Experience</a>
-      <a href="#projects">Projects</a>
+      <a href="#blog">Blog</a>
       <a href="#github">GitHub</a>
       <a href="#ctf">CTFs</a>
       <a href="#htb">HTB</a>
@@ -176,55 +176,85 @@
       </div>
     </section>
 
-    <section id="projects" class="section" aria-labelledby="projects-title">
+    <section id="blog" class="section" aria-labelledby="blog-title">
       <div class="section-heading">
-        <h2 id="projects-title">Projects</h2>
-        <p>Hands-on builds that fuse radio, hardware, and offensive automation into practical operator tooling.</p>
+        <h2 id="blog-title">Blog Dispatches</h2>
+        <p>Field write-ups that walk through the tooling, lessons, and tradecraft behind each build.</p>
       </div>
-      <div class="grid cards">
-        <article class="card">
-          <div class="card-media">
-            <img src="assets/img/homelab.jpg" alt="Server racks lit with violet accent lights representing a homelab cluster" loading="lazy" />
+      <div class="blog-carousel" data-blog-carousel data-post-source="assets/data/posts.json">
+        <button class="carousel-nav is-prev" type="button" aria-label="Previous post" data-carousel-prev>
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+        <div class="carousel-window">
+          <div class="carousel-track" data-carousel-track>
+            <article class="blog-card" data-slug="cyber-range-homelab" data-title="Building a Cyber Range Homelab" data-date="2025-02-10" data-read="8 min" data-summary="How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.">
+              <a class="blog-card-link" href="posts/cyber-range-homelab.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/homelab.jpg" alt="Server racks lit with violet accent lights representing a homelab cluster" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-02-10">Feb 10, 2025</time>
+                    <span>8 min read</span>
+                  </div>
+                  <h3>Building a Cyber Range Homelab</h3>
+                  <p>How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>Proxmox</li>
+                    <li>Cisco</li>
+                    <li>OffSec</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+            <article class="blog-card" data-slug="3d-printed-satellite-antenna" data-title="Printing a Satellite Antenna for NOAA & GOES" data-date="2025-01-18" data-read="6 min" data-summary="Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.">
+              <a class="blog-card-link" href="posts/3d-printed-satellite-antenna.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/antenna.jpg" alt="Hand-built helical antenna pointed at the sky for satellite downlink" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-01-18">Jan 18, 2025</time>
+                    <span>6 min read</span>
+                  </div>
+                  <h3>Printing a Satellite Antenna for NOAA &amp; GOES</h3>
+                  <p>Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>SDR</li>
+                    <li>RF</li>
+                    <li>Python</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+            <article class="blog-card" data-slug="melody-match" data-title="Melody Match: Pairing Biometrics with Music Therapy" data-date="2024-12-03" data-read="7 min" data-summary="An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.">
+              <a class="blog-card-link" href="posts/melody-match.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2024-12-03">Dec 3, 2024</time>
+                    <span>7 min read</span>
+                  </div>
+                  <h3>Melody Match: Pairing Biometrics with Music Therapy</h3>
+                  <p>An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>Swift</li>
+                    <li>ESP8266</li>
+                    <li>ML</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
           </div>
-          <div class="card-body">
-            <h3>Cyber Range HomeLab</h3>
-            <p>Proxmox-based range with Cisco routing and refurbished enterprise nodes. Spins up vulnerable Windows enclaves for malware triage, exploit testing, and red-team drills in a segmented LAN.</p>
-            <ul class="tag-list">
-              <li>Proxmox</li>
-              <li>Cisco</li>
-              <li>OffSec</li>
-            </ul>
-          </div>
-        </article>
-        <article class="card">
-          <div class="card-media">
-            <img src="assets/img/antenna.jpg" alt="Hand-built helical antenna pointed at the sky for satellite downlink" loading="lazy" />
-          </div>
-          <div class="card-body">
-            <h3>3D Printed Satellite Antenna</h3>
-            <p>Custom CAD antennas capturing NOAA &amp; GOES downlink. Coupled SDR decoding with signal processing pipelines to demodulate L-band weather imagery for situational awareness intel.</p>
-            <ul class="tag-list">
-              <li>SDR</li>
-              <li>RF</li>
-              <li>Python</li>
-            </ul>
-          </div>
-        </article>
-        <article class="card">
-          <div class="card-media">
-            <img src="assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" loading="lazy" />
-          </div>
-          <div class="card-body">
-            <h3>Melody Match</h3>
-            <p>IoT health telemetry app pairing ESP8266 heartbeat data with on-device ML to predict stress and auto-curate music therapy cues inside a Swift-powered companion application.</p>
-            <ul class="tag-list">
-              <li>Swift</li>
-              <li>ESP8266</li>
-              <li>ML</li>
-            </ul>
-          </div>
-        </article>
+        </div>
+        <button class="carousel-nav is-next" type="button" aria-label="Next post" data-carousel-next>
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+        <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
       </div>
+      <div class="carousel-status" data-carousel-status role="status" aria-live="polite"></div>
     </section>
 
     <section id="github" class="section" aria-labelledby="github-title">

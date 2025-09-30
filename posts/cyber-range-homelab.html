@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Walkthrough of the Proxmox-powered cyber range homelab used for malware triage, exploit testing, and reporting practice." />
+  <title>Building a Cyber Range Homelab | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#blog" class="is-active">Blog</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">Building a Cyber Range Homelab</h1>
+        <div class="post-meta">
+          <time datetime="2025-02-10">February 10, 2025</time>
+          <span>8 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">Proxmox</span>
+            <span class="post-tag">Cisco</span>
+            <span class="post-tag">Red Team</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/homelab.jpg" alt="Server racks lit with violet accent lights representing a homelab cluster" />
+        <figcaption>Two recycled rackmount nodes, a pfSense gateway, and a Cisco 3750 core switch keep the range isolated from the rest of the network.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p>The homelab started as a bare Proxmox host and grew into a miniature cyber range where I rehearse breach playbooks, sharpen reporting muscle, and practice malware triage in a safe vacuum. This post breaks down the architecture, deployment scripts, and the safety guards that let me fail loudly without taking my home network with me.</p>
+
+        <h2>Range Layout &amp; Segmentation</h2>
+        <p>Three VLANs keep traffic scoped: <code>mgmt</code> for hypervisor access, <code>targets</code> for intentionally vulnerable Windows enclaves, and <code>ops</code> for Kali/Ubuntu attack boxes. A pfSense VM sits between the Cisco 3750 core and the virtual bridges to enforce strict egress rules.</p>
+
+        <div class="content-card">
+          <h3>Why Proxmox?</h3>
+          <p>Live migration, snapshot APIs, and Terraform support keep the lab reproducible. When an exercise is done, everything tears down and returns to a clean base snapshot.</p>
+        </div>
+
+        <h2>Automating Lab Deployments</h2>
+        <p>I version-control all lab scenarios inside a Git repository. From there, a single playbook spins up the entire exercise, wires the VLANs, and loads seed data. The combination of Terraform + Ansible keeps the system declarative and fast to iterate on.</p>
+
+        <pre><code class="language-bash">#!/usr/bin/env bash
+set -euo pipefail
+
+SCENARIO=${1:-ad-breakout}
+
+terraform -chdir=infra init
+terraform -chdir=infra apply -auto-approve -var "scenario=${SCENARIO}"
+
+ansible-playbook -i inventory/${SCENARIO}.ini playbooks/bootstrap.yml
+ansible-playbook -i inventory/${SCENARIO}.ini playbooks/load-malware.yml</code></pre>
+
+        <div class="callout callout--info" data-label="Heads up">
+          <p>Snapshots double as a safety net. Every destructive test creates an <code>auto-preflight</code> snapshot, so a single script can rewind the affected VMs to their known-good state.</p>
+        </div>
+
+        <h2>Isolating Offensive Tooling</h2>
+        <p>Every attack VM routes through a transparent proxy that captures outbound traffic. If a payload tries to beacon somewhere unexpected, the proxy halts the request and writes the payload to disk for later analysis.</p>
+
+        <div class="post-gallery">
+          <figure>
+            <img src="../assets/img/placeholder-card.svg" alt="Stylised dashboard illustration" />
+            <figcaption>Grafana keeps live tabs on CPU pressure and lab bandwidth before, during, and after testing.</figcaption>
+          </figure>
+          <figure>
+            <img src="../assets/img/homelab.jpg" alt="Proxmox UI with multiple running VMs" />
+            <figcaption>Each scenario lives in its own resource pool to make cleanup a one-click affair.</figcaption>
+          </figure>
+        </div>
+
+        <div class="callout callout--warning" data-label="Operational risk">
+          <p>If you reuse tools from prior engagements, scrub C2 listeners and encryption keys before placing them in the lab. A sloppy cleanup can leak live infrastructure into test ranges.</p>
+        </div>
+
+        <h2>Reporting &amp; Post-Exercise Hygiene</h2>
+        <p>After each run-through, I export PCAPs, shell transcripts, and screenshots into a notebook template. The lab includes a <code>reporting</code> VM with Joplin + Obsidian so I can build a draft report while the details are fresh.</p>
+
+        <blockquote>
+          Discipline with reporting in the lab makes client work less stressful—by the time you face a real target, the workflow already lives in muscle memory.
+        </blockquote>
+
+        <p>Next steps include folding in Elastic for blue-team visibility and experimenting with PurpleSharp to run automated detection drills.</p>
+      </div>
+
+      <footer class="post-footer">
+        <p>Want the Terraform + Ansible scaffolding? I keep a sanitized starter kit on GitHub that mirrors the structure shown here.</p>
+        <a class="button ghost" href="../index.html#blog">Back to Blog Dispatches</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

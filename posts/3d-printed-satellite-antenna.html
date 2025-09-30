@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Step-by-step notes on the 3D printed helical antenna and SDR pipeline used to capture NOAA and GOES downlinks." />
+  <title>Printing a Satellite Antenna for NOAA &amp; GOES | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#blog" class="is-active">Blog</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">Printing a Satellite Antenna for NOAA &amp; GOES</h1>
+        <div class="post-meta">
+          <time datetime="2025-01-18">January 18, 2025</time>
+          <span>6 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">SDR</span>
+            <span class="post-tag">RF</span>
+            <span class="post-tag">Python</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/antenna.jpg" alt="Hand-built helical antenna pointed at the sky for satellite downlink" />
+        <figcaption>The final antenna build mounted on a tracking tripod, tuned for 137.1 MHz to target NOAA-18 passes.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p>This antenna started as a paper napkin sketch, a spool of PETG, and a cheap RTL-SDR v4 dongle. My goal was a travel-ready rig that could backpack into remote sites yet still capture weather imagery clean enough to plot storm movement in real time.</p>
+
+        <h2>Designing the Helical</h2>
+        <p>I modelled the boom, supports, and reflector in Fusion 360, then exported each part for slicing. The reflector sits 0.25λ behind the first turn to keep axial ratio tight, while brass inserts hold the copper wire in place without deforming under heat.</p>
+
+        <div class="content-card">
+          <h3>Bill of Materials</h3>
+          <ul>
+            <li>1× RTL-SDR Blog V4</li>
+            <li>5m enamelled copper wire</li>
+            <li>M2 brass heat-set inserts</li>
+            <li>2mm PETG sheets for the ground plane</li>
+          </ul>
+        </div>
+
+        <h2>First-Light Decoding</h2>
+        <p>GNU Radio handles the demodulation chain and pipes the audio into <code>wxtoimg</code>. The block diagram below is simple but robust enough to survive noisy captures.</p>
+
+        <pre><code class="language-python">from gnuradio import blocks, filter, analog, gr
+from satnogs.helpers import doppler_shift
+
+samp_rate = 2_400_000
+freq = 137_912_500
+
+top_block = gr.top_block()
+source = blocks.file_source(gr.sizeof_gr_complex, "capture_2025-01-18.cfile")
+lo = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, doppler_shift(freq), 1.0)
+mixer = blocks.multiply_cc()
+channel = filter.freq_xlating_fir_filter_ccc(5, filter.firdes.low_pass(1, samp_rate, 34e3, 12e3), 0, samp_rate)
+
+top_block.connect(source, (mixer, 0))
+top_block.connect(lo, (mixer, 1))
+top_block.connect(mixer, channel)
+top_block.connect(channel, blocks.wavfile_sink("noaa-18.wav", 1, int(samp_rate / 5)))
+top_block.run()</code></pre>
+
+        <div class="callout callout--info" data-label="Tip">
+          <p>Save the intermediate complex samples. When NOAA or GOES pushes new telemetry formats, you can re-run the captures through updated demodulators without waiting for the next pass.</p>
+        </div>
+
+        <h2>Cleaning the Imagery</h2>
+        <p>The last step is a Python notebook that stitches the APT channel data into full-resolution PNGs. Histogram equalisation plus a simple coastline overlay makes the frames shareable.</p>
+
+        <figure>
+          <img src="../assets/img/placeholder-card.svg" alt="Stylised satellite imagery placeholder" />
+          <figcaption>A sample output frame with coastlines and state outlines burned into the composite.</figcaption>
+        </figure>
+
+        <div class="callout callout--warning" data-label="Noise budget">
+          <p>Handheld rigs hate urban RF noise. If your downlinks look like grey mush, bring a 10dB LNA and move the entire setup at least one block away from power lines.</p>
+        </div>
+
+        <h2>What&apos;s Next</h2>
+        <p>Next revs include an auto-rotor, TDR-based tuning script, and packaging the demod pipeline into a Docker image so I can process imagery on a fanless mini PC in the field.</p>
+      </div>
+
+      <footer class="post-footer">
+        <p>Curious about the Fusion 360 files or GNU Radio companion flowgraph? Ping me and I&apos;ll share the STL + grc bundle.</p>
+        <a class="button ghost" href="../index.html#blog">Back to Blog Dispatches</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
