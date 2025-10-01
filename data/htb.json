@@ -2,11 +2,11 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 6
+      "value": 32
     },
     {
       "label": "Hard",
-      "value": 3
+      "value": 4
     },
     {
       "label": "Insane",
@@ -14,26 +14,26 @@
     },
     {
       "label": "Medium",
-      "value": 4
+      "value": 9
     }
   ],
   "boxes": [
     {
-      "name": "Artificial",
+      "name": "Expressway",
       "difficulty": "Easy",
-      "date": "2025-06-21T19:00:00.000000Z",
+      "date": "2025-09-20T19:00:00.000000Z",
       "summary": "Linux"
     },
     {
-      "name": "Certificate",
-      "difficulty": "Hard",
-      "date": "2025-05-31T19:00:00.000000Z",
-      "summary": "Windows"
+      "name": "Soulmate",
+      "difficulty": "Easy",
+      "date": "2025-09-06T19:00:00.000000Z",
+      "summary": "Linux"
     },
     {
-      "name": "Cobblestone",
-      "difficulty": "Insane",
-      "date": "2025-08-09T19:00:00.000000Z",
+      "name": "Previous",
+      "difficulty": "Medium",
+      "date": "2025-08-23T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
