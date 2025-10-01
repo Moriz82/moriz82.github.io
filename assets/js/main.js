@@ -173,145 +173,86 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const githubGrid = document.querySelector('[data-github-grid]');
-  const githubStatus = document.querySelector('[data-github-status]');
+    const githubGrid = document.querySelector('[data-github-grid]');
+    const githubStatus = document.querySelector('[data-github-status]');
 
-  async function loadGitHubRepos() {
-    if (!githubGrid) {
-      if (githubStatus) githubStatus.textContent = 'GitHub section disabled.';
-      return;
-    }
-
-    const username = githubGrid.getAttribute('data-github-user') || 'moriz82';
-    const pinnedEndpoint = `https://gh-pinned-repos.egoist.dev/?username=${username}`;
-
-    const renderRepos = (repos, sourceLabel) => {
-      const fragment = document.createDocumentFragment();
-      repos.forEach((repo) => {
-        const card = document.createElement('article');
-        card.className = 'repo-card';
-
-        const title = document.createElement('h3');
-        const link = document.createElement('a');
-        link.href = repo.url;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.textContent = repo.name;
-        title.append(link);
-        card.append(title);
-
-        const description = document.createElement('p');
-        description.className = 'repo-description';
-        description.textContent = repo.description || 'No description provided.';
-        card.append(description);
-
-        const meta = document.createElement('div');
-        meta.className = 'repo-meta';
-
-        const stars = document.createElement('span');
-        stars.innerHTML = `
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21Z"></path></svg>
-          ${repo.stars}`.trim();
-        meta.append(stars);
-
-        if (repo.language) {
-          const language = document.createElement('span');
-          language.textContent = repo.language;
-          meta.append(language);
+    async function loadGitHubRepos() {
+        if (!githubGrid) {
+            if (githubStatus) githubStatus.textContent = 'GitHub section disabled.';
+            return;
         }
 
-        if (repo.updated) {
-          const updated = document.createElement('span');
-          updated.textContent = repo.updated;
-          meta.append(updated);
+        const username = githubGrid.getAttribute('data-github-user') || 'moriz82';
+        const pinnedEndpoint = `https://pinned.berrysauce.dev/get/${username}`;
+
+        const renderRepos = (repos, sourceLabel) => {
+            const fragment = document.createDocumentFragment();
+            repos.forEach((repo) => {
+                const card = document.createElement('article');
+                card.className = 'repo-card';
+
+                const title = document.createElement('h3');
+                const link = document.createElement('a');
+                link.href = `https://github.com/${repo.author}/${repo.name}`;
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.textContent = repo.name;
+                title.append(link);
+                card.append(title);
+
+                const description = document.createElement('p');
+                description.className = 'repo-description';
+                description.textContent = repo.description || 'No description provided.';
+                card.append(description);
+
+                const meta = document.createElement('div');
+                meta.className = 'repo-meta';
+
+                const stars = document.createElement('span');
+                stars.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 
+          9.19 8.62 2 9.24l5.46 4.73L5.82 21Z"></path>
+        </svg>
+        ${repo.stars || 0}`.trim();
+                meta.append(stars);
+
+                if (repo.language) {
+                    const language = document.createElement('span');
+                    language.textContent = repo.language;
+                    meta.append(language);
+                }
+
+                card.append(meta);
+                fragment.append(card);
+            });
+
+            githubGrid.innerHTML = '';
+            githubGrid.append(fragment);
+            if (githubStatus) githubStatus.textContent = sourceLabel;
+        };
+
+        try {
+            const response = await fetch(pinnedEndpoint, { headers: { Accept: 'application/json' } });
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data) && data.length) {
+                    renderRepos(data, 'Pinned repositories pulled from berrysauce.dev');
+                    return;
+                }
+            }
+            if (githubStatus) githubStatus.textContent = 'No pinned repositories found.';
+        } catch (err) {
+            console.warn('Pinned repo service unavailable.', err);
+            if (githubStatus) githubStatus.textContent = 'Unable to fetch pinned repos right now.';
         }
-
-        card.append(meta);
-        fragment.append(card);
-      });
-
-      githubGrid.innerHTML = '';
-      githubGrid.append(fragment);
-      if (githubStatus) githubStatus.textContent = sourceLabel;
-    };
-
-    try {
-      const pinnedResponse = await fetch(pinnedEndpoint, { headers: { Accept: 'application/json' } });
-      if (pinnedResponse.ok) {
-        const pinnedData = await pinnedResponse.json();
-        if (Array.isArray(pinnedData) && pinnedData.length) {
-          const repos = pinnedData.slice(0, 6).map((repo) => {
-            const updatedRaw = repo.pushed_at || repo.updated_at || repo.last_updated;
-            return {
-              name: repo.repo,
-              description: repo.description,
-              url: repo.link,
-              language: repo.language,
-              stars: repo.stars || 0,
-              updated: updatedRaw
-                ? `Updated ${new Date(updatedRaw).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}`
-                : null
-            };
-          });
-          renderRepos(repos, 'Pinned repositories pulled from GitHub.');
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('Pinned repo service unavailable, falling back to API.', err);
     }
 
-    const controller = new AbortController();
-    const fetchTimeout = setTimeout(() => controller.abort(), 8000);
+    loadGitHubRepos();
 
-    try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`, {
-        headers: {
-          Accept: 'application/vnd.github+json',
-          'User-Agent': 'moriz82-portfolio'
-        },
-        signal: controller.signal
-      });
-      clearTimeout(fetchTimeout);
-      if (!response.ok) {
-        throw new Error(`GitHub API responded with ${response.status}`);
-      }
-      const repos = await response.json();
-      const filtered = (Array.isArray(repos) ? repos : []).filter((repo) => !repo.fork && !repo.archived);
 
-      if (!filtered.length) {
-        if (githubStatus) githubStatus.textContent = 'No public repositories to display yet.';
-        return;
-      }
 
-      const ranked = filtered
-        .map((repo) => ({
-          name: repo.name,
-          description: repo.description,
-          url: repo.html_url,
-          language: repo.language,
-          stars: repo.stargazers_count || 0,
-          updated: repo.pushed_at
-            ? `Updated ${new Date(repo.pushed_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}`
-            : null,
-          score: repo.stargazers_count * 2 + repo.forks_count + repo.watchers_count
-        }))
-        .sort((a, b) => (b.score || 0) - (a.score || 0))
-        .slice(0, 6);
-
-      renderRepos(ranked, 'Top repositories pulled directly from GitHub.');
-    } catch (error) {
-      clearTimeout(fetchTimeout);
-      console.error('Failed to load GitHub repos', error);
-      if (githubStatus) {
-        githubStatus.textContent = 'Unable to reach GitHub right now. Try again later or head to github.com/moriz82.';
-      }
-    }
-  }
-
-  loadGitHubRepos();
-
-  const blogCarouselEl = document.querySelector('[data-blog-carousel]');
+    const blogCarouselEl = document.querySelector('[data-blog-carousel]');
   if (blogCarouselEl) {
     const track = blogCarouselEl.querySelector('[data-carousel-track]');
     const prevBtn = blogCarouselEl.querySelector('[data-carousel-prev]');
