@@ -34,33 +34,41 @@ jobs:
             done
           }
 
+          # --- 1) Counts: active + retired combined ---
           active_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/paginated")
           retired_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")
 
           all_machines=$(printf '%s\n%s\n' "$active_json" "$retired_json" |
             jq -s 'map(.data // .message // []) | add | unique_by(.id)')
 
-          owned=$(echo "$all_machines" |
+          owned_counts=$(echo "$all_machines" |
             jq 'map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
 
-          mkdir -p data
-          touch data/htb.json
+          difficulties=$(echo "$owned_counts" | jq '
+            group_by(.difficultyText)
+            | map({label: (.[0].difficultyText // "Unknown"), value: length})
+            | sort_by(.label)
+          ')
 
-          echo "$owned" | jq '
-            {
-              difficulties:
-                ( group_by(.difficultyText)
-                  | map({label: (.[0].difficultyText // "Unknown"), value: length})
-                  | sort_by(.label)
-                ),
-              boxes:
-                ( sort_by(.authUserOwnsDate // .release) | reverse
-                  | map({ name: .name, difficulty: .difficultyText, date: (.authUserOwnsDate // .release), summary: .os })
-                  | unique_by(.name)
-                  | .[0:3]
-                )
-            }
-          ' > data/htb.json
+          # --- 2) Recent Boxes: only from active list ---
+          owned_active=$(echo "$active_json" |
+            jq -s 'map(.data // .message // []) | add
+                   | map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
+
+          boxes=$(echo "$owned_active" | jq '
+            sort_by(.release) | reverse
+            | map({ name: .name,
+                    difficulty: .difficultyText,
+                    date: .release,
+                    summary: .os })
+            | unique_by(.name)
+            | .[0:3]
+          ')
+
+          # --- Merge into final JSON ---
+          mkdir -p data
+          jq -n --argjson d "$difficulties" --argjson b "$boxes" \
+            '{difficulties: $d, boxes: $b}' > data/htb.json
 
       - name: Commit updated JSON
         run: |
