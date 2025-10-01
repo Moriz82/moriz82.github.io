@@ -771,7 +771,7 @@ main {
 
 .timeline-tab--hardware,
 .timeline-tab--hardware-red-team {
-  background: linear-gradient(135deg, #ff7eb3, #ff4f81);
+  background: linear-gradient(135deg, #d73535, #960707);
 }
 
 .timeline-tab--ctf {
@@ -1254,8 +1254,8 @@ main {
 }
 
 .club-logo {
-  width: 60px;
-  height: 60px;
+  width: 160px;
+  height: 80px;
   border-radius: 16px;
   background: rgba(141, 76, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.18);
