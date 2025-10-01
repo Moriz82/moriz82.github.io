@@ -2,11 +2,11 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 32
+      "value": 6
     },
     {
       "label": "Hard",
-      "value": 4
+      "value": 3
     },
     {
       "label": "Insane",
@@ -14,7 +14,7 @@
     },
     {
       "label": "Medium",
-      "value": 9
+      "value": 4
     }
   ],
   "boxes": [
