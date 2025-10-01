@@ -8,6 +8,8 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write 
 
     steps:
       - name: Checkout repo
@@ -62,8 +64,8 @@ jobs:
 
       - name: Commit updated JSON
         run: |
-          git config user.name "htb-bot"
-          git config user.email "htb-bot@example.com"
+          git config user.name "moriz82"
+          git config user.email "moriz82t@example.com"
           git add data/htb.json
           git commit -m "chore: update HTB stats" || echo "No changes to commit"
           git push
