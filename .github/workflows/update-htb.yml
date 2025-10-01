@@ -3,7 +3,7 @@ name: Update HTB Stats
 on:
   workflow_dispatch:   # lets you run manually from the Actions tab
   schedule:
-    - cron: "0 */12 * * *"  # optional: run every 12h
+    - cron: "0 */12 * * *"  # run every 12h
 
 jobs:
   update:
@@ -30,25 +30,31 @@ jobs:
           # helper: fetch ALL pages for a given paginated endpoint, return ONE JSON array of machine objects
           fetch_pages_to_array () {
             local url="$1"
-            local pages="[]"
+            local tmpfile
+            tmpfile="$(mktemp)"
+            echo "[]" > "$tmpfile"
+
             while [[ -n "$url" ]]; do
               j="$(curl -sS -H "$auth" -H "$acc" "$url")"
-              # accumulate page responses
-              pages="$(jq -n --argjson acc "$pages" --argjson page "$j" '$acc + [ $page ]')"
+              # accumulate
+              jq -n --argjson acc "$(cat "$tmpfile")" --argjson page "$j" '$acc + [$page]' > "$tmpfile.new"
+              mv "$tmpfile.new" "$tmpfile"
               url="$(echo "$j" | jq -r '.links.next // empty')"
             done
+
             # flatten to just the machine objects (supports .data and .message shapes)
-            echo "$pages" | jq 'map(.data // .message // []) | add'
+            jq 'map(.data // .message // []) | add' "$tmpfile"
+            rm -f "$tmpfile"
           }
 
           # --- (A) COUNTS: active + retired, combined ---
           active_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/paginated")"
           retired_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")"
 
-          all_unique="$(
-            jq -n --argjson a "$active_list" --argjson r "$retired_list" '
-              ($a + $r) | unique_by(.id)
-            '
+          all_unique="$(jq -n \
+            --slurpfile a <(echo "$active_list") \
+            --slurpfile r <(echo "$retired_list") \
+            '($a[0] + $r[0]) | unique_by(.id)'
           )"
 
           owned_counts="$(echo "$all_unique" | jq '
@@ -64,10 +70,9 @@ jobs:
           # --- (B) RECENT BOXES: separate fetch (ACTIVE ONLY), sorted by OWN date (fallback release) ---
           owned_active="$(echo "$active_list" | jq '
             map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
-          ')'
+          ')"
 
           boxes="$(echo "$owned_active" | jq '
-            # prefer the actual own timestamp if present; otherwise fallback to release
             map({
               name: .name,
               difficulty: .difficultyText,
@@ -87,7 +92,7 @@ jobs:
       - name: Commit updated JSON
         run: |
           git config user.name "moriz82"
-          git config user.email "moriz82t@example.com"
+          git config user.email "moriz82@example.com"
           git add data/htb.json
           git commit -m "action: update HTB stats" || echo "No changes to commit"
           git push
