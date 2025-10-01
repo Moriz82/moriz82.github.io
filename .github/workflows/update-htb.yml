@@ -22,50 +22,64 @@ jobs:
         env:
           HTB_APPKEY: ${{ secrets.HTB_APPKEY }}
         run: |
+          set -euo pipefail
+
           auth="Authorization: Bearer ${HTB_APPKEY}"
           acc="Accept: application/json"
 
-          fetch_all_pages () {
+          # helper: fetch ALL pages for a given paginated endpoint, return ONE JSON array of machine objects
+          fetch_pages_to_array () {
             local url="$1"
+            local pages="[]"
             while [[ -n "$url" ]]; do
               j="$(curl -sS -H "$auth" -H "$acc" "$url")"
-              echo "$j"
+              # accumulate page responses
+              pages="$(jq -n --argjson acc "$pages" --argjson page "$j" '$acc + [ $page ]')"
               url="$(echo "$j" | jq -r '.links.next // empty')"
             done
+            # flatten to just the machine objects (supports .data and .message shapes)
+            echo "$pages" | jq 'map(.data // .message // []) | add'
           }
 
-          # --- 1) Counts: active + retired combined ---
-          active_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/paginated")
-          retired_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")
+          # --- (A) COUNTS: active + retired, combined ---
+          active_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/paginated")"
+          retired_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")"
 
-          all_machines=$(printf '%s\n%s\n' "$active_json" "$retired_json" |
-            jq -s 'map(.data // .message // []) | add | unique_by(.id)')
+          all_unique="$(
+            jq -n --argjson a "$active_list" --argjson r "$retired_list" '
+              ($a + $r) | unique_by(.id)
+            '
+          )"
 
-          owned_counts=$(echo "$all_machines" |
-            jq 'map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
+          owned_counts="$(echo "$all_unique" | jq '
+            map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
+          ')"
 
-          difficulties=$(echo "$owned_counts" | jq '
+          difficulties="$(echo "$owned_counts" | jq '
             group_by(.difficultyText)
             | map({label: (.[0].difficultyText // "Unknown"), value: length})
             | sort_by(.label)
-          ')
+          ')"
 
-          # --- 2) Recent Boxes: only from active list ---
-          owned_active=$(echo "$active_json" |
-            jq -s 'map(.data // .message // []) | add
-                   | map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
+          # --- (B) RECENT BOXES: separate fetch (ACTIVE ONLY), sorted by OWN date (fallback release) ---
+          owned_active="$(echo "$active_list" | jq '
+            map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
+          ')'
 
-          boxes=$(echo "$owned_active" | jq '
-            sort_by(.release) | reverse
-            | map({ name: .name,
-                    difficulty: .difficultyText,
-                    date: .release,
-                    summary: .os })
+          boxes="$(echo "$owned_active" | jq '
+            # prefer the actual own timestamp if present; otherwise fallback to release
+            map({
+              name: .name,
+              difficulty: .difficultyText,
+              date: (.authUserOwnsDate // .release // ""),
+              summary: (.os // "")
+            })
+            | sort_by(.date) | reverse
             | unique_by(.name)
             | .[0:3]
-          ')
+          ')"
 
-          # --- Merge into final JSON ---
+          # --- Write final JSON used by your site ---
           mkdir -p data
           jq -n --argjson d "$difficulties" --argjson b "$boxes" \
             '{difficulties: $d, boxes: $b}' > data/htb.json
