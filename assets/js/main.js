@@ -551,167 +551,145 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
   }
 
-  const pieEl = document.querySelector('[data-htb-pie]');
-  const legendEl = document.querySelector('[data-htb-legend]');
-  const timelineEl = document.querySelector('[data-htb-timeline]');
+    // --- HackTheBox static JSON loader ---
+    const pieEl = document.querySelector('[data-htb-pie]');
+    const legendEl = document.querySelector('[data-htb-legend]');
+    const timelineEl = document.querySelector('[data-htb-timeline]');
 
-  const difficultyColors = {
-    veryeasy: '#4ac1ff',
-    easy: '#3ddc84',
-    medium: '#f7b733',
-    hard: '#ef5350',
-    insane: '#8d4cff',
-    guru: '#ff6bd6'
-  };
-
-  const fallbackHTBData = {
-    difficulties: [
-      { label: 'Easy', value: 18, color: difficultyColors.easy },
-      { label: 'Medium', value: 9, color: difficultyColors.medium },
-      { label: 'Hard', value: 4, color: difficultyColors.hard },
-      { label: 'Insane', value: 1, color: difficultyColors.insane }
-    ],
-    boxes: [
-      { name: 'Synced', difficulty: 'Medium', date: 'Mar 2025', summary: 'Pivoted through misconfig APIs to land RCE and escalate via custom DLL payload.' },
-      { name: 'Hawk', difficulty: 'Hard', date: 'Feb 2025', summary: 'Abused AD CS mis-issuance and crafted custom Kerberos tickets to seize domain control.' },
-      { name: 'MonitorsTwo', difficulty: 'Easy', date: 'Jan 2025', summary: 'Chained SSTI to local privesc with service binary hijack; documented detection notes.' }
-    ],
-  };
-
-  const normaliseLabel = (value) => {
-    if (!value) return '';
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  };
-
-  const normaliseDifficulty = (label, value, color) => ({
-    label: normaliseLabel(label),
-    value: Number(value) || 0,
-    color: color || difficultyColors[label?.toLowerCase?.()] || '#8d4cff'
-  });
-
-  const normaliseBoxes = (boxes = []) =>
-    boxes
-      .map((box) => ({
-        name: box.name || box.title || 'Unknown Box',
-        difficulty: normaliseLabel(box.difficulty || box.level || ''),
-        date: box.date || box.completed_at || box.solved_at || box.firstBloodDate || '',
-        summary: box.summary || box.notes || box.description || 'No summary provided.'
-      }))
-      .filter((box) => box.name && box.summary);
-
-  const normaliseDifficulties = (input) => {
-    if (!input) return [];
-    if (Array.isArray(input)) {
-      return input
-        .map((item) => normaliseDifficulty(item.label || item.name, item.value ?? item.count ?? item.total, item.color))
-        .filter((item) => item.value > 0);
-    }
-    if (typeof input === 'object') {
-      return Object.entries(input)
-        .map(([key, value]) => normaliseDifficulty(key, value))
-        .filter((item) => item.value > 0);
-    }
-    return [];
-  };
-
-  const normaliseHTBData = (raw) => {
-    if (!raw) return null;
-    const difficultiesSource = raw.difficulties || raw.machine_difficulties || raw.machines?.difficulties || raw.stats?.machines?.difficulties;
-    const boxesSource = raw.boxes || raw.recentBoxes || raw.machines?.recent || raw.stats?.machines?.recent;
-
-    const difficulties = normaliseDifficulties(difficultiesSource);
-    const boxes = normaliseBoxes(boxesSource);
-
-    if (!difficulties.length && !boxes.length) return null;
-    return {
-      difficulties: difficulties.length ? difficulties : fallbackHTBData.difficulties,
-      boxes: boxes.length ? boxes : fallbackHTBData.boxes
+    const difficultyColors = {
+        veryeasy: '#4ac1ff',
+        easy: '#3ddc84',
+        medium: '#f7b733',
+        hard: '#ef5350',
+        insane: '#8d4cff',
+        guru: '#ff6bd6'
     };
-  };
 
-  const fetchCustomHTBStats = async () => {
-    const url = localStorage.getItem('htbStatsUrl');
-    if (!url) return null;
-    const headers = {};
-    const token = localStorage.getItem('htbStatsToken');
-    if (token) headers.Authorization = token;
-    try {
-      const response = await fetch(url, { headers });
-      if (!response.ok) throw new Error(`HTB stats request failed with ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.warn('HTB stats fetch failed', error);
-      return null;
-    }
-  };
+    const fallbackHTBData = {
+        difficulties: [
+            { label: 'Easy', value: 18, color: difficultyColors.easy },
+            { label: 'Medium', value: 9, color: difficultyColors.medium },
+            { label: 'Hard', value: 4, color: difficultyColors.hard },
+            { label: 'Insane', value: 1, color: difficultyColors.insane }
+        ],
+        boxes: [
+            { name: 'Synced', difficulty: 'Medium', date: 'Mar 2025', summary: 'Pivoted through misconfig APIs to land RCE and escalate via custom DLL payload.' },
+            { name: 'Hawk', difficulty: 'Hard', date: 'Feb 2025', summary: 'Abused AD CS mis-issuance and crafted custom Kerberos tickets to seize domain control.' },
+            { name: 'MonitorsTwo', difficulty: 'Easy', date: 'Jan 2025', summary: 'Chained SSTI to local privesc with service binary hijack; documented detection notes.' }
+        ],
+    };
 
-  const renderHTBData = (dataset) => {
-    if (!dataset) return;
-    const { difficulties = [], boxes = [] } = dataset;
+    const normaliseLabel = (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
 
-    if (pieEl && difficulties.length) {
-      const total = difficulties.reduce((sum, item) => sum + item.value, 0);
-      if (total > 0) {
-        let cumulative = 0;
-        const segments = difficulties.map((item) => {
-          const start = (cumulative / total) * 100;
-          cumulative += item.value;
-          const end = (cumulative / total) * 100;
-          return `${item.color} ${start}% ${end}%`;
-        });
-        pieEl.style.setProperty('--pie-gradient', `conic-gradient(${segments.join(', ')})`);
-      }
+    const normaliseDifficulty = (label, value, color) => ({
+        label: normaliseLabel(label),
+        value: Number(value) || 0,
+        color: color || difficultyColors[label?.toLowerCase?.()] || '#8d4cff'
+    });
 
-      if (legendEl) {
-        legendEl.innerHTML = '';
-        difficulties.forEach((item) => {
-          const li = document.createElement('li');
-          const swatch = document.createElement('span');
-          swatch.style.background = item.color;
-          li.append(swatch, document.createTextNode(`${item.label} · ${item.value}`));
-          legendEl.append(li);
-        });
-      }
-    }
+    const normaliseBoxes = (boxes = []) =>
+        boxes.map((box) => ({
+            name: box.name || box.title || 'Unknown Box',
+            difficulty: normaliseLabel(box.difficulty || box.level || ''),
+            date: box.date || '',
+            summary: box.summary || 'No summary provided.'
+        })).filter((box) => box.name && box.summary);
 
-    if (timelineEl) {
-      timelineEl.innerHTML = '';
-      (boxes.length ? boxes.slice(0, 3) : fallbackHTBData.boxes).forEach((box) => {
-        const item = document.createElement('div');
-        item.className = 'htb-timeline-item';
+    const normaliseDifficulties = (input) =>
+        Array.isArray(input)
+            ? input.map((item) =>
+                normaliseDifficulty(item.label || item.name, item.value ?? item.count ?? item.total, item.color)
+            ).filter((item) => item.value > 0)
+            : [];
 
-        const heading = document.createElement('h4');
-        heading.textContent = box.name;
-        item.append(heading);
+    const normaliseHTBData = (raw) => {
+        if (!raw) return null;
+        const difficulties = normaliseDifficulties(raw.difficulties);
+        const boxes = normaliseBoxes(raw.boxes);
+        if (!difficulties.length && !boxes.length) return null;
+        return {
+            difficulties: difficulties.length ? difficulties : fallbackHTBData.difficulties,
+            boxes: boxes.length ? boxes : fallbackHTBData.boxes
+        };
+    };
 
-        if (box.date || box.difficulty) {
-          const meta = document.createElement('div');
-          meta.className = 'htb-meta';
-          const metaParts = [];
-          if (box.date) metaParts.push(box.date);
-          if (box.difficulty) metaParts.push(box.difficulty);
-          meta.textContent = metaParts.join(' · ');
-          item.append(meta);
+    const renderHTBData = (dataset) => {
+        if (!dataset) return;
+        const { difficulties = [], boxes = [] } = dataset;
+
+        // Pie chart
+        if (pieEl && difficulties.length) {
+            const total = difficulties.reduce((sum, item) => sum + item.value, 0);
+            if (total > 0) {
+                let cumulative = 0;
+                const segments = difficulties.map((item) => {
+                    const start = (cumulative / total) * 100;
+                    cumulative += item.value;
+                    const end = (cumulative / total) * 100;
+                    return `${item.color} ${start}% ${end}%`;
+                });
+                pieEl.style.setProperty('--pie-gradient', `conic-gradient(${segments.join(', ')})`);
+            }
+
+            if (legendEl) {
+                legendEl.innerHTML = '';
+                difficulties.forEach((item) => {
+                    const li = document.createElement('li');
+                    const swatch = document.createElement('span');
+                    swatch.style.background = item.color;
+                    li.append(swatch, document.createTextNode(`${item.label} · ${item.value}`));
+                    legendEl.append(li);
+                });
+            }
         }
 
-        if (box.summary) {
-          const summary = document.createElement('p');
-          summary.textContent = box.summary;
-          item.append(summary);
+        // Timeline
+        if (timelineEl) {
+            timelineEl.innerHTML = '';
+            (boxes.length ? boxes.slice(0, 3) : fallbackHTBData.boxes).forEach((box) => {
+                const item = document.createElement('div');
+                item.className = 'htb-timeline-item';
+
+                const heading = document.createElement('h4');
+                heading.textContent = box.name;
+                item.append(heading);
+
+                if (box.date || box.difficulty) {
+                    const meta = document.createElement('div');
+                    meta.className = 'htb-meta';
+                    const parts = [];
+                    if (box.date) parts.push(box.date);
+                    if (box.difficulty) parts.push(box.difficulty);
+                    meta.textContent = parts.join(' · ');
+                    item.append(meta);
+                }
+
+                if (box.summary) {
+                    const summary = document.createElement('p');
+                    summary.textContent = box.summary;
+                    item.append(summary);
+                }
+
+                timelineEl.append(item);
+            });
         }
+    };
 
-        timelineEl.append(item);
-      });
-    }
-  };
+// Load JSON written by GitHub Action
+    (async () => {
+        try {
+            const resp = await fetch('/data/htb.json', { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const raw = await resp.json();
+            renderHTBData(normaliseHTBData(raw) || fallbackHTBData);
+        } catch (err) {
+            console.warn('Failed to load HTB JSON, using fallback', err);
+            renderHTBData(fallbackHTBData);
+        }
+    })();
 
-  (async () => {
-    const remoteData = await fetchCustomHTBStats();
-    const normalised = normaliseHTBData(remoteData) || fallbackHTBData;
-    renderHTBData(normalised);
-  })();
 
-  const yearEl = document.getElementById('copyright-year');
+    const yearEl = document.getElementById('copyright-year');
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear();
   }
