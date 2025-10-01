@@ -67,5 +67,5 @@ jobs:
           git config user.name "moriz82"
           git config user.email "moriz82t@example.com"
           git add data/htb.json
-          git commit -m "chore: update HTB stats" || echo "No changes to commit"
+          git commit -m "action: update HTB stats" || echo "No changes to commit"
           git push
