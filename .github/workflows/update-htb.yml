@@ -1,0 +1,66 @@
+name: Update HTB Stats
+
+on:
+  workflow_dispatch:   # lets you run manually from the Actions tab
+  schedule:
+    - cron: "0 */12 * * *"  # optional: run every 12h
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up jq
+        run: sudo apt-get update && sudo apt-get install -y jq curl
+
+      - name: Fetch HTB stats
+        env:
+          HTB_APPKEY: ${{ secrets.HTB_APPKEY }}
+        run: |
+          auth="Authorization: Bearer ${HTB_APPKEY}"
+          acc="Accept: application/json"
+
+          fetch_all_pages () {
+            local url="$1"
+            while [[ -n "$url" ]]; do
+              j="$(curl -sS -H "$auth" -H "$acc" "$url")"
+              echo "$j"
+              url="$(echo "$j" | jq -r '.links.next // empty')"
+            done
+          }
+
+          active_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/paginated")
+          retired_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")
+
+          all_machines=$(printf '%s\n%s\n' "$active_json" "$retired_json" |
+            jq -s 'map(.data // .message // []) | add | unique_by(.id)')
+
+          owned=$(echo "$all_machines" |
+            jq 'map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
+
+          echo "$owned" | jq '
+            {
+              difficulties:
+                ( group_by(.difficultyText)
+                  | map({label: (.[0].difficultyText // "Unknown"), value: length})
+                  | sort_by(.label)
+                ),
+              boxes:
+                ( sort_by(.authUserOwnsDate // .release) | reverse
+                  | map({ name: .name, difficulty: .difficultyText, date: (.authUserOwnsDate // .release), summary: .os })
+                  | unique_by(.name)
+                  | .[0:3]
+                )
+            }
+          ' > data/htb.json
+
+      - name: Commit updated JSON
+        run: |
+          git config user.name "htb-bot"
+          git config user.email "htb-bot@example.com"
+          git add data/htb.json
+          git commit -m "chore: update HTB stats" || echo "No changes to commit"
+          git push
