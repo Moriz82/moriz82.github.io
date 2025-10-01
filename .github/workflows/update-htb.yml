@@ -41,6 +41,9 @@ jobs:
           owned=$(echo "$all_machines" |
             jq 'map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
 
+          mkdir -p data
+          touch data/htb.json
+
           echo "$owned" | jq '
             {
               difficulties:
