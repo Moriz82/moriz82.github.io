@@ -1,0 +1,40 @@
+{
+  "difficulties": [
+    {
+      "label": "Easy",
+      "value": 32
+    },
+    {
+      "label": "Hard",
+      "value": 4
+    },
+    {
+      "label": "Insane",
+      "value": 1
+    },
+    {
+      "label": "Medium",
+      "value": 9
+    }
+  ],
+  "boxes": [
+    {
+      "name": "Active",
+      "difficulty": "Easy",
+      "date": "2018-07-28T19:00:00.000000Z",
+      "summary": "Windows"
+    },
+    {
+      "name": "Administrator",
+      "difficulty": "Medium",
+      "date": "2024-11-09T19:00:00.000000Z",
+      "summary": "Windows"
+    },
+    {
+      "name": "Artificial",
+      "difficulty": "Easy",
+      "date": "2025-06-21T19:00:00.000000Z",
+      "summary": "Linux"
+    }
+  ]
+}
