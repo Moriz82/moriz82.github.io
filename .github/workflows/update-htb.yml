@@ -1,15 +1,15 @@
 name: Update HTB Stats
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # lets you run manually from the Actions tab
   schedule:
-    - cron: "0 */12 * * *"  # run every 12h
+    - cron: "0 */12 * * *"  # optional: run every 12h
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write 
 
     steps:
       - name: Checkout repo
@@ -22,73 +22,52 @@ jobs:
         env:
           HTB_APPKEY: ${{ secrets.HTB_APPKEY }}
         run: |
-          set -euo pipefail
-
           auth="Authorization: Bearer ${HTB_APPKEY}"
           acc="Accept: application/json"
 
-          # Fetch all pages and flatten into array of machines
-          fetch_pages_to_array () {
+          fetch_all_pages () {
             local url="$1"
-            local tmpfile
-            tmpfile="$(mktemp)"
-            echo "[]" > "$tmpfile"
-
             while [[ -n "$url" ]]; do
-              curl -sS -H "$auth" -H "$acc" "$url" \
-              | jq -s '.[0]' > "$tmpfile.page"
-
-              # append this page
-              jq -s '.[0] + [.[1]]' "$tmpfile" "$tmpfile.page" > "$tmpfile.new"
-              mv "$tmpfile.new" "$tmpfile"
-
-              url="$(jq -r '.links.next // empty' "$tmpfile.page")"
+              j="$(curl -sS -H "$auth" -H "$acc" "$url")"
+              echo "$j"
+              url="$(echo "$j" | jq -r '.links.next // empty')"
             done
-
-            # flatten to just the machine objects
-            jq 'map(.data // .message // []) | add' "$tmpfile"
-            rm -f "$tmpfile" "$tmpfile.page"
           }
 
-          # --- (A) COUNTS ---
-          active_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/paginated")"
-          retired_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")"
+          # --- 1) COUNTS: active + retired combined ---
+          active_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/paginated")
+          retired_json=$(fetch_all_pages "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")
 
-          all_unique="$(jq -n \
-            --slurpfile a <(echo "$active_list") \
-            --slurpfile r <(echo "$retired_list") \
-            '($a[0] + $r[0]) | unique_by(.id)'
-          )"
+          all_machines=$(printf '%s\n%s\n' "$active_json" "$retired_json" |
+            jq -s 'map(.data // .message // []) | add | unique_by(.id)')
 
-          owned_counts="$(echo "$all_unique" | jq '
-            map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
-          ')"
+          owned_counts=$(echo "$all_machines" |
+            jq 'map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))')
 
-          difficulties="$(echo "$owned_counts" | jq '
+          difficulties=$(echo "$owned_counts" | jq '
             group_by(.difficultyText)
             | map({label: (.[0].difficultyText // "Unknown"), value: length})
             | sort_by(.label)
-          ')"
+          ')
 
-          # --- (B) RECENT BOXES ---
-          owned_active="$(echo "$active_list" | jq '
-            map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
-          ')"
+          # --- 2) ACTIVITY (use simpler single-page request for last 3 boxes) ---
+          activity_json=$(
+            curl -sS -H "$auth" -H "$acc" \
+              "https://labs.hackthebox.com/api/v4/machine/paginated?retired=0&page=1" |
+            jq ' .data
+                | map(select(.authUserInUserOwns == true or .authUserInRootOwns == true)) as $owned
+                | $owned
+                  | sort_by(.release) | reverse
+                  | map({ name: .name,
+                          difficulty: .difficultyText,
+                          date: .release,
+                          summary: .os })
+                  | .[0:3]'
+          )
 
-          boxes="$(echo "$owned_active" | jq '
-            map({
-              name: .name,
-              difficulty: .difficultyText,
-              date: (.authUserOwnsDate // .release // ""),
-              summary: (.os // "")
-            })
-            | sort_by(.date) | reverse
-            | unique_by(.name)
-            | .[0:3]
-          ')"
-
+          # --- Merge into final JSON ---
           mkdir -p data
-          jq -n --argjson d "$difficulties" --argjson b "$boxes" \
+          jq -n --argjson d "$difficulties" --argjson b "$activity_json" \
             '{difficulties: $d, boxes: $b}' > data/htb.json
 
       - name: Commit updated JSON
