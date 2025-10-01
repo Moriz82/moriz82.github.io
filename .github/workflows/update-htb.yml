@@ -1,7 +1,7 @@
 name: Update HTB Stats
 
 on:
-  workflow_dispatch:   # lets you run manually from the Actions tab
+  workflow_dispatch:
   schedule:
     - cron: "0 */12 * * *"  # run every 12h
 
@@ -9,7 +9,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write 
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -27,7 +27,7 @@ jobs:
           auth="Authorization: Bearer ${HTB_APPKEY}"
           acc="Accept: application/json"
 
-          # helper: fetch ALL pages for a given paginated endpoint, return ONE JSON array of machine objects
+          # Fetch all pages and flatten into array of machines
           fetch_pages_to_array () {
             local url="$1"
             local tmpfile
@@ -35,19 +35,22 @@ jobs:
             echo "[]" > "$tmpfile"
 
             while [[ -n "$url" ]]; do
-              j="$(curl -sS -H "$auth" -H "$acc" "$url")"
-              # accumulate
-              jq -n --argjson acc "$(cat "$tmpfile")" --argjson page "$j" '$acc + [$page]' > "$tmpfile.new"
+              curl -sS -H "$auth" -H "$acc" "$url" \
+              | jq -s '.[0]' > "$tmpfile.page"
+
+              # append this page
+              jq -s '.[0] + [.[1]]' "$tmpfile" "$tmpfile.page" > "$tmpfile.new"
               mv "$tmpfile.new" "$tmpfile"
-              url="$(echo "$j" | jq -r '.links.next // empty')"
+
+              url="$(jq -r '.links.next // empty' "$tmpfile.page")"
             done
 
-            # flatten to just the machine objects (supports .data and .message shapes)
+            # flatten to just the machine objects
             jq 'map(.data // .message // []) | add' "$tmpfile"
-            rm -f "$tmpfile"
+            rm -f "$tmpfile" "$tmpfile.page"
           }
 
-          # --- (A) COUNTS: active + retired, combined ---
+          # --- (A) COUNTS ---
           active_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/paginated")"
           retired_list="$(fetch_pages_to_array "https://labs.hackthebox.com/api/v4/machine/list/retired/paginated")"
 
@@ -67,7 +70,7 @@ jobs:
             | sort_by(.label)
           ')"
 
-          # --- (B) RECENT BOXES: separate fetch (ACTIVE ONLY), sorted by OWN date (fallback release) ---
+          # --- (B) RECENT BOXES ---
           owned_active="$(echo "$active_list" | jq '
             map(select(.authUserInUserOwns == true or .authUserInRootOwns == true))
           ')"
@@ -84,7 +87,6 @@ jobs:
             | .[0:3]
           ')"
 
-          # --- Write final JSON used by your site ---
           mkdir -p data
           jq -n --argjson d "$difficulties" --argjson b "$boxes" \
             '{difficulties: $d, boxes: $b}' > data/htb.json
@@ -92,7 +94,7 @@ jobs:
       - name: Commit updated JSON
         run: |
           git config user.name "moriz82"
-          git config user.email "moriz82@example.com"
+          git config user.email "moriz82t@example.com"
           git add data/htb.json
           git commit -m "action: update HTB stats" || echo "No changes to commit"
           git push
