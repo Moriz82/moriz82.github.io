@@ -14,10 +14,16 @@
     },
     {
       "label": "Medium",
-      "value": 9
+      "value": 10
     }
   ],
   "boxes": [
+    {
+      "name": "Imagery",
+      "difficulty": "Medium",
+      "date": "2025-09-27T19:00:00.000000Z",
+      "summary": "Linux"
+    },
     {
       "name": "Expressway",
       "difficulty": "Easy",
@@ -28,12 +34,6 @@
       "name": "Soulmate",
       "difficulty": "Easy",
       "date": "2025-09-06T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "Previous",
-      "difficulty": "Medium",
-      "date": "2025-08-23T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
