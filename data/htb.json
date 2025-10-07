@@ -6,7 +6,7 @@
     },
     {
       "label": "Hard",
-      "value": 4
+      "value": 5
     },
     {
       "label": "Insane",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "DarkZero",
+      "difficulty": "Hard",
+      "date": "2025-10-04T19:00:00.000000Z",
+      "summary": "Windows"
+    },
+    {
       "name": "Imagery",
       "difficulty": "Medium",
       "date": "2025-09-27T19:00:00.000000Z",
@@ -28,12 +34,6 @@
       "name": "Expressway",
       "difficulty": "Easy",
       "date": "2025-09-20T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "Soulmate",
-      "difficulty": "Easy",
-      "date": "2025-09-06T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
