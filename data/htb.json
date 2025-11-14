@@ -6,7 +6,7 @@
     },
     {
       "label": "Hard",
-      "value": 5
+      "value": 6
     },
     {
       "label": "Insane",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "NanoCorp",
+      "difficulty": "Hard",
+      "date": "2025-11-08T19:00:00.000000Z",
+      "summary": "Windows"
+    },
+    {
       "name": "Conversor",
       "difficulty": "Easy",
       "date": "2025-10-25T19:00:00.000000Z",
@@ -29,12 +35,6 @@
       "difficulty": "Hard",
       "date": "2025-10-04T19:00:00.000000Z",
       "summary": "Windows"
-    },
-    {
-      "name": "Imagery",
-      "difficulty": "Medium",
-      "date": "2025-09-27T19:00:00.000000Z",
-      "summary": "Linux"
     }
   ]
 }
