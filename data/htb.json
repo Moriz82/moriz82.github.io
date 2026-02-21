@@ -2,7 +2,7 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 37
+      "value": 34
     },
     {
       "label": "Hard",
@@ -14,27 +14,27 @@
     },
     {
       "label": "Medium",
-      "value": 13
+      "value": 11
     }
   ],
   "boxes": [
     {
-      "name": "WingData",
-      "difficulty": "Easy",
-      "date": "2026-02-14T19:00:00.000000Z",
-      "summary": "Linux"
+      "name": "Fries",
+      "difficulty": "Hard",
+      "date": "2025-11-22T19:00:00.000000Z",
+      "summary": "Windows"
     },
     {
-      "name": "Pterodactyl",
-      "difficulty": "Medium",
-      "date": "2026-02-07T19:00:00.000000Z",
-      "summary": "Linux"
+      "name": "Eighteen",
+      "difficulty": "Easy",
+      "date": "2025-11-15T19:00:00.000000Z",
+      "summary": "Windows"
     },
     {
-      "name": "Facts",
-      "difficulty": "Easy",
-      "date": "2026-01-31T19:00:00.000000Z",
-      "summary": "Linux"
+      "name": "NanoCorp",
+      "difficulty": "Hard",
+      "date": "2025-11-08T19:00:00.000000Z",
+      "summary": "Windows"
     }
   ]
 }
