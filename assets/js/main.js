@@ -66,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Array.isArray(entries) && entries.length) {
       const cursor = document.createElement('span');
       cursor.className = 'typewriter-cursor';
-      const textNode = document.createTextNode('');
       terminalCode.textContent = '';
-      terminalCode.append(textNode, cursor);
 
       const typingDelay = 200;
       const commandDelay = 1050;
@@ -76,22 +74,49 @@ document.addEventListener('DOMContentLoaded', () => {
       let charIndex = 0;
       let commandText = '';
       let currentEntry = null;
-
-      textNode.nodeValue = `${prompt} `;
+      let activeCommandEl = null;
 
       const getOutputs = (entry) => {
         if (!entry) return [];
-        if (Array.isArray(entry.output)) return entry.output;
-        if (Array.isArray(entry.outputs)) return entry.outputs;
+        if (Array.isArray(entry.output)) return entry.output.map((line) => String(line));
+        if (Array.isArray(entry.outputs)) return entry.outputs.map((line) => String(line));
         if (typeof entry.output === 'string') return [entry.output];
-        if (entry.output && typeof entry.output === 'object') return Object.values(entry.output);
+        if (entry.output && typeof entry.output === 'object') return Object.values(entry.output).map((line) => String(line));
         return [];
       };
 
+      const appendPromptLine = () => {
+        const line = document.createElement('span');
+        line.className = 'terminal-line';
+
+        const promptEl = document.createElement('span');
+        promptEl.className = 'terminal-prompt';
+        promptEl.textContent = `${prompt} `;
+
+        const commandEl = document.createElement('span');
+        commandEl.className = 'terminal-command';
+
+        line.append(promptEl, commandEl);
+        terminalCode.append(line);
+        return { line, commandEl };
+      };
+
+      const appendOutputLine = (text) => {
+        const line = document.createElement('span');
+        line.className = 'terminal-line';
+
+        const outputEl = document.createElement('span');
+        outputEl.className = 'terminal-output';
+        outputEl.textContent = text;
+
+        line.append(outputEl);
+        terminalCode.append(line);
+      };
+
       const typeCommand = () => {
-        if (!currentEntry) return;
+        if (!currentEntry || !activeCommandEl) return;
         if (charIndex < commandText.length) {
-          textNode.nodeValue += commandText.charAt(charIndex);
+          activeCommandEl.textContent += commandText.charAt(charIndex);
           charIndex += 1;
           setTimeout(typeCommand, typingDelay);
         } else {
@@ -101,43 +126,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const showOutputs = () => {
         const outputs = getOutputs(currentEntry);
-        textNode.nodeValue += '\n';
-        if (outputs.length) {
-          textNode.nodeValue += outputs.join('\n');
-          textNode.nodeValue += '\n';
+        outputs.forEach((line) => appendOutputLine(line));
+
+        entryIndex += 1;
+        currentEntry = null;
+        activeCommandEl = null;
+
+        if (entryIndex < entries.length) {
+          setTimeout(startNextEntry, commandDelay);
+          return;
         }
 
-          entryIndex += 1;
-          currentEntry = null;
-          if (entryIndex < entries.length) {
-              // print prompt immediately
-              if (textNode.nodeValue && !textNode.nodeValue.endsWith('\n')) {
-                  textNode.nodeValue += '\n';
-              }
-              textNode.nodeValue += `${prompt} `;
-
-              // wait before typing command
-              setTimeout(startNextEntry, commandDelay);
-          } else {
-              if (!textNode.nodeValue.endsWith('\n')) {
-                  textNode.nodeValue += '\n';
-              }
-              textNode.nodeValue += `${prompt} `;
-          }
+        const { line } = appendPromptLine();
+        line.append(cursor);
       };
 
-        const startNextEntry = () => {
-            if (entryIndex >= entries.length) return;
-            currentEntry = entries[entryIndex];
-            const commandValue = currentEntry && currentEntry.command != null ? String(currentEntry.command) : '';
+      const startNextEntry = () => {
+        if (entryIndex >= entries.length) return;
+        currentEntry = entries[entryIndex];
+        const commandValue = currentEntry && currentEntry.command != null ? String(currentEntry.command) : '';
+        commandText = commandValue;
+        charIndex = 0;
 
-            commandText = commandValue; // only type the command
-            charIndex = 0;
-            typeCommand();
-        };
+        const { line, commandEl } = appendPromptLine();
+        activeCommandEl = commandEl;
+        line.append(cursor);
+        typeCommand();
+      };
 
-
-        startNextEntry();
+      startNextEntry();
     }
   }
 
@@ -252,304 +269,320 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    const blogCarouselEl = document.querySelector('[data-blog-carousel]');
-  if (blogCarouselEl) {
-    const track = blogCarouselEl.querySelector('[data-carousel-track]');
-    const prevBtn = blogCarouselEl.querySelector('[data-carousel-prev]');
-    const nextBtn = blogCarouselEl.querySelector('[data-carousel-next]');
-    const dotsEl = blogCarouselEl.querySelector('[data-carousel-dots]');
-    const statusEl = blogCarouselEl.closest('section')?.querySelector('[data-carousel-status]') || null;
-    const sourcePath = blogCarouselEl.getAttribute('data-post-source');
+    const blogCarouselEls = Array.from(document.querySelectorAll('[data-blog-carousel]'));
+    const initBlogCarousel = (blogCarouselEl) => {
+      const track = blogCarouselEl.querySelector('[data-carousel-track]');
+      const prevBtn = blogCarouselEl.querySelector('[data-carousel-prev]');
+      const nextBtn = blogCarouselEl.querySelector('[data-carousel-next]');
+      const dotsEl = blogCarouselEl.querySelector('[data-carousel-dots]');
+      const statusEl = blogCarouselEl.closest('section')?.querySelector('[data-carousel-status]') || null;
+      const sourcePath = blogCarouselEl.getAttribute('data-post-source');
 
-    let posts = [];
-    let perView = 1;
-    let currentPage = 0;
-    let maxPage = 0;
+      let posts = [];
+      let perView = 1;
+      let currentPage = 0;
+      let maxPage = 0;
+      let resizeBound = false;
 
-    const setStatus = (message) => {
-      if (!statusEl) return;
-      statusEl.hidden = !message;
-      statusEl.textContent = message || '';
-    };
+      const bindResize = () => {
+        if (resizeBound) return;
+        window.addEventListener('resize', handleResize);
+        resizeBound = true;
+      };
 
-    const getPerView = () => {
-      const width = window.innerWidth;
-      if (width >= 1200) return 3;
-      if (width >= 768) return 2;
-      return 1;
-    };
+      const setStatus = (message) => {
+        if (!statusEl) return;
+        statusEl.hidden = !message;
+        statusEl.textContent = message || '';
+      };
 
-    const formatDate = (input) => {
-      if (!input) return '';
-      const date = new Date(input);
-      if (Number.isNaN(date.getTime())) return input;
-      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    };
+      const getPerView = () => {
+        const width = window.innerWidth;
+        if (width >= 1200) return 3;
+        if (width >= 768) return 2;
+        return 1;
+      };
 
-    const createTagList = (tags = []) => {
-      const list = document.createElement('ul');
-      list.className = 'tag-list blog-card-tags';
-      tags.slice(0, 4).forEach((tag) => {
-        const item = document.createElement('li');
-        item.textContent = tag;
-        list.append(item);
-      });
-      return list;
-    };
+      const formatDate = (input) => {
+        if (!input) return '';
+        const date = new Date(input);
+        if (Number.isNaN(date.getTime())) return input;
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      };
 
-    const createCard = (post) => {
-      const { slug, title, summary, hero, heroAlt, date, readTime, tags = [] } = post;
-      const link = slug ? `posts/${slug}.html` : '#';
+      const toDateAttr = (input) => {
+        if (!input) return '';
+        const date = new Date(input);
+        if (Number.isNaN(date.getTime())) return String(input);
+        return date.toISOString().split('T')[0];
+      };
 
-      const card = document.createElement('article');
-      card.className = 'blog-card';
-
-      const anchor = document.createElement('a');
-      anchor.className = 'blog-card-link';
-      anchor.href = link;
-
-      const media = document.createElement('div');
-      media.className = 'blog-card-media';
-      if (hero) {
-        const img = document.createElement('img');
-        img.src = hero;
-        img.alt = heroAlt || title || 'Blog hero image';
-        img.loading = 'lazy';
-        media.append(img);
-      }
-
-      const body = document.createElement('div');
-      body.className = 'blog-card-body';
-
-      const meta = document.createElement('div');
-      meta.className = 'blog-card-meta';
-      if (date) {
-        const dateEl = document.createElement('time');
-        dateEl.dateTime = new Date(date).toISOString().split('T')[0];
-        dateEl.textContent = formatDate(date);
-        meta.append(dateEl);
-      }
-      if (readTime) {
-        const readEl = document.createElement('span');
-        readEl.textContent = `${readTime} read`;
-        meta.append(readEl);
-      }
-
-      const heading = document.createElement('h3');
-      heading.textContent = title || 'Untitled Post';
-
-      const description = document.createElement('p');
-      description.textContent = summary || '';
-
-      body.append(meta, heading, description);
-      if (tags.length) {
-        body.append(createTagList(tags));
-      }
-
-      anchor.append(media, body);
-      card.append(anchor);
-      return card;
-    };
-
-    const calculateMaxPage = () => {
-      if (!posts.length) return 0;
-      return Math.max(Math.ceil(posts.length / perView) - 1, 0);
-    };
-
-    const updateDots = () => {
-      if (!dotsEl) return;
-      dotsEl.innerHTML = '';
-      for (let page = 0; page <= maxPage; page += 1) {
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = `carousel-dot${page === currentPage ? ' is-active' : ''}`;
-        const startIndex = page * perView + 1;
-        const endIndex = Math.min(startIndex + perView - 1, posts.length);
-        dot.setAttribute('aria-label', `Show posts ${startIndex} through ${endIndex}`);
-        dot.addEventListener('click', () => {
-          currentPage = page;
-          updateCarousel();
+      const createTagList = (tags = []) => {
+        const list = document.createElement('ul');
+        list.className = 'tag-list blog-card-tags';
+        tags.slice(0, 4).forEach((tag) => {
+          const item = document.createElement('li');
+          item.textContent = tag;
+          list.append(item);
         });
-        dotsEl.append(dot);
-      }
-    };
+        return list;
+      };
 
-    const updateNavButtons = () => {
-      if (prevBtn) prevBtn.disabled = currentPage <= 0;
-      if (nextBtn) nextBtn.disabled = currentPage >= maxPage;
-    };
+      const createCard = (post) => {
+        const { slug, title, summary, hero, heroAlt, date, readTime, tags = [] } = post;
+        const link = slug ? `posts/${slug}.html` : '#';
 
-    const updateStatus = () => {
-      if (!posts.length) {
-        setStatus('No posts available yet.');
-        return;
-      }
-      const start = currentPage * perView + 1;
-      const end = Math.min(start + perView - 1, posts.length);
-      const currentTitles = posts.slice(start - 1, end).map((post) => post.title).filter(Boolean);
-      const titleSummary = currentTitles.length ? `Featuring ${currentTitles.join(' · ')}.` : '';
-      setStatus(`Showing posts ${start}–${end} of ${posts.length}. ${titleSummary}`.trim());
-    };
+        const card = document.createElement('article');
+        card.className = 'blog-card';
 
-    const updateTrackPosition = () => {
-      if (!track || !track.children.length) return;
-      const card = track.querySelector('.blog-card');
-      if (!card) return;
-      const style = window.getComputedStyle(track);
-      const gap = parseFloat(style.columnGap || style.gap || '0');
-      const cardRect = card.getBoundingClientRect();
-      const pageWidth = perView * cardRect.width + Math.max(perView - 1, 0) * gap;
-      const offset = currentPage * pageWidth;
-      track.style.transform = `translateX(-${offset}px)`;
-    };
+        const anchor = document.createElement('a');
+        anchor.className = 'blog-card-link';
+        anchor.href = link;
 
-    const updateCarousel = () => {
-      maxPage = calculateMaxPage();
-      if (currentPage > maxPage) currentPage = maxPage;
-      blogCarouselEl.style.setProperty('--cards-per-view', String(perView));
-      updateTrackPosition();
-      updateNavButtons();
-      updateDots();
-      updateStatus();
-    };
+        const media = document.createElement('div');
+        media.className = 'blog-card-media';
+        if (hero) {
+          const img = document.createElement('img');
+          img.src = hero;
+          img.alt = heroAlt || title || 'Card hero image';
+          img.loading = 'lazy';
+          media.append(img);
+        }
 
-    const handleResize = () => {
-      const nextPerView = getPerView();
-      if (nextPerView !== perView) {
-        perView = nextPerView;
-        updateCarousel();
-      } else {
+        const body = document.createElement('div');
+        body.className = 'blog-card-body';
+
+        const meta = document.createElement('div');
+        meta.className = 'blog-card-meta';
+        if (date) {
+          const dateEl = document.createElement('time');
+          dateEl.dateTime = toDateAttr(date);
+          dateEl.textContent = formatDate(date);
+          meta.append(dateEl);
+        }
+        if (readTime) {
+          const readEl = document.createElement('span');
+          readEl.textContent = `${readTime} read`;
+          meta.append(readEl);
+        }
+
+        const heading = document.createElement('h3');
+        heading.textContent = title || 'Untitled Post';
+
+        const description = document.createElement('p');
+        description.textContent = summary || '';
+
+        body.append(meta, heading, description);
+        if (tags.length) {
+          body.append(createTagList(tags));
+        }
+
+        anchor.append(media, body);
+        card.append(anchor);
+        return card;
+      };
+
+      const calculateMaxPage = () => {
+        if (!posts.length) return 0;
+        return Math.max(Math.ceil(posts.length / perView) - 1, 0);
+      };
+
+      const updateDots = () => {
+        if (!dotsEl) return;
+        dotsEl.innerHTML = '';
+        for (let page = 0; page <= maxPage; page += 1) {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = `carousel-dot${page === currentPage ? ' is-active' : ''}`;
+          const startIndex = page * perView + 1;
+          const endIndex = Math.min(startIndex + perView - 1, posts.length);
+          dot.setAttribute('aria-label', `Show cards ${startIndex} through ${endIndex}`);
+          dot.addEventListener('click', () => {
+            currentPage = page;
+            updateCarousel();
+          });
+          dotsEl.append(dot);
+        }
+      };
+
+      const updateNavButtons = () => {
+        if (prevBtn) prevBtn.disabled = currentPage <= 0;
+        if (nextBtn) nextBtn.disabled = currentPage >= maxPage;
+      };
+
+      const updateStatus = () => {
+        if (!posts.length) {
+          setStatus('No entries available yet.');
+          return;
+        }
+        const start = currentPage * perView + 1;
+        const end = Math.min(start + perView - 1, posts.length);
+        const currentTitles = posts.slice(start - 1, end).map((post) => post.title).filter(Boolean);
+        const titleSummary = currentTitles.length ? `Featuring ${currentTitles.join(' · ')}.` : '';
+        setStatus(`Showing entries ${start}–${end} of ${posts.length}. ${titleSummary}`.trim());
+      };
+
+      const updateTrackPosition = () => {
+        if (!track || !track.children.length) return;
+        const card = track.querySelector('.blog-card');
+        if (!card) return;
+        const style = window.getComputedStyle(track);
+        const gap = parseFloat(style.columnGap || style.gap || '0');
+        const cardRect = card.getBoundingClientRect();
+        const pageWidth = perView * cardRect.width + Math.max(perView - 1, 0) * gap;
+        const offset = currentPage * pageWidth;
+        track.style.transform = `translateX(-${offset}px)`;
+      };
+
+      const updateCarousel = () => {
+        maxPage = calculateMaxPage();
+        if (currentPage > maxPage) currentPage = maxPage;
+        blogCarouselEl.style.setProperty('--cards-per-view', String(perView));
         updateTrackPosition();
-      }
-    };
+        updateNavButtons();
+        updateDots();
+        updateStatus();
+      };
 
-    const renderPosts = (replaceExisting = true) => {
-      if (!track) return;
-      if (replaceExisting) {
-        track.innerHTML = '';
-        posts.forEach((post) => {
-          const card = createCard(post);
-          track.append(card);
+      const handleResize = () => {
+        const nextPerView = getPerView();
+        if (nextPerView !== perView) {
+          perView = nextPerView;
+          updateCarousel();
+        } else {
+          updateTrackPosition();
+        }
+      };
+
+      const renderPosts = (replaceExisting = true) => {
+        if (!track) return;
+        if (replaceExisting) {
+          track.innerHTML = '';
+          posts.forEach((post) => {
+            const card = createCard(post);
+            track.append(card);
+          });
+        }
+        perView = getPerView();
+        currentPage = 0;
+        updateCarousel();
+      };
+
+      const hydratePostsFromDOM = () => {
+        if (!track) return [];
+        const cards = Array.from(track.querySelectorAll('.blog-card'));
+        if (!cards.length) return [];
+        return cards.map((card) => {
+          const link = card.querySelector('.blog-card-link');
+          const titleEl = card.querySelector('h3');
+          const summaryEl = card.querySelector('p');
+          const imgEl = card.querySelector('img');
+          const timeEl = card.querySelector('time');
+          const readEl = card.querySelector('.blog-card-meta span');
+          return {
+            slug: card.getAttribute('data-slug') || '',
+            title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : ''),
+            summary: card.getAttribute('data-summary') || (summaryEl ? summaryEl.textContent.trim() : ''),
+            hero: imgEl ? imgEl.getAttribute('src') : '',
+            heroAlt: imgEl ? imgEl.getAttribute('alt') : '',
+            date: card.getAttribute('data-date') || (timeEl ? timeEl.getAttribute('datetime') || timeEl.textContent.trim() : ''),
+            readTime: card.getAttribute('data-read') || (readEl ? readEl.textContent.trim() : ''),
+            tags: Array.from(card.querySelectorAll('.tag-list li')).map((tag) => tag.textContent.trim()),
+            href: link ? link.getAttribute('href') : '#'
+          };
         });
-      }
-      perView = getPerView();
-      currentPage = 0;
-      updateCarousel();
-    };
+      };
 
-    const hydratePostsFromDOM = () => {
-      if (!track) return [];
-      const cards = Array.from(track.querySelectorAll('.blog-card'));
-      if (!cards.length) return [];
-      return cards.map((card) => {
-        const link = card.querySelector('.blog-card-link');
-        const titleEl = card.querySelector('h3');
-        const summaryEl = card.querySelector('p');
-        const imgEl = card.querySelector('img');
-        const timeEl = card.querySelector('time');
-        const readEl = card.querySelector('.blog-card-meta span');
-        return {
-          slug: card.getAttribute('data-slug') || '',
-          title: card.getAttribute('data-title') || (titleEl ? titleEl.textContent.trim() : ''),
-          summary: card.getAttribute('data-summary') || (summaryEl ? summaryEl.textContent.trim() : ''),
-          hero: imgEl ? imgEl.getAttribute('src') : '',
-          heroAlt: imgEl ? imgEl.getAttribute('alt') : '',
-          date: card.getAttribute('data-date') || (timeEl ? timeEl.getAttribute('datetime') || timeEl.textContent.trim() : ''),
-          readTime: card.getAttribute('data-read') || (readEl ? readEl.textContent.trim() : ''),
-          tags: Array.from(card.querySelectorAll('.tag-list li')).map((tag) => tag.textContent.trim()),
-          href: link ? link.getAttribute('href') : '#'
-        };
-      });
-    };
+      const parsePosts = (data) => {
+        if (!Array.isArray(data)) return [];
+        return data
+          .filter((item) => item && item.slug && item.title)
+          .map((item) => ({
+            slug: String(item.slug).trim(),
+            title: String(item.title || 'Untitled Post').trim(),
+            summary: String(item.summary || item.excerpt || '').trim(),
+            hero: item.hero || item.image || '',
+            heroAlt: item.heroAlt || item.hero_alt || item.imageAlt || '',
+            date: item.date || item.published || '',
+            readTime: item.readTime || item.read_time || item.read || '',
+            tags: Array.isArray(item.tags) ? item.tags.map((tag) => String(tag)) : []
+          }))
+          .sort((a, b) => {
+            const aDate = a.date ? new Date(a.date).getTime() : 0;
+            const bDate = b.date ? new Date(b.date).getTime() : 0;
+            return bDate - aDate;
+          });
+      };
 
-    const parsePosts = (data) => {
-      if (!Array.isArray(data)) return [];
-      return data
-        .filter((item) => item && item.slug && item.title)
-        .map((item) => ({
-          slug: String(item.slug).trim(),
-          title: String(item.title || 'Untitled Post').trim(),
-          summary: String(item.summary || item.excerpt || '').trim(),
-          hero: item.hero || item.image || '',
-          heroAlt: item.heroAlt || item.hero_alt || item.imageAlt || '',
-          date: item.date || item.published || '',
-          readTime: item.readTime || item.read_time || item.read || '',
-          tags: Array.isArray(item.tags) ? item.tags.map((tag) => String(tag)) : []
-        }))
-        .sort((a, b) => {
-          const aDate = a.date ? new Date(a.date).getTime() : 0;
-          const bDate = b.date ? new Date(b.date).getTime() : 0;
-          return bDate - aDate;
-        });
-    };
+      const fetchPosts = async () => {
+        if (!sourcePath) {
+          setStatus('Carousel data source missing.');
+          return;
+        }
 
-    const fetchPosts = async () => {
-      if (!sourcePath) {
-        setStatus('Blog data source missing.');
-        return;
-      }
-
-      try {
-        const response = await fetch(sourcePath, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        const parsed = parsePosts(data);
-        if (!parsed.length) {
+        try {
+          const response = await fetch(sourcePath, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const parsed = parsePosts(data);
+          if (!parsed.length) {
+            if (!posts.length) {
+              posts = hydratePostsFromDOM();
+              if (posts.length) {
+                renderPosts(false);
+                bindResize();
+                setStatus('No entries published in feed. Showing local entries.');
+              } else if (statusEl) {
+                setStatus('No entries have been published yet.');
+              }
+            } else {
+              setStatus('No new entries in the feed yet.');
+            }
+            return;
+          }
+          posts = parsed;
+          renderPosts(true);
+          bindResize();
+        } catch (error) {
+          console.error('Failed to load carousel entries', error);
           if (!posts.length) {
             posts = hydratePostsFromDOM();
             if (posts.length) {
               renderPosts(false);
-              window.addEventListener('resize', handleResize);
-              setStatus('No posts have been published yet in the feed. Showing local entries.');
-            } else if (statusEl) {
-              setStatus('No posts have been published yet.');
+              bindResize();
             }
-          } else {
-            setStatus('No new posts in the feed yet.');
           }
-          return;
+          setStatus('Unable to load entries right now. Showing cached entries.');
         }
-        posts = parsed;
-        renderPosts(true);
-        window.addEventListener('resize', handleResize);
-      } catch (error) {
-        console.error('Failed to load blog posts', error);
-        if (!posts.length) {
-          posts = hydratePostsFromDOM();
-          if (posts.length) {
-            renderPosts(false);
-            window.addEventListener('resize', handleResize);
-          }
-        }
-        setStatus('Unable to load posts right now. Showing cached entries.');
+      };
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (currentPage <= 0) return;
+          currentPage -= 1;
+          updateCarousel();
+        });
       }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (currentPage >= maxPage) return;
+          currentPage += 1;
+          updateCarousel();
+        });
+      }
+
+      posts = hydratePostsFromDOM();
+      if (posts.length) {
+        perView = getPerView();
+        updateCarousel();
+        bindResize();
+      }
+
+      fetchPosts();
     };
 
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        if (currentPage <= 0) return;
-        currentPage -= 1;
-        updateCarousel();
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        if (currentPage >= maxPage) return;
-        currentPage += 1;
-        updateCarousel();
-      });
-    }
-
-    posts = hydratePostsFromDOM();
-    if (posts.length) {
-      perView = getPerView();
-      updateCarousel();
-      window.addEventListener('resize', handleResize);
-    }
-
-    fetchPosts();
-  }
+    blogCarouselEls.forEach((carouselEl) => initBlogCarousel(carouselEl));
 
     // --- HackTheBox static JSON loader ---
     const pieEl = document.querySelector('[data-htb-pie]');
@@ -687,7 +720,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderHTBData(fallbackHTBData);
         }
     })();
-
 
     const yearEl = document.getElementById('copyright-year');
   if (yearEl) {

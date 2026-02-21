@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="How Melody Match pairs an ESP8266 wearable with a Swift app and on-device ML to deliver adaptive music therapy." />
-  <title>Melody Match: Pairing Biometrics with Music Therapy | Will DeDominico</title>
+  <meta name="description" content="RowdyHacks X project: Melody Match uses live heart-rate telemetry, a Python recommendation backend, and a Swift iOS app to select calming music." />
+  <title>Melody Match: Swift Client + Python Server | Will DeDominico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
@@ -25,100 +25,112 @@
     <nav id="site-nav" class="site-nav" aria-expanded="false">
       <a href="../index.html#home">Home</a>
       <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#blog" class="is-active">Blog</a>
+      <a href="../index.html#projects" class="is-active">Projects</a>
+      <a href="../index.html#writeups">Writeups</a>
       <a href="../index.html#github">GitHub</a>
       <a href="../index.html#ctf">CTFs</a>
       <a href="../index.html#htb">HTB</a>
       <a href="../index.html#clubs">Clubs</a>
       <a href="../index.html#education">Education</a>
-      <a href="../contact.html">Contact</a>
     </nav>
   </header>
 
   <main>
     <article class="section blog-layout post-content" aria-labelledby="post-title">
       <header>
-        <h1 id="post-title">Melody Match: Pairing Biometrics with Music Therapy</h1>
+        <h1 id="post-title">Melody Match: Swift Client + Python Server</h1>
         <div class="post-meta">
           <time datetime="2024-12-03">December 3, 2024</time>
           <span>7 minute read</span>
           <div class="post-tags" aria-label="Topics">
             <span class="post-tag">Swift</span>
+            <span class="post-tag">Python</span>
             <span class="post-tag">ESP8266</span>
-            <span class="post-tag">Machine Learning</span>
+            <span class="post-tag">Hackathon</span>
           </div>
         </div>
       </header>
 
       <figure class="post-hero">
         <img src="../assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" />
-        <figcaption>The pilot wearable streams heart-rate variability into a SwiftUI dashboard that adapts playlists on the fly.</figcaption>
+        <figcaption>Built at RowdyHacks X, Melody Match pairs sensor data with a Swift client and Python backend to recommend calming tracks.</figcaption>
       </figure>
 
       <div class="post-body">
-        <p>Melody Match watches heart rate, skin temperature, and accelerometer data to infer stress levels. When readings spike, the app fades in a curated playlist and pushes breathing cues. Everything runs on-device to keep personal data offline.</p>
+        <p>Melody Match started as a RowdyHacks X build focused on stress and anxiety support through music. The prototype uses live heart-rate input, maps that telemetry to genre selection, and delivers playback through a mobile app workflow.</p>
 
-        <h2>Hardware Stack</h2>
-        <p>The wearable uses an ESP8266 dev board paired with a MAX30102 pulse sensor. A LiPo pack plus charging circuit keeps the footprint small enough to sit under a wrist strap.</p>
+        <h2>RowdyHacks X Context</h2>
+        <p>During the event, the team treated Melody Match as a full hackathon pipeline: sensor capture, model-backed recommendation, and mobile playback loop. The project was submitted on Devpost as part of the RowdyHacks X challenge and served as the baseline for the current repo split.</p>
 
         <div class="content-card">
-          <h3>Workflow Loop</h3>
-          <p>Firmware samples biometrics → MQTT over TLS → CoreBluetooth bridge → Swift Combine pipeline → on-device Core ML classifier.</p>
+          <h3>How it was used at the hackathon</h3>
+          <ul>
+            <li>Collected live heart-rate data from an IR sensor + microcontroller setup.</li>
+            <li>Sent telemetry to a Python service that searched genre candidates for lower BPM outcomes.</li>
+            <li>Returned song IDs/metadata to the iOS app for playback and quick iteration during demos.</li>
+            <li>Validated a complete sensor-to-recommendation-to-player loop under hackathon time constraints.</li>
+          </ul>
         </div>
 
-        <div class="callout callout--info" data-label="Privacy first">
-          <p>Personal metrics never leave the device cluster. The Core ML model runs offline and the only cloud connection is an optional backup of anonymised session summaries.</p>
+        <h2>Project Repositories</h2>
+        <div class="content-card">
+          <h3>Codebase Split</h3>
+          <ul>
+            <li><a href="https://github.com/Moriz82/MelodyMatchServer" target="_blank" rel="noopener">Moriz82/MelodyMatchServer</a> - Python recommendation and server loop.</li>
+            <li><a href="https://github.com/LOLROW/Melody-Match" target="_blank" rel="noopener">LOLROW/Melody-Match</a> - Swift iOS app for song control and playback.</li>
+          </ul>
         </div>
 
-        <h2>SwiftUI Control Room</h2>
-        <p>The app exposes a dashboard for operators (therapists, caretakers, or the wearer) to see state changes and override the playlist. The entire UI updates reactively through Combine publishers.</p>
+        <h2>Data Flow</h2>
+        <p>The app and server both communicate with the ESP8266 host at <code>192.168.4.1</code>. Sensor values are read from <code>/viewserial</code>, song selections are sent to <code>/serverdata</code>, and client actions are posted to <code>/clientdata</code>.</p>
 
-        <pre><code class="language-swift">struct SessionView: View {
-  @ObservedObject var session: BioFeedbackSession
+        <pre><code class="language-python">ESP8266URL = "http://192.168.4.1/"
 
-  var body: some View {
-    VStack(spacing: 24) {
-      Gauge(value: session.hrvScore, in: 0...100) {
-        Text("Resilience")
-      }
-      .tint(Gradient(colors: [.blue, .purple]))
+def fetch_view_serial():
+    response = requests.get(f"{ESP8266URL}/viewserial")
+    response.raise_for_status()
+    return response.json()
 
-      Chart(session.recentReadings) { reading in
-        LineMark(
-          x: .value("Timestamp", reading.timestamp),
-          y: .value("BPM", reading.bpm)
-        )
-        .interpolationMethod(.monotone)
-      }
+def send_server_data(song_id):
+    payload = {"id": song_id}
+    requests.post(f"{ESP8266URL}/serverdata", json=payload)</code></pre>
 
-      Button("Trigger Calm Playlist") {
-        session.playlist.enqueue(.calm)
-      }
-      .buttonStyle(.borderedProminent)
-    }
-    .padding(24)
-  }
+        <h2>iOS Client Loop</h2>
+        <p>The Swift client requests a new song, polls the selected ID, then updates labels and playback state in the UI.</p>
+
+        <pre><code class="language-swift">public static func requestNextSong() async -> Bool {
+    let esp8266URL = "http://192.168.4.1/clientdata"
+    let jsonPayload: [String: Any] = ["code": 14]
+    ...
+}
+
+if let id = await WebServerQuerier.getSongID() as? (Int?, String?, Double?) {
+    songIndex = id.0!
+    self.genreLabel.text = "Genre: \(id.1!)"
+    self.confidenceLevelLabel.text = "BPM: \(Int(ceil(id.2!)))"
+    playAudio(songID: songIndex)
 }</code></pre>
 
-        <h2>Classifying Stress On-Device</h2>
-        <p>The Core ML model is a tiny gradient boosted tree exported from Create ML. It looks for short-term HRV drops paired with stillness—if both conditions hit, the app crossfades in a decompression track.</p>
-
-        <figure>
-          <img src="../assets/img/placeholder-card.svg" alt="Stylised app dashboard placeholder" />
-          <figcaption>Prototype dashboard showing HRV, BPM, and the currently queued intervention track.</figcaption>
-        </figure>
-
-        <div class="callout callout--warning" data-label="Calibration">
-          <p>Run a 7-day baseline capture before enabling automations. Without enough rest-state data the model assumes you&apos;re stressed 24/7.</p>
+        <div class="callout callout--info" data-label="Current state">
+          <p>The current implementation is a local-network prototype focused on rapid iteration across sensor input, model output, and iOS playback behavior.</p>
         </div>
 
-        <h2>Roadmap</h2>
-        <p>I&apos;m layering in voice guidance, RAG-powered journaling prompts, and a second wearable that tracks galvanic skin response to tighten prediction accuracy.</p>
+        <h2>Next Iteration</h2>
+        <p>Next updates are documenting setup in both repos, hardening the app-server contract, and cleaning the recommendation loop for repeatable testing.</p>
+
+        <div class="callout callout--info" data-label="Submission">
+          <p>This project was originally submitted as Melody Match on Devpost for RowdyHacks X, then expanded into separate server/client repositories for maintainability.</p>
+        </div>
       </div>
 
       <footer class="post-footer">
-        <p>Have ideas for additional biometric signals or accessibility improvements? Send me a note and let&apos;s experiment together.</p>
-        <a class="button ghost" href="../index.html#blog">Back to Blog Dispatches</a>
+        <p>Melody Match was built for RowdyHacks X and is now maintained as split Python/Swift codebases.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://devpost.com/software/melody-match-roplm6" target="_blank" rel="noopener">RowdyHacks Devpost</a>
+          <a class="button primary" href="https://github.com/Moriz82/MelodyMatchServer" target="_blank" rel="noopener">Server Repo</a>
+          <a class="button primary" href="https://github.com/LOLROW/Melody-Match" target="_blank" rel="noopener">iOS Repo</a>
+          <a class="button ghost" href="../index.html#projects">Back to Projects</a>
+        </div>
       </footer>
     </article>
   </main>

