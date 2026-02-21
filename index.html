@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Portfolio for Will DeDominico (moriz82) – UTSA cyber security student and aspiring red team operator." />
+  <meta name="description" content="Portfolio for Will DeDominico (moriz82) – UTSA cyber security student and red team operator." />
   <title>Will's Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,26 +25,25 @@
     <nav id="site-nav" class="site-nav" aria-expanded="false">
       <a href="#home">Home</a>
       <a href="#experience">Experience</a>
-      <a href="#blog">Blog</a>
+      <a href="#projects">Projects</a>
+      <a href="#writeups">Writeups</a>
       <a href="#github">GitHub</a>
       <a href="#ctf">CTFs</a>
       <a href="#htb">HTB</a>
       <a href="#clubs">Clubs</a>
       <a href="#education">Education</a>
-      <a href="#connect">Contact</a>
     </nav>
   </header>
 
   <main>
     <section id="home" class="section hero" aria-label="Hero">
       <div class="hero-copy">
-        <p class="eyebrow">Aspiring Red Team Operator · UTSA</p>
+        <p class="eyebrow">Red Team Operator · UTSA</p>
         <h1>Hey, I&apos;m <span class="accent">Will DeDominico</span>!</h1>
-        <p class="lead">I'm a Novice Red Team Operator who loves investigating systems and simulating attacks. I love CTF and HTB, and have a passion for Free and Open Source Software / Hardware.</p>
+        <p class="lead">I'm a Red Team Operator who loves investigating systems and simulating attacks. I love CTF and HTB, and have a passion for Free and Open Source Software / Hardware.</p>
         <div class="hero-actions">
           <a class="button primary" href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf"
              target="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" rel="noopener">View Resume</a>
-          <a class="button ghost" href="#connect">Contact Me</a>
         </div>
         <dl class="hero-meta">
           <div>
@@ -55,8 +54,8 @@
           </div>
           <div>
             <dt>Current missions</dt>
-            <dd>UTSA BBA Cyber & Info Systems
-                <br>Hack The Box CPTS
+            <dd>Bug Bounty
+                <br>Learning Blue Team
             </dd>
           </div>
         </dl>
@@ -72,9 +71,9 @@
           {"command": "whoami",
            "output": ["Will_DeDominico"]},
             {"command": "neofetch",
-            "output": ["OS: Arch Linux", "Role: Red Team Operator (in training)", "Focus: enumerate > weaponize > report"]},
+            "output": ["OS: Arch Linux", "Role: Red Team Operator", "Focus: enumerate > weaponize > report"]},
             {"command": "todo next",
-            "output": ["- Work on school labs", "- Sit HTB CPTS Exam", "- Better Reporting skills"]}]'>
+            "output": ["- Work on school labs", "- Build more HTB writeups", "- Better Reporting skills"]}]'>
           </code></pre>
         </div>
       </div>
@@ -86,6 +85,35 @@
         <p>Past roles that helped me learn industry standards in Support, Networking, and SIEM.</p>
       </div>
       <div class="timeline">
+          <article class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                  <div class="timeline-header">
+                      <div class="timeline-header-main">
+                          <div class="timeline-logos">
+                              <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcompanieslogo.com%2Fimg%2Forig%2FCRWD-442a5e7d.png%3Ft%3D1648651763&amp;f=1&amp;nofb=1&amp;ipt=27bed45b3936228a109a34c3c6dd58ca177037f1f3f5580e802c219ff7bbf410" alt="CrowdStrike logo" loading="lazy" />
+                          </div>
+                          <div>
+                              <h3 class="timeline-company">CrowdStrike</h3>
+                              <p class="timeline-role">Falcon Complete Intern</p>
+                          </div>
+                      </div>
+                      <div class="timeline-header-meta">
+                          <span class="timeline-meta">Starts Jun 1, 2026 · Upcoming</span>
+                          <div class="timeline-tabs">
+                              <span class="timeline-tab timeline-tab--blue-team">Managed Detection &amp; Response</span>
+                          </div>
+                      </div>
+                  </div>
+                  <p>Incoming Falcon Complete intern focused on real-world alert triage, investigation workflows, and customer-facing response operations.</p>
+                  <ul class="timeline-skill-tags">
+                      <li>MDR Operations</li>
+                      <li>Threat Triage</li>
+                      <li>Detection Analysis</li>
+                      <li>Incident Workflow</li>
+                  </ul>
+              </div>
+          </article>
           <article class="timeline-item">
               <div class="timeline-marker"></div>
               <div class="timeline-content">
@@ -176,9 +204,9 @@
       </div>
     </section>
 
-    <section id="blog" class="section" aria-labelledby="blog-title">
+    <section id="projects" class="section" aria-labelledby="projects-title">
       <div class="section-heading">
-        <h2 id="blog-title">Blog Dispatches</h2>
+        <h2 id="projects-title">Projects</h2>
         <p>Field write-ups that walk through the tooling, lessons, and tradecraft behind each build.</p>
       </div>
       <div class="blog-carousel" data-blog-carousel data-post-source="assets/data/posts.json">
@@ -227,7 +255,7 @@
                 </div>
               </a>
             </article>
-            <article class="blog-card" data-slug="melody-match" data-title="Melody Match: Pairing Biometrics with Music Therapy" data-date="2024-12-03" data-read="7 min" data-summary="An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.">
+            <article class="blog-card" data-slug="melody-match" data-title="Melody Match: Swift Client + Python Server" data-date="2024-12-03" data-read="7 min" data-summary="Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.">
               <a class="blog-card-link" href="posts/melody-match.html">
                 <div class="blog-card-media">
                   <img src="assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" loading="lazy" />
@@ -237,12 +265,13 @@
                     <time datetime="2024-12-03">Dec 3, 2024</time>
                     <span>7 min read</span>
                   </div>
-                  <h3>Melody Match: Pairing Biometrics with Music Therapy</h3>
-                  <p>An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.</p>
+                  <h3>Melody Match: Swift Client + Python Server</h3>
+                  <p>Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.</p>
                   <ul class="tag-list blog-card-tags">
                     <li>Swift</li>
+                    <li>Python</li>
                     <li>ESP8266</li>
-                    <li>ML</li>
+                    <li>Hackathon</li>
                   </ul>
                 </div>
               </a>
@@ -250,6 +279,107 @@
           </div>
         </div>
         <button class="carousel-nav is-next" type="button" aria-label="Next post" data-carousel-next>
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+        <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
+      </div>
+      <div class="carousel-status" data-carousel-status role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="writeups" class="section" aria-labelledby="writeups-title">
+      <div class="section-heading">
+        <h2 id="writeups-title">Writeups</h2>
+        <p>HTB-style walkthroughs documenting enumeration, exploitation paths, and clean reporting takeaways.</p>
+      </div>
+      <div class="blog-carousel" data-blog-carousel data-post-source="assets/data/writeups.json">
+        <button class="carousel-nav is-prev" type="button" aria-label="Previous writeup" data-carousel-prev>
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+        <div class="carousel-window">
+          <div class="carousel-track" data-carousel-track>
+            <article class="blog-card" data-slug="htb-certificate-writeup" data-title="HTB Certificate Writeup" data-date="2025-06-08" data-read="11 min" data-summary="Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.">
+              <a class="blog-card-link" href="posts/htb-certificate-writeup.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/writeups/htb-certificate.png" alt="First page preview of the HTB Certificate writeup PDF report" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-06-08">Jun 8, 2025</time>
+                    <span>11 min read</span>
+                  </div>
+                  <h3>HTB Certificate Writeup</h3>
+                  <p>Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>HTB</li>
+                    <li>Windows</li>
+                    <li>Web Exploitation</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+            <article class="blog-card" data-slug="htb-escapetwo-writeup" data-title="HTB EscapeTwo Writeup" data-date="2025-06-08" data-read="14 min" data-summary="Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.">
+              <a class="blog-card-link" href="posts/htb-escapetwo-writeup.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/writeups/htb-escapetwo.png" alt="First page preview of the HTB EscapeTwo writeup PDF report" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-06-08">Jun 8, 2025</time>
+                    <span>14 min read</span>
+                  </div>
+                  <h3>HTB EscapeTwo Writeup</h3>
+                  <p>Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>HTB</li>
+                    <li>Windows</li>
+                    <li>LDAP</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+            <article class="blog-card" data-slug="htb-heal-writeup" data-title="HTB Heal Writeup" data-date="2025-06-08" data-read="10 min" data-summary="Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.">
+              <a class="blog-card-link" href="posts/htb-heal-writeup.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/writeups/htb-heal.png" alt="First page preview of the HTB Heal writeup PDF report" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-06-08">Jun 8, 2025</time>
+                    <span>10 min read</span>
+                  </div>
+                  <h3>HTB Heal Writeup</h3>
+                  <p>Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>HTB</li>
+                    <li>Linux</li>
+                    <li>LFI</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+            <article class="blog-card" data-slug="htb-planning-writeup" data-title="HTB Planning Writeup" data-date="2025-06-08" data-read="7 min" data-summary="Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.">
+              <a class="blog-card-link" href="posts/htb-planning-writeup.html">
+                <div class="blog-card-media">
+                  <img src="assets/img/writeups/htb-planning.png" alt="First page preview of the HTB Planning writeup PDF report" loading="lazy" />
+                </div>
+                <div class="blog-card-body">
+                  <div class="blog-card-meta">
+                    <time datetime="2025-06-08">Jun 8, 2025</time>
+                    <span>7 min read</span>
+                  </div>
+                  <h3>HTB Planning Writeup</h3>
+                  <p>Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.</p>
+                  <ul class="tag-list blog-card-tags">
+                    <li>HTB</li>
+                    <li>Linux</li>
+                    <li>Grafana</li>
+                  </ul>
+                </div>
+              </a>
+            </article>
+          </div>
+        </div>
+        <button class="carousel-nav is-next" type="button" aria-label="Next writeup" data-carousel-next>
           <span aria-hidden="true">&#8594;</span>
         </button>
         <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
@@ -274,33 +404,6 @@
         <p>Field notes from team-based competitions that sharpen exploit chains, reporting, and presentation chops.</p>
       </div>
       <div class="timeline">
-          <article class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <div class="timeline-header-main">
-                  <div class="timeline-logos">
-                      <img src="assets/img/ccdc.png" alt="Apple logo" loading="lazy" />
-                  </div>
-                <h3 class="timeline-company">CCDC</h3>
-                <p class="timeline-role">Off-Season Training</p>
-              </div>
-              <div class="timeline-header-meta">
-                <span class="timeline-meta">Spring 2026 · Collegiate Cyber Defense Competition</span>
-                <div class="timeline-tabs">
-                  <span class="timeline-tab timeline-tab--blue-team">Blue Team</span>
-                </div>
-              </div>
-            </div>
-            <p>Reinforce enterprise services under live fire, monitor intrusions, and orchestrate rapid incident response.</p>
-            <ul class="timeline-skill-tags">
-              <li>Incident Response</li>
-                <li>Service hardening</li>
-              <li>SOC Monitoring</li>
-              <li>Blue Team Playbooks</li>
-            </ul>
-          </div>
-        </article>
           <article class="timeline-item">
               <div class="timeline-marker"></div>
               <div class="timeline-content">
@@ -393,8 +496,8 @@
         <article class="card compact">
           <div class="card-body">
             <div class="badge badge--purple">Certification</div>
-            <h3>HTB CPTS (In Progress)</h3>
-            <p>Grinding advanced adversary tradecraft and operator methodology to lock in the CPTS credential.</p>
+            <h3>HTB CPTS (Completed)</h3>
+            <p>Earned the HTB Certified Penetration Testing Specialist credential through practical adversary-style assessment and reporting.</p>
           </div>
         </article>
         <article class="card compact">
@@ -446,18 +549,6 @@
         <article class="club-card">
           <div class="club-header">
             <div class="club-logo">
-              <img src="assets/img/ccdc.png" alt="National Collegiate Cyber Defense Competition logo" loading="lazy" />
-            </div>
-            <div>
-              <h3>UTSA Collegiate Cyber Defense Team (CCDC)</h3>
-              <p class="club-role">Infrastructure Defense &amp; Client Blue Team</p>
-            </div>
-          </div>
-          <p>Hardening enterprise-scale environments and coordinating playbooks against Red Team bombardment</p>
-        </article>
-        <article class="club-card">
-          <div class="club-header">
-            <div class="club-logo">
               <img src="assets/img/und.webp" alt="Collegiate Penetration Testing Competition logo" loading="lazy" />
             </div>
             <div>
@@ -491,46 +582,12 @@
             <li>CompTIA Security+</li>
             <li>Google Cybersecurity Professional</li>
             <li>HTB Mini Pro Lab Full House</li>
-            <li>HTB Certified Penetration Testing Specialist (In Progress)</li>
+            <li>HTB Certified Penetration Testing Specialist (CPTS)</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <section id="connect" class="section contact-cta" aria-labelledby="connect-title">
-      <div class="contact-card">
-        <div class="contact-card-header">
-          <h2 id="connect-title">Contact Me!</h2>
-          <p>Interested in teaming up?</p>
-        </div>
-        <div class="contact-card-grid">
-          <div class="contact-info-block">
-            <ul class="contact-list">
-              <li><span class="contact-label">Email</span><a href="mailto:willdedominico@proton.me">willdedominico@proton.me</a></li>
-              <li><span class="contact-label">LinkedIn</span><a href="https://www.linkedin.com/in/wdedo" target="_blank" rel="noopener">linkedin.com/in/wdedo</a></li>
-              <li><span class="contact-label">GitHub</span><a href="https://github.com/moriz82" target="_blank" rel="noopener">github.com/moriz82</a></li>
-              <li><span class="contact-label">Location</span>San Antonio, Texas · Remote friendly</li>
-            </ul>
-          </div>
-          <form class="contact-form" data-mailto="willdedominico@proton.me">
-            <label for="contact-name">Display Name</label>
-            <input id="contact-name" name="contact-name" type="text" placeholder="Your handle" required />
-
-            <label for="contact-email">Your Email</label>
-            <input id="contact-email" name="contact-email" type="email" placeholder="you@domain.com" required />
-
-            <label for="contact-message">Message body</label>
-            <textarea id="contact-message" name="contact-message" rows="5" placeholder="Let me know what you'd like to collaborate on." required></textarea>
-
-            <div class="contact-form-actions">
-              <button type="submit" class="button primary">Launch email draft</button>
-              <p class="contact-form-note">Opens your default mail client with the message pre-filled.</p>
-              <p class="contact-form-status" data-mailto-status hidden>Launching email client…</p>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">

@@ -1,0 +1,121 @@
+Description:
+Planning is an easy linux box that is strong in web exploitation, and linux knowledge.
+This lab is very simple with majority of vulnerabilities being default credentials and know
+exploits.
+Difficulty: Easy
+Operating System: Linux
+Default Creds: admin / 0D5oT70Fq13EvB5r
+
+
+
+Skills Required:
+   Web Enumeration
+   Basic Linux understanding
+   Trivial docker understanding
+Tools Used:
+   nmap
+   ffuf
+   netcat
+   ssh
+
+
+Enumeration
+
+Port Scanning - Nmap
+
+
+
+
+Observing the Nmap scan we can see there is a website running on port 80 via nginx. It
+seems the website is called Edukate. We can also see the server in also on linux
+running ssh.
+Web Enumeration - ffuf
+
+
+
+
+Browsing the website and web requests, there is nothing vulnerable on the main page.
+The registration and the search field both are not injectable nor does the website seem
+to even care about what you send it. IT seems very bare bones, and not our target.
+
+
+
+
+After running ffuf, we can see there is a subdomain called grafana.
+Here we can see the page we were given credentials for to login to. Grafana seems to
+be some kind of analytics tool, and we have admin access to the panel.
+
+
+
+
+First thing we can see is the Grafana version is out of date by around a year or two. This
+allows us to find known vulnerabilities, which I linked below along. I also included
+revshells, a website that can generate reverse shell payloads for you.
+https://github.com/nollium/CVE-2024-9264
+https://www.revshells.com/
+Foothold
+
+User Enumeration
+
+
+
+
+Interestingly enough the shell is root. Which seems way to easy at first, however there is
+no root or user flag. This mean we must be in a sandbox of some kind.
+
+
+
+
+After searching for docker on the machine we can see we are in fact in a docker
+container.
+
+
+
+
+While we could find a way to escape the container, it seems when checking the
+environment we can find plain text credentials. This is most likely a way to ssh into the
+main machine.
+
+
+
+
+Simple enough we can just ssh with these credentials and get the user flag.
+Privilege Escalation
+
+
+
+
+After running the linux privilege escalation tool linPEAS, we can see a interesting file
+called crontab.db. We can also see crontab is running as the root user. crontab is a linux
+program that runs commands every so often, this is often for actions like backups,
+clearing memory, or restarts.
+
+
+
+
+Looking into the database file with just cat we can see, once again, a plaintext
+password. Now we just need to find a way to login to whatever is hosting this database.
+
+
+
+
+Looking into the active network listeners there is something running on the localhost on
+port 8000. This port is commonly known for hosting web servers. We can use a ssh
+tunnel to gain access to this website.
+
+
+
+
+The website greets us with a login page that we can just use the password we found,
+and username as root. We find this website to be some kind of chrontab UI, since this is
+running as root we have code execution as root.
+The first thing I did was copy the root flag over to enzo's home folder. This ended up
+working but the permissions were root only.
+
+
+
+
+The next thing I did was change the permission level to everyone can access, this
+allowed me to cat the root flag. Looking back if this was a real pentest, it would be better
+to either change the root password or make a link to /bin/bash.
+

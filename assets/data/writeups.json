@@ -1,0 +1,42 @@
+[
+  {
+    "slug": "htb-certificate-writeup",
+    "title": "HTB Certificate Writeup",
+    "summary": "Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.",
+    "date": "2025-06-08",
+    "readTime": "11 min",
+    "hero": "assets/img/writeups/htb-certificate.png",
+    "heroAlt": "First page preview of the HTB Certificate writeup PDF report",
+    "tags": ["HTB", "Windows", "Web Exploitation", "Active Directory"]
+  },
+  {
+    "slug": "htb-escapetwo-writeup",
+    "title": "HTB EscapeTwo Writeup",
+    "summary": "Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.",
+    "date": "2025-06-08",
+    "readTime": "14 min",
+    "hero": "assets/img/writeups/htb-escapetwo.png",
+    "heroAlt": "First page preview of the HTB EscapeTwo writeup PDF report",
+    "tags": ["HTB", "Windows", "LDAP", "SMB", "ADCS"]
+  },
+  {
+    "slug": "htb-heal-writeup",
+    "title": "HTB Heal Writeup",
+    "summary": "Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.",
+    "date": "2025-06-08",
+    "readTime": "10 min",
+    "hero": "assets/img/writeups/htb-heal.png",
+    "heroAlt": "First page preview of the HTB Heal writeup PDF report",
+    "tags": ["HTB", "Linux", "LFI", "API", "RCE"]
+  },
+  {
+    "slug": "htb-planning-writeup",
+    "title": "HTB Planning Writeup",
+    "summary": "Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.",
+    "date": "2025-06-08",
+    "readTime": "7 min",
+    "hero": "assets/img/writeups/htb-planning.png",
+    "heroAlt": "First page preview of the HTB Planning writeup PDF report",
+    "tags": ["HTB", "Linux", "Grafana", "Privilege Escalation"]
+  }
+]

