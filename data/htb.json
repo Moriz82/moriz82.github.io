@@ -2,7 +2,7 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 37
+      "value": 38
     },
     {
       "label": "Hard",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "CCTV",
+      "difficulty": "Easy",
+      "date": "2026-03-07T19:00:00.000000Z",
+      "summary": "Linux"
+    },
+    {
       "name": "Pirate",
       "difficulty": "Hard",
       "date": "2026-02-28T19:00:00.000000Z",
@@ -28,12 +34,6 @@
       "name": "WingData",
       "difficulty": "Easy",
       "date": "2026-02-14T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "Pterodactyl",
-      "difficulty": "Medium",
-      "date": "2026-02-07T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
