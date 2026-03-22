@@ -14,10 +14,16 @@
     },
     {
       "label": "Medium",
-      "value": 13
+      "value": 14
     }
   ],
   "boxes": [
+    {
+      "name": "VariaType",
+      "difficulty": "Medium",
+      "date": "2026-03-14T19:00:00.000000Z",
+      "summary": "Linux"
+    },
     {
       "name": "CCTV",
       "difficulty": "Easy",
@@ -29,12 +35,6 @@
       "difficulty": "Hard",
       "date": "2026-02-28T19:00:00.000000Z",
       "summary": "Windows"
-    },
-    {
-      "name": "WingData",
-      "difficulty": "Easy",
-      "date": "2026-02-14T19:00:00.000000Z",
-      "summary": "Linux"
     }
   ]
 }
