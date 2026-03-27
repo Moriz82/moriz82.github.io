@@ -2,7 +2,7 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 38
+      "value": 39
     },
     {
       "label": "Hard",
@@ -14,10 +14,16 @@
     },
     {
       "label": "Medium",
-      "value": 14
+      "value": 18
     }
   ],
   "boxes": [
+    {
+      "name": "Kobold",
+      "difficulty": "Easy",
+      "date": "2026-03-21T19:00:00.000000Z",
+      "summary": "Linux"
+    },
     {
       "name": "VariaType",
       "difficulty": "Medium",
@@ -29,12 +35,6 @@
       "difficulty": "Easy",
       "date": "2026-03-07T19:00:00.000000Z",
       "summary": "Linux"
-    },
-    {
-      "name": "Pirate",
-      "difficulty": "Hard",
-      "date": "2026-02-28T19:00:00.000000Z",
-      "summary": "Windows"
     }
   ]
 }
