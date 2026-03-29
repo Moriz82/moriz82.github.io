@@ -10,14 +10,20 @@
     },
     {
       "label": "Insane",
-      "value": 2
+      "value": 3
     },
     {
       "label": "Medium",
-      "value": 18
+      "value": 19
     }
   ],
   "boxes": [
+    {
+      "name": "DevArea",
+      "difficulty": "Medium",
+      "date": "2026-03-28T19:00:00.000000Z",
+      "summary": "Linux"
+    },
     {
       "name": "Kobold",
       "difficulty": "Easy",
@@ -28,12 +34,6 @@
       "name": "VariaType",
       "difficulty": "Medium",
       "date": "2026-03-14T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "CCTV",
-      "difficulty": "Easy",
-      "date": "2026-03-07T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
