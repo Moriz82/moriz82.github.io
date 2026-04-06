@@ -6,7 +6,7 @@
     },
     {
       "label": "Hard",
-      "value": 8
+      "value": 9
     },
     {
       "label": "Insane",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "Garfield",
+      "difficulty": "Hard",
+      "date": "2026-04-04T19:00:00.000000Z",
+      "summary": "Windows"
+    },
+    {
       "name": "DevArea",
       "difficulty": "Medium",
       "date": "2026-03-28T19:00:00.000000Z",
@@ -28,12 +34,6 @@
       "name": "Kobold",
       "difficulty": "Easy",
       "date": "2026-03-21T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "VariaType",
-      "difficulty": "Medium",
-      "date": "2026-03-14T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
