@@ -2,7 +2,7 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 39
+      "value": 40
     },
     {
       "label": "Hard",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "Silentium",
+      "difficulty": "Easy",
+      "date": "2026-04-11T19:00:00.000000Z",
+      "summary": "Linux"
+    },
+    {
       "name": "Garfield",
       "difficulty": "Hard",
       "date": "2026-04-04T19:00:00.000000Z",
@@ -28,12 +34,6 @@
       "name": "DevArea",
       "difficulty": "Medium",
       "date": "2026-03-28T19:00:00.000000Z",
-      "summary": "Linux"
-    },
-    {
-      "name": "Kobold",
-      "difficulty": "Easy",
-      "date": "2026-03-21T19:00:00.000000Z",
       "summary": "Linux"
     }
   ]
