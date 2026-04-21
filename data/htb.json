@@ -14,10 +14,16 @@
     },
     {
       "label": "Medium",
-      "value": 19
+      "value": 20
     }
   ],
   "boxes": [
+    {
+      "name": "Logging",
+      "difficulty": "Medium",
+      "date": "2026-04-18T19:00:00.000000Z",
+      "summary": "Windows"
+    },
     {
       "name": "Silentium",
       "difficulty": "Easy",
@@ -29,12 +35,6 @@
       "difficulty": "Hard",
       "date": "2026-04-04T19:00:00.000000Z",
       "summary": "Windows"
-    },
-    {
-      "name": "DevArea",
-      "difficulty": "Medium",
-      "date": "2026-03-28T19:00:00.000000Z",
-      "summary": "Linux"
     }
   ]
 }
