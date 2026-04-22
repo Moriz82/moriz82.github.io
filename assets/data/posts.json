@@ -1,32 +1,38 @@
 [
   {
     "slug": "cyber-range-homelab",
-    "title": "Building a Cyber Range Homelab",
-    "summary": "How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.",
-    "date": "2025-02-10",
-    "readTime": "8 min",
-    "hero": "assets/img/homelab.jpg",
-    "heroAlt": "Server racks lit with violet accent lights representing a homelab cluster",
-    "tags": ["Proxmox", "Cisco", "OffSec"]
+    "title": "Cyber Range Homelab",
+    "summary": "Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.",
+    "date": "2025-02-10T00:00:00.000Z",
+    "readTime": "8 min read",
+    "tags": [
+      "PROXMOX",
+      "CISCO",
+      "LAB"
+    ]
   },
   {
     "slug": "3d-printed-satellite-antenna",
-    "title": "Printing a Satellite Antenna for NOAA & GOES",
-    "summary": "Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.",
-    "date": "2025-01-18",
-    "readTime": "6 min",
-    "hero": "assets/img/antenna.jpg",
-    "heroAlt": "Hand-built helical antenna pointed at the sky for satellite downlink",
-    "tags": ["SDR", "RF", "Python"]
+    "title": "3D-Printed Satellite Antenna",
+    "summary": "Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly NOAA/GOES weather downlink possible.",
+    "date": "2025-01-18T00:00:00.000Z",
+    "readTime": "6 min read",
+    "tags": [
+      "SDR",
+      "RF",
+      "NOAA"
+    ]
   },
   {
     "slug": "melody-match",
-    "title": "Melody Match: Swift Client + Python Server",
-    "summary": "Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.",
-    "date": "2024-12-03",
-    "readTime": "7 min",
-    "hero": "assets/img/melody.jpg",
-    "heroAlt": "Person testing a wearable device and companion mobile app",
-    "tags": ["Swift", "Python", "ESP8266", "Hackathon"]
+    "title": "Melody Match",
+    "summary": "Built at RowdyHacks X. A Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.",
+    "date": "2024-12-03T00:00:00.000Z",
+    "readTime": "7 min read",
+    "tags": [
+      "SWIFT",
+      "PYTHON",
+      "ESP8266"
+    ]
   }
 ]

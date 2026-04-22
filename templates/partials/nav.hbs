@@ -1,0 +1,19 @@
+<header class="nav">
+  <div class="nav-left">
+    <a href="{{root}}index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="{{root}}index.html" class="{{#if (eq active 'home')}}is-active{{/if}}">HOME</a>
+    <a href="{{root}}writeups/index.html" class="{{#if (eq active 'writeups')}}is-active{{/if}}">WRITEUPS</a>
+    <a href="{{root}}projects/index.html" class="{{#if (eq active 'projects')}}is-active{{/if}}">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="{{root}}about.html" class="{{#if (eq active 'about')}}is-active{{/if}}">ABOUT</a>
+    <a href="{{root}}contact.html" class="{{#if (eq active 'contact')}}is-active{{/if}}">CONTACT</a>
+  </nav>
+</header>

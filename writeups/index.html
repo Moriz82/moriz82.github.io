@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Writeups by Will DeDominico — HTB, CTF, and research walkthroughs.">
+<title>Writeups · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<main class="shell">
+  <section class="page-head">
+    <div class="eye">// WRITEUPS</div>
+    <h1 class="page-title">Research &amp; walkthroughs.</h1>
+    <p class="page-lead">10 posts across 1 categories. Newest first.</p>
+  </section>
+
+  <section class="wp-group" id="htb">
+    <div class="wp-group-head">
+      <span class="wp-group-label">// HACK THE BOX</span>
+      <span class="wp-group-count">10 POSTS</span>
+    </div>
+    <hr class="dashed-thick">
+
+    <div class="post-grid">
+      <a class="card post-card medium" href="../posts/htb-devarea-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB DevArea</div>
+        <p class="post-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
+        <div class="post-tags">
+          <span class="chip">CVE</span><span class="chip">SOAP</span><span class="chip">FLASK</span>
+        </div>
+        <div class="card-footer"><span>March 27, 2026 · 14 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card insane" href="../posts/htb-hercules-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">INSANE · WINDOWS</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Hercules</div>
+        <p class="post-summary">NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts &#x60;johnathan.j&#x60;&#x27;s description — a live password. Spray into &#x60;ken.w&#x60;, coerce + crack to &#x60;natalie.a&#x60;, Shadow-Creds across &#x60;bob.w&#x60; → move &#x60;Auditor&#x60; between OUs → Shadow-Creds &#x60;auditor&#x60;. Forest Migration OU &#x60;GenericAll&#x60; + ESC3 Enrollment Agent → &#x60;ashley.b&#x60; → a scheduled &#x60;aCleanup.ps1&#x60; reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on &#x60;IIS_WEBSERVER$&#x60; (a user account, no SPNs) — swap NT hash for the TGT session key, run &#x60;S4U2Self+U2U+S4U2Proxy&#x60;, impersonate Administrator.</p>
+        <div class="post-tags">
+          <span class="chip">AD</span><span class="chip">ADCS</span><span class="chip">KERBEROS</span>
+        </div>
+        <div class="card-footer"><span>February 11, 2026 · 13 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-airtouch-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Airtouch</div>
+        <p class="post-summary">SNMP coughs up a &#x60;consultant&#x60; cred → passwordless sudo on the consultant host. From there, &#x60;airodump-ng&#x60; captures the WPA2-PSK handshake for &#x60;AirTouch-Internet&#x60; (crack → &#x60;[REDACTED]&#x60;), &#x60;airdecap-ng&#x60; exposes the router&#x27;s &#x60;UserRole&#x3D;admin&#x60; cookie, a &#x60;.phtml&#x60; upload lands RCE, and the router&#x27;s &#x60;/root/certs-backup/&#x60; + &#x60;send_certs.sh&#x60; are the keys to the WPA-Enterprise office net and the final management host.</p>
+        <div class="post-tags">
+          <span class="chip">WIFI</span><span class="chip">WPA</span><span class="chip">PIVOT</span>
+        </div>
+        <div class="card-footer"><span>October 21, 2025 · 12 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card hard" href="../posts/htb-garfield-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">HARD · WINDOWS</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Garfield</div>
+        <p class="post-summary">IT-support user &#x60;j.arbuckle&#x60; has &#x60;scriptPath&#x60; WRITE on Liz Wilson — drop a &#x60;.bat&#x60; in NETLOGON, flip her scriptPath, and her ForceChangePassword propagates to &#x60;l.wilson_adm&#x60;. l.wilson_adm can &#x60;AddSelf&#x60; to RODC Administrators and has &#x60;WriteAccountRestrictions&#x60; on &#x60;RODC01$&#x60;, enabling an RBCD chain that impersonates Administrator on the internal RODC. Dump &#x60;krbtgt_8245&#x60;, clear the RODC deny-list, forge an RODC golden ticket, and run a Key List Attack to extract Administrator&#x27;s NT hash.</p>
+        <div class="post-tags">
+          <span class="chip">AD</span><span class="chip">RODC</span><span class="chip">KERBEROS</span>
+        </div>
+        <div class="card-footer"><span>September 9, 2025 · 16 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-browsed-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Browsed</div>
+        <p class="post-summary">Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to &#x60;localhost&#x60; — abuse that to hit a Flask app with a Bash arithmetic-eval bug (&#x60;arr[$(…)]&#x60;) and land as &#x60;larry&#x60;. Root comes from a &#x60;sudo&#x60;-allowed Python tool whose &#x60;__pycache__&#x60; is mode 777 — drop a poisoned &#x60;.pyc&#x60; and SUID bash.</p>
+        <div class="post-tags">
+          <span class="chip">CHROME</span><span class="chip">BASH</span><span class="chip">PYCACHE</span>
+        </div>
+        <div class="card-footer"><span>August 17, 2025 · 10 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-interpreter-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Interpreter</div>
+        <p class="post-summary">Unauth Mirth Connect RCE (CVE-2023-43208) for &#x60;mirth&#x60; shell → DB creds from &#x60;mirth.properties&#x60; → crack PBKDF2-SHA256 &#x60;sedric&#x60; hash with 600K iterations → SSH in → local Flask notifier service with an f-string template injection through an &#x60;&lt;lastname&gt;&#x60; XML field pops &#x60;/root/root.txt&#x60;.</p>
+        <div class="post-tags">
+          <span class="chip">CVE</span><span class="chip">RCE</span><span class="chip">SSTI</span>
+        </div>
+        <div class="card-footer"><span>July 19, 2025 · 8 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card hard" href="../posts/htb-certificate-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">HARD · WINDOWS</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Certificate</div>
+        <p class="post-summary">Course portal quiz uploader into a &#x60;.php&#x60; shell via zip + null-byte trick, bcrypt crack, &#x60;GenericAll&#x60; pivot to &#x60;Ryan.K&#x60;, and &#x60;SeManageVolumePrivilege&#x60; → &#x60;diaghub&#x60; LOLBAS → Administrator NT hash.</p>
+        <div class="post-tags">
+          <span class="chip">AD</span><span class="chip">WEB</span><span class="chip">WINDOWS</span>
+        </div>
+        <div class="card-footer"><span>June 1, 2025 · 12 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card easy" href="../posts/htb-escapetwo-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">EASY · WINDOWS</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB EscapeTwo</div>
+        <p class="post-summary">Default &#x60;rose&#x60; creds → SMB share with spreadsheet secrets → &#x60;sa&#x60; MSSQL → &#x60;sql_svc&#x60; config file leak → password spray to &#x60;ryan&#x60; → ADCS ESC-style chain via &#x60;ca_svc&#x60; to Administrator NT hash.</p>
+        <div class="post-tags">
+          <span class="chip">AD</span><span class="chip">LDAP</span><span class="chip">SMB</span><span class="chip">ADCS</span>
+        </div>
+        <div class="card-footer"><span>May 14, 2025 · 14 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card easy" href="../posts/htb-planning-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">EASY · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Planning</div>
+        <p class="post-summary">Default creds on a Grafana panel → CVE-2024-9264 RCE → docker container foothold → plaintext &#x60;GF_SECURITY_ADMIN_PASSWORD&#x60; reused for &#x60;enzo&#x60; SSH → linpeas spots a root crontab.db → crontab-ui on &#x60;localhost:8000&#x60; with same creds → arbitrary root scheduled jobs.</p>
+        <div class="post-tags">
+          <span class="chip">GRAFANA</span><span class="chip">DOCKER</span><span class="chip">CRON</span>
+        </div>
+        <div class="card-footer"><span>May 14, 2025 · 7 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-heal-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Heal</div>
+        <p class="post-summary">Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as &#x60;www-data&#x60; → unauthenticated HashiCorp Consul service-registration → root.</p>
+        <div class="post-tags">
+          <span class="chip">LFI</span><span class="chip">API</span><span class="chip">RCE</span>
+        </div>
+        <div class="card-footer"><span>May 12, 2025 · 10 min read</span><span class="go">READ →</span></div>
+      </a>
+    </div>
+  </section>
+  <section class="wp-group" id="cit-ctf">
+    <div class="wp-group-head">
+      <span class="wp-group-label">// CIT@CTF</span>
+      <span class="wp-group-count">00 </span>
+    </div>
+    <hr class="dashed-thick">
+
+    <div class="wp-group-empty">
+      <p>No posts yet — coming soon.</p>
+    </div>
+  </section>
+  <section class="wp-group" id="other">
+    <div class="wp-group-head">
+      <span class="wp-group-label">// OTHER / RESEARCH</span>
+      <span class="wp-group-count">00 </span>
+    </div>
+    <hr class="dashed-thick">
+
+    <div class="wp-group-empty">
+      <p>No posts yet — coming soon.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

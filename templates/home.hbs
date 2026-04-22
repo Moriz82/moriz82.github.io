@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active="home"}}
+
+<main class="shell">
+
+  <div class="grid-top">
+    <a class="card bio" href="about.html">
+      {{> card}}
+      <div class="card-head"><span class="l">// ABOUT</span><span class="r">ONLINE</span></div>
+      <hr class="dashed">
+      <div class="eye">STUDENT SECURITY RESEARCHER · UTSA</div>
+      <h1 class="bio-title">Hey, I'm <u>Will DeDominico</u>.</h1>
+      <p class="bio-lead">Cyber security student at UTSA researching red team operations and adversary emulation. I break things, write up what I learn, and publish it here.</p>
+      <dl class="bio-meta">
+        <div><dt>Focus</dt><dd>Adversary emulation<br>Web exploitation<br>GNU/Linux</dd></div>
+        <div><dt>Current</dt><dd>Bug bounty<br>Learning blue team</dd></div>
+      </dl>
+      <div class="card-footer"><span>FULL BIO + EDUCATION</span><span class="go">/about →</span></div>
+    </a>
+
+    <a class="card" href="{{htb.profileUrl}}" target="_blank" rel="noopener">
+      {{> card}}
+      <div class="card-head"><span class="l">// LEDGER · HTB</span><span class="r">LIVE · {{htb.updatedAgo}}</span></div>
+      <hr class="dashed">
+      <div class="big-num">{{htb.total}}</div>
+      <div class="big-sub">BOXES PWNED · TOP {{htb.percent}}% GLOBAL</div>
+      <div class="bars">
+        {{#each htb.bars}}
+        <div class="bar-row"><span class="lbl">{{label}}</span><span class="track"><span class="fill {{cls}}" style="width:{{pct}}%"></span></span><span class="val">{{padVal value}}</span></div>
+        {{/each}}
+      </div>
+      {{#if htb.recent}}
+      <div class="inset">
+        <div class="inset-lbl">▸ RECENT CAPTURE</div>
+        <div class="inset-title">{{upper htb.recent.name}}</div>
+        <div class="inset-meta">WIN · {{upper htb.recent.difficulty}} · {{htb.recent.summary}} · {{htb.recent.ago}}</div>
+      </div>
+      {{/if}}
+      <div class="card-footer"><span>FULL PROFILE</span><span class="go">htb profile ↗</span></div>
+    </a>
+  </div>
+
+  <div class="grid-bottom">
+
+    <a class="card" href="about.html#ctfs">
+      {{> card}}
+      <div class="card-head"><span class="l">// LEDGER · CTF</span><span class="r">{{padVal ctfs.count}} COMPS · {{ctfs.podiums}} PODIUMS</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo timeline-sm">
+        {{#each ctfs.items}}
+        <div class="tl-row {{state}}">
+          {{#if logo}}<div class="tl-logo"><img src="{{logo}}" alt="{{name}}"></div>{{/if}}
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">{{upper name}}</span><span class="tl-date">{{date}}</span></div>
+            <div class="tl-sub">{{sub}}</div>
+            {{#each tags}}<span class="tl-tag {{cls}}">{{label}}</span>{{/each}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <div class="card-footer"><span>ALL COMPETITIONS</span><span class="go">/about#ctfs →</span></div>
+    </a>
+
+    <a class="card" href="about.html#experience">
+      {{> card}}
+      <div class="card-head"><span class="l">// EXPERIENCE</span><span class="r">{{padVal experience.count}} ROLES</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo timeline-sm">
+        {{#each experience.items}}
+        <div class="tl-row {{state}}">
+          {{#if logo}}<div class="tl-logo"><img src="{{logo}}" alt="{{company}}"></div>{{/if}}
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">{{upper company}}</span><span class="tl-date">{{date}}</span></div>
+            <div class="tl-sub">{{role}}</div>
+            {{#each tags}}<span class="tl-tag {{cls}}">{{label}}</span>{{/each}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <div class="card-footer"><span>FULL WORK HISTORY</span><span class="go">/about#experience →</span></div>
+    </a>
+
+    <a class="card" href="about.html#certs">
+      {{> card}}
+      <div class="card-head"><span class="l">// LEDGER · CERTS</span><span class="r">{{padVal certs.done}}/{{padVal certs.total}} · ACTIVE</span></div>
+      <hr class="dashed">
+      <div class="big-num"><span>{{padVal certs.done}}</span><span class="big-num-sub">/{{padVal certs.total}}</span></div>
+      <div class="big-sub">CERTIFIED · {{certs.wip}} IN PROGRESS</div>
+      <div class="cert-list">
+        {{#each certs.items}}
+        <div class="cert-row"><span class="n">{{name}}</span><span class="s {{state}}">{{status}}</span></div>
+        {{/each}}
+      </div>
+      <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
+    </a>
+
+    {{#if latest}}
+    <a class="card" href="{{latest.href}}">
+      {{> card}}
+      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">{{latest.ago}}</span></div>
+      <hr class="dashed">
+      <div class="latest-meta">{{upper latest.category}}</div>
+      <div class="latest-title">{{upper latest.title}}</div>
+      <p class="latest-summary">{{latest.summary}}</p>
+      <div class="latest-tags">
+        {{#each latest.tags}}<span class="chip">{{this}}</span>{{/each}}
+      </div>
+      <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
+    </a>
+    {{/if}}
+
+  </div>
+
+</main>
+
+{{> footer}}
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,42 +1,143 @@
 [
   {
+    "slug": "htb-devarea-writeup",
+    "title": "HTB DevArea",
+    "summary": "Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak `/etc/systemd/system/hoverfly.service` → admin creds → CVE-2025-54123 middleware RCE → SSH as `dev_ryan`. Root chains a leaked Flask `SECRET_KEY` (session forge) + a regex-allow-listed `|` pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.",
+    "date": "2026-03-28T00:00:00.000Z",
+    "readTime": "14 min read",
+    "tags": [
+      "CVE",
+      "SOAP",
+      "FLASK"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-hercules-writeup",
+    "title": "HTB Hercules",
+    "summary": "NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts `johnathan.j`'s description — a live password. Spray into `ken.w`, coerce + crack to `natalie.a`, Shadow-Creds across `bob.w` → move `Auditor` between OUs → Shadow-Creds `auditor`. Forest Migration OU `GenericAll` + ESC3 Enrollment Agent → `ashley.b` → a scheduled `aCleanup.ps1` reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on `IIS_WEBSERVER$` (a user account, no SPNs) — swap NT hash for the TGT session key, run `S4U2Self+U2U+S4U2Proxy`, impersonate Administrator.",
+    "date": "2026-02-12T00:00:00.000Z",
+    "readTime": "13 min read",
+    "tags": [
+      "AD",
+      "ADCS",
+      "KERBEROS"
+    ],
+    "difficulty": "insane",
+    "os": "windows"
+  },
+  {
+    "slug": "htb-airtouch-writeup",
+    "title": "HTB Airtouch",
+    "summary": "SNMP coughs up a `consultant` cred → passwordless sudo on the consultant host. From there, `airodump-ng` captures the WPA2-PSK handshake for `AirTouch-Internet` (crack → `[REDACTED]`), `airdecap-ng` exposes the router's `UserRole=admin` cookie, a `.phtml` upload lands RCE, and the router's `/root/certs-backup/` + `send_certs.sh` are the keys to the WPA-Enterprise office net and the final management host.",
+    "date": "2025-10-22T00:00:00.000Z",
+    "readTime": "12 min read",
+    "tags": [
+      "WIFI",
+      "WPA",
+      "PIVOT"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-garfield-writeup",
+    "title": "HTB Garfield",
+    "summary": "IT-support user `j.arbuckle` has `scriptPath` WRITE on Liz Wilson — drop a `.bat` in NETLOGON, flip her scriptPath, and her ForceChangePassword propagates to `l.wilson_adm`. l.wilson_adm can `AddSelf` to RODC Administrators and has `WriteAccountRestrictions` on `RODC01$`, enabling an RBCD chain that impersonates Administrator on the internal RODC. Dump `krbtgt_8245`, clear the RODC deny-list, forge an RODC golden ticket, and run a Key List Attack to extract Administrator's NT hash.",
+    "date": "2025-09-10T00:00:00.000Z",
+    "readTime": "16 min read",
+    "tags": [
+      "AD",
+      "RODC",
+      "KERBEROS"
+    ],
+    "difficulty": "hard",
+    "os": "windows"
+  },
+  {
+    "slug": "htb-browsed-writeup",
+    "title": "HTB Browsed",
+    "summary": "Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to `localhost` — abuse that to hit a Flask app with a Bash arithmetic-eval bug (`arr[$(…)]`) and land as `larry`. Root comes from a `sudo`-allowed Python tool whose `__pycache__` is mode 777 — drop a poisoned `.pyc` and SUID bash.",
+    "date": "2025-08-18T00:00:00.000Z",
+    "readTime": "10 min read",
+    "tags": [
+      "CHROME",
+      "BASH",
+      "PYCACHE"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-interpreter-writeup",
+    "title": "HTB Interpreter",
+    "summary": "Unauth Mirth Connect RCE (CVE-2023-43208) for `mirth` shell → DB creds from `mirth.properties` → crack PBKDF2-SHA256 `sedric` hash with 600K iterations → SSH in → local Flask notifier service with an f-string template injection through an `<lastname>` XML field pops `/root/root.txt`.",
+    "date": "2025-07-20T00:00:00.000Z",
+    "readTime": "8 min read",
+    "tags": [
+      "CVE",
+      "RCE",
+      "SSTI"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
     "slug": "htb-certificate-writeup",
-    "title": "HTB Certificate Writeup",
-    "summary": "Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.",
-    "date": "2025-06-08",
-    "readTime": "11 min",
-    "hero": "assets/img/writeups/htb-certificate.png",
-    "heroAlt": "First page preview of the HTB Certificate writeup PDF report",
-    "tags": ["HTB", "Windows", "Web Exploitation", "Active Directory"]
+    "title": "HTB Certificate",
+    "summary": "Course portal quiz uploader into a `.php` shell via zip + null-byte trick, bcrypt crack, `GenericAll` pivot to `Ryan.K`, and `SeManageVolumePrivilege` → `diaghub` LOLBAS → Administrator NT hash.",
+    "date": "2025-06-02T00:00:00.000Z",
+    "readTime": "12 min read",
+    "tags": [
+      "AD",
+      "WEB",
+      "WINDOWS"
+    ],
+    "difficulty": "hard",
+    "os": "windows"
   },
   {
     "slug": "htb-escapetwo-writeup",
-    "title": "HTB EscapeTwo Writeup",
-    "summary": "Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.",
-    "date": "2025-06-08",
-    "readTime": "14 min",
-    "hero": "assets/img/writeups/htb-escapetwo.png",
-    "heroAlt": "First page preview of the HTB EscapeTwo writeup PDF report",
-    "tags": ["HTB", "Windows", "LDAP", "SMB", "ADCS"]
-  },
-  {
-    "slug": "htb-heal-writeup",
-    "title": "HTB Heal Writeup",
-    "summary": "Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.",
-    "date": "2025-06-08",
-    "readTime": "10 min",
-    "hero": "assets/img/writeups/htb-heal.png",
-    "heroAlt": "First page preview of the HTB Heal writeup PDF report",
-    "tags": ["HTB", "Linux", "LFI", "API", "RCE"]
+    "title": "HTB EscapeTwo",
+    "summary": "Default `rose` creds → SMB share with spreadsheet secrets → `sa` MSSQL → `sql_svc` config file leak → password spray to `ryan` → ADCS ESC-style chain via `ca_svc` to Administrator NT hash.",
+    "date": "2025-05-15T00:00:00.000Z",
+    "readTime": "14 min read",
+    "tags": [
+      "AD",
+      "LDAP",
+      "SMB",
+      "ADCS"
+    ],
+    "difficulty": "easy",
+    "os": "windows"
   },
   {
     "slug": "htb-planning-writeup",
-    "title": "HTB Planning Writeup",
-    "summary": "Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.",
-    "date": "2025-06-08",
-    "readTime": "7 min",
-    "hero": "assets/img/writeups/htb-planning.png",
-    "heroAlt": "First page preview of the HTB Planning writeup PDF report",
-    "tags": ["HTB", "Linux", "Grafana", "Privilege Escalation"]
+    "title": "HTB Planning",
+    "summary": "Default creds on a Grafana panel → CVE-2024-9264 RCE → docker container foothold → plaintext `GF_SECURITY_ADMIN_PASSWORD` reused for `enzo` SSH → linpeas spots a root crontab.db → crontab-ui on `localhost:8000` with same creds → arbitrary root scheduled jobs.",
+    "date": "2025-05-15T00:00:00.000Z",
+    "readTime": "7 min read",
+    "tags": [
+      "GRAFANA",
+      "DOCKER",
+      "CRON"
+    ],
+    "difficulty": "easy",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-heal-writeup",
+    "title": "HTB Heal",
+    "summary": "Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as `www-data` → unauthenticated HashiCorp Consul service-registration → root.",
+    "date": "2025-05-13T00:00:00.000Z",
+    "readTime": "10 min read",
+    "tags": [
+      "LFI",
+      "API",
+      "RCE"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
   }
 ]

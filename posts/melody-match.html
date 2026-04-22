@@ -1,144 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="RowdyHacks X project: Melody Match uses live heart-rate telemetry, a Python recommendation backend, and a Swift iOS app to select calming music." />
-  <title>Melody Match: Swift Client + Python Server | Will DeDominico</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Built at RowdyHacks X. A Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.">
+<title>Melody Match · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
-<body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#projects" class="is-active">Projects</a>
-      <a href="../index.html#writeups">Writeups</a>
-      <a href="../index.html#github">GitHub</a>
-      <a href="../index.html#ctf">CTFs</a>
-      <a href="../index.html#htb">HTB</a>
-      <a href="../index.html#clubs">Clubs</a>
-      <a href="../index.html#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <article class="section blog-layout post-content" aria-labelledby="post-title">
-      <header>
-        <h1 id="post-title">Melody Match: Swift Client + Python Server</h1>
-        <div class="post-meta">
-          <time datetime="2024-12-03">December 3, 2024</time>
-          <span>7 minute read</span>
-          <div class="post-tags" aria-label="Topics">
-            <span class="post-tag">Swift</span>
-            <span class="post-tag">Python</span>
-            <span class="post-tag">ESP8266</span>
-            <span class="post-tag">Hackathon</span>
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>BUILDS</span> / <span class="cur">MELODY-MATCH</span></span>
+    <span class="wp-crumb-r">ENG#01 &middot; UNCLASSIFIED &middot; DECLASSIFIED 24.12.03</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            
+            
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">SWIFT</span><span class="wp-chip wp-chip-ghost tag-cycle-1">PYTHON</span><span class="wp-chip wp-chip-ghost tag-cycle-2">ESP8266</span>
+            
           </div>
+          <h1 class="wp-title">Melody Match<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Built at RowdyHacks X. A Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.</p>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <figure class="post-hero">
-        <img src="../assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" />
-        <figcaption>Built at RowdyHacks X, Melody Match pairs sensor data with a Swift client and Python backend to recommend calming tracks.</figcaption>
-      </figure>
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>RowdyHacks X</dd></div>
+        <div><dt>TARGET</dt><dd>36-hour hackathon</dd></div>
+        <div><dt>REF</dt><dd>San Antonio</dd></div>
+        <div><dt>START</dt><dd>NOV &#x27;24</dd></div>
+        <div><dt>FIRST BLOOD</dt><dd>FIRST DEMO — 32 hours</dd></div>
+        <div><dt>DURATION</dt><dd>7 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD + team (4)</dd></div>
+      </dl>
+    </aside>
+  </section>
 
-      <div class="post-body">
-        <p>Melody Match started as a RowdyHacks X build focused on stress and anxiety support through music. The prototype uses live heart-rate input, maps that telemetry to genre selection, and delivers playback through a mobile app workflow.</p>
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">DEMO</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#hardware">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">HARDWARE</div>
+        <div class="kc-sub">ESP8266 + HR sensor</div>
+        <div class="kc-tag kc-tag-warn">WEARABLE</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#backend">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">BACKEND</div>
+        <div class="kc-sub">FastAPI + Postgres</div>
+        <div class="kc-tag kc-tag-warn">PYTHON</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#client">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">CLIENT</div>
+        <div class="kc-sub">SwiftUI + Spotify</div>
+        <div class="kc-tag kc-tag-warn">IOS</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#match">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">MATCH</div>
+        <div class="kc-sub">bpm-aware ranker</div>
+        <div class="kc-tag kc-tag-warn">LOGIC</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#demo">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">DEMO</div>
+        <div class="kc-sub">judges + lanyards</div>
+        <div class="kc-tag kc-tag-ok">SHIPPED</div>
+      </a>
+    </div>
+  </section>
 
-        <h2>RowdyHacks X Context</h2>
-        <p>During the event, the team treated Melody Match as a full hackathon pipeline: sensor capture, model-backed recommendation, and mobile playback loop. The project was submitted on Devpost as part of the RowdyHacks X challenge and served as the baseline for the current repo split.</p>
+  <div class="wp-grid">
 
-        <div class="content-card">
-          <h3>How it was used at the hackathon</h3>
-          <ul>
-            <li>Collected live heart-rate data from an IR sensor + microcontroller setup.</li>
-            <li>Sent telemetry to a Python service that searched genre candidates for lower BPM outcomes.</li>
-            <li>Returned song IDs/metadata to the iOS app for playback and quick iteration during demos.</li>
-            <li>Validated a complete sensor-to-recommendation-to-player loop under hackathon time constraints.</li>
-          </ul>
-        </div>
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#hardware" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">HARDWARE</span>
+        </a>
+        <a href="#backend" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">BACKEND</span>
+        </a>
+        <a href="#client" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">CLIENT</span>
+        </a>
+        <a href="#match" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">MATCH</span>
+        </a>
+        <a href="#demo" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">DEMO</span>
+        </a>
+      </nav>
+    </aside>
 
-        <h2>Project Repositories</h2>
-        <div class="content-card">
-          <h3>Codebase Split</h3>
-          <ul>
-            <li><a href="https://github.com/Moriz82/MelodyMatchServer" target="_blank" rel="noopener">Moriz82/MelodyMatchServer</a> - Python recommendation and server loop.</li>
-            <li><a href="https://github.com/LOLROW/Melody-Match" target="_blank" rel="noopener">LOLROW/Melody-Match</a> - Swift iOS app for song control and playback.</li>
-          </ul>
-        </div>
-
-        <h2>Data Flow</h2>
-        <p>The app and server both communicate with the ESP8266 host at <code>192.168.4.1</code>. Sensor values are read from <code>/viewserial</code>, song selections are sent to <code>/serverdata</code>, and client actions are posted to <code>/clientdata</code>.</p>
-
-        <pre><code class="language-python">ESP8266URL = "http://192.168.4.1/"
-
-def fetch_view_serial():
-    response = requests.get(f"{ESP8266URL}/viewserial")
-    response.raise_for_status()
-    return response.json()
-
-def send_server_data(song_id):
-    payload = {"id": song_id}
-    requests.post(f"{ESP8266URL}/serverdata", json=payload)</code></pre>
-
-        <h2>iOS Client Loop</h2>
-        <p>The Swift client requests a new song, polls the selected ID, then updates labels and playback state in the UI.</p>
-
-        <pre><code class="language-swift">public static func requestNextSong() async -> Bool {
-    let esp8266URL = "http://192.168.4.1/clientdata"
-    let jsonPayload: [String: Any] = ["code": 14]
-    ...
-}
-
-if let id = await WebServerQuerier.getSongID() as? (Int?, String?, Double?) {
-    songIndex = id.0!
-    self.genreLabel.text = "Genre: \(id.1!)"
-    self.confidenceLevelLabel.text = "BPM: \(Int(ceil(id.2!)))"
-    playAudio(songID: songIndex)
+    <article class="wp-article">
+      <section class="wp-stage" id="hardware" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; HARDWARE</div>
+<h2 class="wp-stage-title">Cheap micro + a pulse sensor on a 3D-printed strap.</h2>
+<div class="wp-stage-body"><p>ESP8266 over Wi-Fi, an off-the-shelf PPG heart-rate sensor, a LiPo and charging circuit. Telemetry sent as JSON every 2 seconds to the backend.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># esp8266 · serial</span></div>
+<pre class="wp-term-body"><code class="language-bash">[wearable] booted · wifi=ok · ip=192.168.42.17
+[wearable] sensor ready · baseline 72 bpm
+[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:74,&quot;ts&quot;:1701212101}
+[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:76,&quot;ts&quot;:1701212103}
+[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:81,&quot;ts&quot;:1701212105}</code></pre>
+</div></div>
+</section>
+<section class="wp-stage" id="backend" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; BACKEND</div>
+<h2 class="wp-stage-title">FastAPI because we had 32 hours.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · server · python</span></div>
+<pre class="wp-term-body"><code class="language-python">@app.post(&quot;/telemetry&quot;)
+async def telemetry(packet: Telemetry, db: Session = Depends(get_db)):
+    window = await db.recent_bpm(packet.user, seconds=30)
+    state = infer_state(window)   # rest | active | peak
+    await catalog.suggest(packet.user, bpm=packet.bpm, state=state)
+    return {&quot;ok&quot;: True, &quot;state&quot;: state}</code></pre>
+</div>
+30-second rolling window smooths out sensor noise. The state classifier is a simple threshold tree — not ML, just engineering.</div>
+</section>
+<section class="wp-stage" id="client" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; CLIENT</div>
+<h2 class="wp-stage-title">SwiftUI + Spotify SDK, because iPhones were the demo platform.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># swift · ios app</span></div>
+<pre class="wp-term-body"><code class="language-swift">struct NowPlayingView: View {
+    @EnvironmentObject var session: Session
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(&quot;\(session.bpm) BPM&quot;)
+                .font(.system(size: 72, weight: .heavy, design: .monospaced))
+            Text(session.state.rawValue.uppercased())
+                .foregroundColor(session.state.color)
+            TrackRow(track: session.nextTrack)
+        }
+    }
 }</code></pre>
+</div>
+Swift + Spotify SDK handled the catalog pull. The client just renders whatever state + track the server assigns.</div>
+</section>
+<section class="wp-stage" id="match" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; MATCH</div>
+<h2 class="wp-stage-title">BPM-aware ranker — your heart rate picks the next song.</h2>
+<div class="wp-stage-body"><p>Target track tempo = <span class="hl-cool">current_bpm ± 10</span>. Pull top 40 candidates from Spotify&#39;s recommendations endpoint, filter by tempo band, pick the highest-rated one we haven&#39;t played in the last hour.</p>
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># WHY IT FELT GOOD</div><div class="wp-callout-body"><p>The jump from &quot;music is random&quot; to &quot;music tracks your effort&quot; is a small UX change that feels enormous. The algorithm is simple — the effect is the real product.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="demo" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; DEMO</div>
+<h2 class="wp-stage-title">32 hours in, green lanyards, one working prototype.</h2>
+<div class="wp-stage-body"><p>Judges tried it on. A volunteer&#39;s resting heart rate pulled up lo-fi. 30 seconds of jumping jacks bumped it to 130, and the app swapped to drum-and-bass mid-song. Loud applause. We walked away with top 10 and a bag of swag.</p>
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>Hackathon wisdom: one feature that feels magical beats three features that work OK. Cut ruthlessly at hour 20.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+<span></span>
+        <span class="wp-np-sig">LAST SIGNAL &middot; 24.12.03</span>
+        <a class="wp-np next" href="3d-printed-satellite-antenna.html">
+          <span class="l">ENG#02 &rarr;</span>
+          <span class="t">3D-PRINTED SATELLITE ANTENNA</span>
+        </a>
+        
+      </nav>
+    </article>
 
-        <div class="callout callout--info" data-label="Current state">
-          <p>The current implementation is a local-network prototype focused on rapid iteration across sensor input, model output, and iOS playback behavior.</p>
-        </div>
-
-        <h2>Next Iteration</h2>
-        <p>Next updates are documenting setup in both repos, hardening the app-server contract, and cleaning the recommendation loop for repeatable testing.</p>
-
-        <div class="callout callout--info" data-label="Submission">
-          <p>This project was originally submitted as Melody Match on Devpost for RowdyHacks X, then expanded into separate server/client repositories for maintainability.</p>
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">esp8266</span><span class="purp">wearable</span></div>
+          <div class="wp-loadout-row"><span class="tool">fastapi</span><span class="purp">backend</span></div>
+          <div class="wp-loadout-row"><span class="tool">postgres</span><span class="purp">db</span></div>
+          <div class="wp-loadout-row"><span class="tool">swiftui</span><span class="purp">client</span></div>
+          <div class="wp-loadout-row"><span class="tool">spotify</span><span class="purp">catalog</span></div>
         </div>
       </div>
 
-      <footer class="post-footer">
-        <p>Melody Match was built for RowdyHacks X and is now maintained as split Python/Swift codebases.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="https://devpost.com/software/melody-match-roplm6" target="_blank" rel="noopener">RowdyHacks Devpost</a>
-          <a class="button primary" href="https://github.com/Moriz82/MelodyMatchServer" target="_blank" rel="noopener">Server Repo</a>
-          <a class="button primary" href="https://github.com/LOLROW/Melody-Match" target="_blank" rel="noopener">iOS Repo</a>
-          <a class="button ghost" href="../index.html#projects">Back to Projects</a>
-        </div>
-      </footer>
-    </article>
-  </main>
+    </aside>
 
-  <footer class="site-footer">
-    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
-  </footer>
+  </div>
 
-  <script src="../assets/js/main.js"></script>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

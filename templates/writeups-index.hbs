@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active="writeups"}}
+
+<main class="shell">
+  <section class="page-head">
+    <div class="eye">// WRITEUPS</div>
+    <h1 class="page-title">Research &amp; walkthroughs.</h1>
+    <p class="page-lead">{{count}} posts across {{groupCount}} categories. Newest first.</p>
+  </section>
+
+  {{#each groups}}
+  <section class="wp-group" id="{{slug}}">
+    <div class="wp-group-head">
+      <span class="wp-group-label">// {{upper label}}</span>
+      <span class="wp-group-count">{{padVal posts.length}} {{#if posts.length}}{{#ifeq posts.length 1}}POST{{else}}POSTS{{/ifeq}}{{/if}}</span>
+    </div>
+    <hr class="dashed-thick">
+
+    {{#if posts.length}}
+    <div class="post-grid">
+      {{#each posts}}
+      <a class="card post-card {{difficulty}}" href="{{href}}">
+        {{> card}}
+        <div class="card-head"><span class="l">// {{upper typeLabel}}</span><span class="r">{{#if difficulty}}{{upper difficulty}}{{#if os}} · {{upper os}}{{/if}}{{else}}{{#if os}}{{upper os}}{{/if}}{{/if}}</span></div>
+        <hr class="dashed">
+        <div class="post-title">{{title}}</div>
+        <p class="post-summary">{{summary}}</p>
+        <div class="post-tags">
+          {{#each tags}}<span class="chip">{{this}}</span>{{/each}}
+        </div>
+        <div class="card-footer"><span>{{dateLong}}{{#if readTime}} · {{readTime}}{{/if}}</span><span class="go">READ →</span></div>
+      </a>
+      {{/each}}
+    </div>
+    {{else}}
+    <div class="wp-group-empty">
+      <p>No posts yet — coming soon.</p>
+    </div>
+    {{/if}}
+  </section>
+  {{/each}}
+</main>
+
+{{> footer}}
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

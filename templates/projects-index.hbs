@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active="projects"}}
+
+<main class="shell">
+  <section class="page-head">
+    <div class="eye">// PROJECTS</div>
+    <h1 class="page-title">Builds &amp; side quests.</h1>
+    <p class="page-lead">{{count}} projects · hardware, homelab, apps. Newest first.</p>
+  </section>
+
+  <div class="post-grid">
+    {{#each posts}}
+    <a class="card post-card" href="{{href}}">
+      {{> card}}
+      <div class="card-head"><span class="l">// PROJECT</span><span class="r">{{upper (first tags)}}</span></div>
+      <hr class="dashed">
+      <div class="post-title">{{title}}</div>
+      <p class="post-summary">{{summary}}</p>
+      <div class="post-tags">
+        {{#each tags}}<span class="chip">{{this}}</span>{{/each}}
+      </div>
+      <div class="card-footer"><span>{{dateLong}} · {{readTime}}</span><span class="go">READ →</span></div>
+    </a>
+    {{/each}}
+  </div>
+</main>
+
+{{> footer}}
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
