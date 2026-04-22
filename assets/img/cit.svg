@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" fill="#0b1f3a"/>
+  <rect x="4" y="4" width="56" height="56" fill="none" stroke="#22d3ee" stroke-width="2"/>
+  <text x="32" y="30" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="#22d3ee">CIT</text>
+  <text x="32" y="48" text-anchor="middle" font-family="monospace" font-size="10" font-weight="700" fill="#7dd3fc" letter-spacing="2">@CTF</text>
+</svg>

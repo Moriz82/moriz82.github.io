@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" fill="#0a0a0a"/>
+  <polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="none" stroke="#9fef00" stroke-width="3"/>
+  <text x="32" y="38" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="#9fef00" letter-spacing="1">HTB</text>
+</svg>

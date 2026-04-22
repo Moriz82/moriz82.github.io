@@ -1,128 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Step-by-step notes on the 3D printed helical antenna and SDR pipeline used to capture NOAA and GOES downlinks." />
-  <title>Printing a Satellite Antenna for NOAA &amp; GOES | Will DeDominico</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly NOAA/GOES weather downlink possible.">
+<title>3D-Printed Satellite Antenna · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
-<body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#projects" class="is-active">Projects</a>
-      <a href="../index.html#writeups">Writeups</a>
-      <a href="../index.html#github">GitHub</a>
-      <a href="../index.html#ctf">CTFs</a>
-      <a href="../index.html#htb">HTB</a>
-      <a href="../index.html#clubs">Clubs</a>
-      <a href="../index.html#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <article class="section blog-layout post-content" aria-labelledby="post-title">
-      <header>
-        <h1 id="post-title">Printing a Satellite Antenna for NOAA &amp; GOES</h1>
-        <div class="post-meta">
-          <time datetime="2025-01-18">January 18, 2025</time>
-          <span>6 minute read</span>
-          <div class="post-tags" aria-label="Topics">
-            <span class="post-tag">SDR</span>
-            <span class="post-tag">RF</span>
-            <span class="post-tag">Python</span>
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>BUILDS</span> / <span class="cur">3D-PRINTED-SATELLITE-ANTENNA</span></span>
+    <span class="wp-crumb-r">ENG#02 &middot; UNCLASSIFIED &middot; DECLASSIFIED 25.01.18</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            
+            
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">SDR</span><span class="wp-chip wp-chip-ghost tag-cycle-1">RF</span><span class="wp-chip wp-chip-ghost tag-cycle-2">NOAA</span>
+            
           </div>
+          <h1 class="wp-title">3D-Printed Satellite Antenna<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly NOAA/GOES weather downlink possible.</p>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <figure class="post-hero">
-        <img src="../assets/img/antenna.jpg" alt="Hand-built helical antenna pointed at the sky for satellite downlink" />
-        <figcaption>The final antenna build mounted on a tracking tripod, tuned for 137.1 MHz to target NOAA-18 passes.</figcaption>
-      </figure>
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Backyard SDR</dd></div>
+        <div><dt>TARGET</dt><dd>NOAA 18/19 · GOES-16</dd></div>
+        <div><dt>REF</dt><dd>137 MHz · 1.69 GHz</dd></div>
+        <div><dt>START</dt><dd>NOV &#x27;24</dd></div>
+        <div><dt>FIRST BLOOD</dt><dd>FIRST GOOD FRAME — 9 days</dd></div>
+        <div><dt>DURATION</dt><dd>6 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
 
-      <div class="post-body">
-        <p>This antenna started as a paper napkin sketch, a spool of PETG, and a cheap RTL-SDR v4 dongle. My goal was a travel-ready rig that could backpack into remote sites yet still capture weather imagery clean enough to plot storm movement in real time.</p>
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">DECODE</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#cad">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">CAD</div>
+        <div class="kc-sub">helical build</div>
+        <div class="kc-tag kc-tag-warn">FUSION</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#print">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">PRINT</div>
+        <div class="kc-sub">PETG spine</div>
+        <div class="kc-tag kc-tag-warn">PRUSA</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#tune">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">TUNE</div>
+        <div class="kc-sub">VNA sweep</div>
+        <div class="kc-tag kc-tag-warn">SWR</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#capture">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">CAPTURE</div>
+        <div class="kc-sub">rtl-sdr + gqrx</div>
+        <div class="kc-tag kc-tag-warn">SDR</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#decode">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">DECODE</div>
+        <div class="kc-sub">noaa-apt</div>
+        <div class="kc-tag kc-tag-ok">IMG</div>
+      </a>
+    </div>
+  </section>
 
-        <h2>Designing the Helical</h2>
-        <p>I modelled the boom, supports, and reflector in Fusion 360, then exported each part for slicing. The reflector sits 0.25λ behind the first turn to keep axial ratio tight, while brass inserts hold the copper wire in place without deforming under heat.</p>
+  <div class="wp-grid">
 
-        <div class="content-card">
-          <h3>Bill of Materials</h3>
-          <ul>
-            <li>1× RTL-SDR Blog V4</li>
-            <li>5m enamelled copper wire</li>
-            <li>M2 brass heat-set inserts</li>
-            <li>2mm PETG sheets for the ground plane</li>
-          </ul>
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#cad" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">CAD</span>
+        </a>
+        <a href="#print" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">PRINT</span>
+        </a>
+        <a href="#tune" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">TUNE</span>
+        </a>
+        <a href="#capture" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">CAPTURE</span>
+        </a>
+        <a href="#decode" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">DECODE</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="cad" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; CAD</div>
+<h2 class="wp-stage-title">A helical, because linear-polarized gets wrecked by Faraday rotation.</h2>
+<div class="wp-stage-body"><p>Right-hand circularly polarized. NOAA satellites transmit RHCP, so matching it buys you 3 dB over a linear dipole. Helix geometry — four turns, 0.75λ diameter, 0.25λ pitch. At 137 MHz that&#39;s ugly big; at 1.69 GHz it&#39;s palm-sized, so GOES is the easier target for a first build.</p>
+<p>Fusion 360 for the spine, 3mm copper wire wound around a 3D-printed helical jig for repeatability.</p>
+</div>
+</section>
+<section class="wp-stage" id="print" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; PRINT</div>
+<h2 class="wp-stage-title">PETG, 40% gyroid, because a PLA antenna warps in the Texas sun.</h2>
+<div class="wp-stage-body"><p>Print time: 14 hours. Four pieces that lap-joint together. Wire channels routed at the exact pitch for the helix — no eyeballing the winding.</p>
+<aside class="wp-opsec"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-opsec-head"># OPSEC NOTE</div><div class="wp-opsec-body"><p>PLA will deform at ~55°C. San Antonio attics hit 60°C easy. PETG or ASA only.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="tune" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; TUNE</div>
+<h2 class="wp-stage-title">VNA → the antenna lies to you until you measure it.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@bench</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nanovna-cli sweep 1.6e9 1.8e9
+freq(MHz)   |SWR|   |Z|
+1600.00     1.82    48.3 - j15.0
+1650.00     1.41    52.1 - j06.2
+1690.00     1.12    51.8 + j01.1   ← sweet spot
+1700.00     1.19    53.4 + j04.8
+1800.00     2.24    44.9 + j22.6</code></pre>
+</div>
+Trimmed the active element 6mm, re-measured, landed at <span class="hl-ok">SWR 1.12 @ 1690 MHz</span>. Good enough.</div>
+</section>
+<section class="wp-stage" id="capture" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; CAPTURE</div>
+<h2 class="wp-stage-title">RTL-SDR + an LNA + the sky.</h2>
+<div class="wp-stage-body"><p>RTL-SDR v3 on a laptop. BiasT-powered LNA at the feedpoint. Gqrx spectrum view, then record to IQ samples when a pass crosses overhead.</p>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/antenna.jpg" alt="3D-printed helical antenna pointing at sky" loading="lazy"><figcaption>Finished helical mounted on a TV rotor</figcaption></figure>
+Pass prediction with `gpredict`. NOAA-19 gave me a 12-minute window at 42° peak elevation — strong enough for a clean capture.</div>
+</section>
+<section class="wp-stage" id="decode" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; DECODE</div>
+<h2 class="wp-stage-title">noaa-apt → weather image, printed on silicon.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ noaa-apt decode noaa19_pass_20250118.wav -o n19.png
+Decoding APT... 97% SNR: 42 dB
+Demodulating channel A ... done
+Demodulating channel B ... done
+Saved n19.png (909×1040)</code></pre>
+</div>
+Visible and IR stripes from the same pass. Frame it, put it on the wall, start planning GOES-16 full-disk capture next.
+
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>Start with NOAA APT at 137 MHz for your first build — the antenna tolerates more error than GOES does at 1.69 GHz. Walk before running.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="melody-match.html">
+          <span class="l">&larr; ENG#01</span>
+          <span class="t">MELODY MATCH</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 25.01.18</span>
+        <a class="wp-np next" href="cyber-range-homelab.html">
+          <span class="l">ENG#03 &rarr;</span>
+          <span class="t">CYBER RANGE HOMELAB</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">fusion360</span><span class="purp">cad</span></div>
+          <div class="wp-loadout-row"><span class="tool">prusa-mk4</span><span class="purp">print</span></div>
+          <div class="wp-loadout-row"><span class="tool">nanovna</span><span class="purp">swr</span></div>
+          <div class="wp-loadout-row"><span class="tool">rtl-sdr</span><span class="purp">radio</span></div>
+          <div class="wp-loadout-row"><span class="tool">gqrx</span><span class="purp">capture</span></div>
+          <div class="wp-loadout-row"><span class="tool">noaa-apt</span><span class="purp">decode</span></div>
         </div>
-
-        <h2>First-Light Decoding</h2>
-        <p>GNU Radio handles the demodulation chain and pipes the audio into <code>wxtoimg</code>. The block diagram below is simple but robust enough to survive noisy captures.</p>
-
-        <pre><code class="language-python">from gnuradio import blocks, filter, analog, gr
-from satnogs.helpers import doppler_shift
-
-samp_rate = 2_400_000
-freq = 137_912_500
-
-top_block = gr.top_block()
-source = blocks.file_source(gr.sizeof_gr_complex, "capture_2025-01-18.cfile")
-lo = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, doppler_shift(freq), 1.0)
-mixer = blocks.multiply_cc()
-channel = filter.freq_xlating_fir_filter_ccc(5, filter.firdes.low_pass(1, samp_rate, 34e3, 12e3), 0, samp_rate)
-
-top_block.connect(source, (mixer, 0))
-top_block.connect(lo, (mixer, 1))
-top_block.connect(mixer, channel)
-top_block.connect(channel, blocks.wavfile_sink("noaa-18.wav", 1, int(samp_rate / 5)))
-top_block.run()</code></pre>
-
-        <div class="callout callout--info" data-label="Tip">
-          <p>Save the intermediate complex samples. When NOAA or GOES pushes new telemetry formats, you can re-run the captures through updated demodulators without waiting for the next pass.</p>
-        </div>
-
-        <h2>Cleaning the Imagery</h2>
-        <p>The last step is a Python notebook that stitches the APT channel data into full-resolution PNGs. Histogram equalisation plus a simple coastline overlay makes the frames shareable.</p>
-
-        <figure>
-          <img src="../assets/img/placeholder-card.svg" alt="Stylised satellite imagery placeholder" />
-          <figcaption>A sample output frame with coastlines and state outlines burned into the composite.</figcaption>
-        </figure>
-
-        <div class="callout callout--warning" data-label="Noise budget">
-          <p>Handheld rigs hate urban RF noise. If your downlinks look like grey mush, bring a 10dB LNA and move the entire setup at least one block away from power lines.</p>
-        </div>
-
-        <h2>What&apos;s Next</h2>
-        <p>Next revs include an auto-rotor, TDR-based tuning script, and packaging the demod pipeline into a Docker image so I can process imagery on a fanless mini PC in the field.</p>
       </div>
 
-      <footer class="post-footer">
-        <p>Curious about the Fusion 360 files or GNU Radio companion flowgraph? Ping me and I&apos;ll share the STL + grc bundle.</p>
-        <a class="button ghost" href="../index.html#projects">Back to Projects</a>
-      </footer>
-    </article>
-  </main>
+    </aside>
 
-  <footer class="site-footer">
-    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
-  </footer>
+  </div>
 
-  <script src="../assets/js/main.js"></script>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

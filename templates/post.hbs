@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active=navActive}}
+
+<main class="shell post-shell">
+  <article class="post">
+    <div class="card post-meta-card">
+      {{> card}}
+      <div class="card-head"><span class="l">// {{upper typeLabel}}</span><span class="r">{{dateLong}} · {{readTime}}</span></div>
+      <hr class="dashed">
+      <div class="eye post-eye">{{#if difficulty}}{{upper difficulty}} · {{/if}}{{#if os}}{{upper os}}{{/if}}</div>
+      <h1 class="post-title-big">{{postTitle}}</h1>
+      <p class="post-summary">{{summary}}</p>
+      <div class="post-tags">
+        {{#each tags}}<span class="chip">{{this}}</span>{{/each}}
+      </div>
+    </div>
+
+    <div class="post-body">
+      {{{body}}}
+    </div>
+
+    <nav class="post-nav">
+      <a class="back-link" href="../{{indexHref}}">← All {{typeLabel}}s</a>
+    </nav>
+  </article>
+</main>
+
+{{> footer}}
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

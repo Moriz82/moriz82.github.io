@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active="about"}}
+
+<main class="shell">
+
+  <section class="page-head">
+    <div class="eye">// ABOUT</div>
+    <h1 class="page-title">Will DeDominico.</h1>
+    <p class="page-lead">Student security researcher at UTSA. Red team focused — adversary emulation, web exploitation, GNU/Linux. I break things, write them up, publish here.</p>
+  </section>
+
+  <section id="education" class="block">
+    <div class="card static">
+      {{> card}}
+      <div class="card-head"><span class="l">// EDUCATION</span><span class="r">{{education.status}}</span></div>
+      <hr class="dashed">
+      <div class="edu-row">
+        <div>
+          <div class="edu-school">{{education.school}}</div>
+          <div class="edu-degree">{{education.degree}}</div>
+          {{#if education.focus}}<div class="edu-focus">Focus: {{education.focus}}</div>{{/if}}
+        </div>
+        <div class="edu-date">{{education.dates}}</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience" class="block">
+    <div class="card static">
+      {{> card}}
+      <div class="card-head"><span class="l">// EXPERIENCE</span><span class="r">{{padVal experience.count}} ROLES</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo">
+        {{#each experience.items}}
+        <div class="tl-row {{state}}">
+          {{#if logo}}<div class="tl-logo"><img src="../{{logo}}" alt="{{company}}"></div>{{/if}}
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">{{upper company}}</span><span class="tl-date">{{date}}</span></div>
+            <div class="tl-sub">{{role}}</div>
+            {{#if body}}<p class="tl-body">{{body}}</p>{{/if}}
+            {{#each tags}}<span class="tl-tag {{cls}}">{{label}}</span>{{/each}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+  <section id="ctfs" class="block">
+    <div class="card static">
+      {{> card}}
+      <div class="card-head"><span class="l">// CTF HISTORY</span><span class="r">{{padVal ctfs.count}} COMPS · {{ctfs.podiums}} PODIUMS</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo">
+        {{#each ctfs.items}}
+        <div class="tl-row {{state}}">
+          {{#if logo}}<div class="tl-logo"><img src="../{{logo}}" alt="{{name}}"></div>{{/if}}
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">{{upper name}}</span><span class="tl-date">{{date}}</span></div>
+            <div class="tl-sub">{{sub}}</div>
+            {{#if body}}<p class="tl-body">{{body}}</p>{{/if}}
+            {{#each tags}}<span class="tl-tag {{cls}}">{{label}}</span>{{/each}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+  <section id="certs" class="block">
+    <div class="card static">
+      {{> card}}
+      <div class="card-head"><span class="l">// CERTIFICATIONS</span><span class="r">{{padVal certs.done}}/{{padVal certs.total}} · ACTIVE</span></div>
+      <hr class="dashed">
+      <div class="cert-list wide">
+        {{#each certs.items}}
+        <div class="cert-row"><span class="n">{{name}}</span><span class="s {{state}}">{{status}}</span></div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+  <section id="clubs" class="block">
+    <div class="card static">
+      {{> card}}
+      <div class="card-head"><span class="l">// CLUBS &amp; ORGS</span><span class="r">{{padVal clubs.count}} AT UTSA</span></div>
+      <hr class="dashed">
+      <div class="club-list">
+        {{#each clubs.items}}
+        <div class="club-row">
+          <div class="club-name">{{name}}</div>
+          <div class="club-role">{{role}}</div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{{> footer}}
+<script src="assets/js/main.js"></script>
+</body>
+</html>

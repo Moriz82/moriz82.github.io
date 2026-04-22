@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+{{> nav active="writeups"}}
+
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>{{engBreadcrumbCategory}}</span> / <span class="cur">{{engBreadcrumbName}}</span></span>
+    <span class="wp-crumb-r">{{engLabel}} &middot; {{classification}} &middot; DECLASSIFIED {{dateCode}}</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-{{category}}">
+          {{#ifeq category "htb"}}<img src="../assets/img/htb.svg" alt="HTB">{{/ifeq}}
+          {{#ifeq category "cit-ctf"}}<img src="../assets/img/cit.svg" alt="CIT@CTF">{{/ifeq}}
+          {{#ifeq category "utsa-iot"}}<img src="../assets/img/utsa-iot.svg" alt="UTSA IoT">{{/ifeq}}
+          {{#unless category}}<span class="wp-hero-mono">OPS</span>{{/unless}}
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            {{#if difficulty}}<span class="wp-chip diff-{{difficulty}}">{{upper difficulty}}</span>{{/if}}
+            {{#if os}}<span class="wp-chip wp-chip-os os-{{os}}">{{upper os}}</span>{{/if}}
+            {{#each tags}}<span class="wp-chip wp-chip-ghost tag-cycle-{{@index}}">{{upper this}}</span>{{/each}}
+            {{#if points}}<span class="wp-chip wp-chip-pts">{{points}} PTS</span>{{/if}}
+          </div>
+          <h1 class="wp-title">{{postTitle}}<span class="wp-title-mark">&mdash;</span></h1>
+          {{#if summary}}<p class="wp-summary">{{{summary}}}</p>{{/if}}
+        </div>
+      </div>
+    </div>
+
+    {{#if engagement}}
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        {{#if engagement.platform}}<div><dt>PLATFORM</dt><dd>{{engagement.platform}}</dd></div>{{/if}}
+        {{#if engagement.target}}<div><dt>TARGET</dt><dd>{{engagement.target}}</dd></div>{{/if}}
+        {{#if engagement.ref}}<div><dt>REF</dt><dd>{{engagement.ref}}</dd></div>{{/if}}
+        {{#if engagement.start}}<div><dt>START</dt><dd>{{engagement.start}}</dd></div>{{/if}}
+        {{#if engagement.firstBlood}}<div><dt>FIRST BLOOD</dt><dd>{{engagement.firstBlood}}</dd></div>{{/if}}
+        {{#if engagement.duration}}<div><dt>DURATION</dt><dd>{{engagement.duration}}</dd></div>{{/if}}
+        {{#if engagement.operator}}<div><dt>OPERATOR</dt><dd>{{engagement.operator}}</dd></div>{{/if}}
+      </dl>
+    </aside>
+    {{/if}}
+  </section>
+
+  {{#if killchain.length}}
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; {{killchain.length}} STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">{{outcome killchain}}</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      {{#each killchain}}
+      <a class="wp-kc-card kc-{{color}}" href="#{{anchor stage}}">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.{{padVal (inc @index)}}</div>
+        <div class="kc-stage">{{upper stage}}</div>
+        {{#if sub}}<div class="kc-sub">{{sub}}</div>{{/if}}
+        {{#if tag}}<div class="kc-tag kc-tag-{{color}}">{{upper tag}}</div>{{/if}}
+      </a>
+      {{/each}}
+    </div>
+  </section>
+  {{/if}}
+
+  <div class="wp-grid">
+
+    {{#if killchain.length}}
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        {{#each killchain}}
+        <a href="#{{anchor stage}}" class="wp-toc-row" data-stage="{{padVal (inc @index)}}">
+          <span class="n">{{padVal (inc @index)}}</span>
+          <span class="t">{{stage}}</span>
+        </a>
+        {{/each}}
+      </nav>
+    </aside>
+    {{else}}
+    <aside class="wp-toc"></aside>
+    {{/if}}
+
+    <article class="wp-article">
+      {{{body}}}
+      <nav class="wp-post-nav">
+        {{#if prev}}
+        <a class="wp-np prev" href="{{prev.slug}}.html">
+          <span class="l">&larr; {{prev.label}}</span>
+          <span class="t">{{prev.title}}</span>
+        </a>
+        {{else}}<span></span>{{/if}}
+        <span class="wp-np-sig">LAST SIGNAL &middot; {{dateCode}}</span>
+        {{#if next}}
+        <a class="wp-np next" href="{{next.slug}}.html">
+          <span class="l">{{next.label}} &rarr;</span>
+          <span class="t">{{next.title}}</span>
+        </a>
+        {{else}}<span></span>{{/if}}
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      {{#if loadout.length}}
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          {{#each loadout}}
+          <div class="wp-loadout-row"><span class="tool">{{tool}}</span><span class="purp">{{purpose}}</span></div>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if remediation.length}}
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          {{#each remediation}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </aside>
+
+  </div>
+
+</main>
+
+{{> footer}}
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

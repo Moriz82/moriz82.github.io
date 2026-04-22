@@ -1,626 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Portfolio for Will DeDominico (moriz82) – UTSA cyber security student and red team operator." />
-  <title>Will's Portfolio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Will DeDominico — student security researcher at UTSA. Writeups, projects, HTB, CTFs.">
+<title>Will DeDominico · Student Security Researcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
 <body>
-  <div class="background-noise" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="logo-lockup">
-      <div class="logo-mark" aria-hidden="true">💾</div>
-      <a href="#home" class="logo-type">Will<span>DeDominico</span></a>
-    </div>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="sr-only">Toggle navigation</span>
-      <span></span>
-      <span></span>
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-expanded="false">
-      <a href="#home">Home</a>
-      <a href="#experience">Experience</a>
-      <a href="#projects">Projects</a>
-      <a href="#writeups">Writeups</a>
-      <a href="#github">GitHub</a>
-      <a href="#ctf">CTFs</a>
-      <a href="#htb">HTB</a>
-      <a href="#clubs">Clubs</a>
-      <a href="#education">Education</a>
-    </nav>
-  </header>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="index.html" class="is-active">HOME</a>
+    <a href="writeups/index.html" class="">WRITEUPS</a>
+    <a href="projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="about.html" class="">ABOUT</a>
+    <a href="contact.html" class="">CONTACT</a>
+  </nav>
+</header>
 
-  <main>
-    <section id="home" class="section hero" aria-label="Hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Red Team Operator · UTSA</p>
-        <h1>Hey, I&apos;m <span class="accent">Will DeDominico</span>!</h1>
-        <p class="lead">I'm a Red Team Operator who loves investigating systems and simulating attacks. I love CTF and HTB, and have a passion for Free and Open Source Software / Hardware.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf"
-             target="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" rel="noopener">View Resume</a>
-        </div>
-        <dl class="hero-meta">
-          <div>
-            <dt>Focus</dt>
-            <dd>Adversary emulation
-                <br>Web Exploitation
-                <br>Gnu/Linux</dd>
-          </div>
-          <div>
-            <dt>Current missions</dt>
-            <dd>Bug Bounty
-                <br>Learning Blue Team
-            </dd>
-          </div>
-        </dl>
-      </div>
-      <div class="hero-terminal" role="img" aria-label="Terminal window placeholder">
-        <div class="terminal-header">
-          <span class="dot red"></span>
-          <span class="dot yellow"></span>
-          <span class="dot green"></span>
-        </div>
-        <div class="terminal-body">
-          <pre><code class="typewriter" data-prompt="moriz@arch:~$" data-terminal='[
-          {"command": "whoami",
-           "output": ["Will_DeDominico"]},
-            {"command": "neofetch",
-            "output": ["OS: Arch Linux", "Role: Red Team Operator", "Focus: enumerate > weaponize > report"]},
-            {"command": "todo next",
-            "output": ["- Work on school labs", "- Build more HTB writeups", "- Better Reporting skills"]}]'>
-          </code></pre>
-        </div>
-      </div>
-    </section>
+<main class="shell">
 
-    <section id="experience" class="section" aria-labelledby="experience-title">
-      <div class="section-heading">
-        <h2 id="experience-title">Experience</h2>
-        <p>Past roles that helped me learn industry standards in Support, Networking, and SIEM.</p>
-      </div>
-      <div class="timeline">
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcompanieslogo.com%2Fimg%2Forig%2FCRWD-442a5e7d.png%3Ft%3D1648651763&amp;f=1&amp;nofb=1&amp;ipt=27bed45b3936228a109a34c3c6dd58ca177037f1f3f5580e802c219ff7bbf410" alt="CrowdStrike logo" loading="lazy" />
-                          </div>
-                          <div>
-                              <h3 class="timeline-company">CrowdStrike</h3>
-                              <p class="timeline-role">Falcon Complete Intern</p>
-                          </div>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">Starts Jun 1, 2026 · Upcoming</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--blue-team">Managed Detection &amp; Response</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Incoming Falcon Complete intern focused on real-world alert triage, investigation workflows, and customer-facing response operations.</p>
-                  <ul class="timeline-skill-tags">
-                      <li>MDR Operations</li>
-                      <li>Threat Triage</li>
-                      <li>Detection Analysis</li>
-                      <li>Incident Workflow</li>
-                  </ul>
-              </div>
-          </article>
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="assets/img/verizon.png" alt="Verizon logo" loading="lazy" />
-                          </div>
-                          <div>
-                              <h3 class="timeline-company">Verizon Business</h3>
-                              <p class="timeline-role">Install Contractor</p>
-                          </div>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">May 2025 &ndash; Aug 2025 · Austin, TX / San Antonio, TX</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--field-services">Field Services</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Surveyed commercial sites, deployed cellular extenders, and installed CAT5e, fiber, phone lines, and network hardware to keep enterprise clients online.</p>
-                  <ul class="timeline-skill-tags">
-                      <li>Cellular Extenders</li>
-                      <li>CAT5e &amp; Fiber Runs</li>
-                      <li>Network Hardware Install</li>
-                      <li>Site Surveys</li>
-                  </ul>
-              </div>
-          </article>
-          <article class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <div class="timeline-header-main">
-                <div class="timeline-logos">
-                  <img src="assets/img/Apple_logo_black.svg" alt="Apple logo" loading="lazy" />
-                </div>
-                <div>
-                  <h3 class="timeline-company">Apple</h3>
-                  <p class="timeline-role">Technical Support Advisor</p>
-                </div>
-              </div>
-              <div class="timeline-header-meta">
-                <span class="timeline-meta">May 2024 &ndash; Jan 2025 · Remote</span>
-                <div class="timeline-tabs">
-                  <span class="timeline-tab timeline-tab--it-support">IT Support</span>
-                </div>
-              </div>
-            </div>
-            <p>Troubleshot 30+ complex cases across macOS/iOS a day, coached customers on account hardening, and partnered with cross-functional teams to drive a 45% faster resolution time and 100% CSAT.</p>
-            <ul class="timeline-skill-tags">
-              <li>macOS &amp; iOS</li>
-              <li>Customer Security Coaching</li>
-              <li>Escalation Triage</li>
-              <li>Service KPIs</li>
-            </ul>
-          </div>
-        </article>
-          <article class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <div class="timeline-header-main">
-                <div class="timeline-logos">
-                  <img src="assets/img/tx_dps_logo.png" alt="Texas DPS seal" loading="lazy" />
-                </div>
-                <div>
-                  <h3 class="timeline-company">Texas Department of Public Safety</h3>
-                  <p class="timeline-role">Cyber Operations Intern</p>
-                </div>
-              </div>
-              <div class="timeline-header-meta">
-                <span class="timeline-meta">Jul 2022 &ndash; Aug 2022 · Austin, TX</span>
-                <div class="timeline-tabs">
-                  <span class="timeline-tab timeline-tab--blue-team">Blue Team</span>
-                </div>
-              </div>
-            </div>
-            <p>Ran phishing simulations, built Splunk/SOAR automations, and tuned perimeter controls (Fortinet, Palo Alto, Cisco) to harden statewide infrastructure.</p>
-            <ul class="timeline-skill-tags">
-              <li>Splunk Enterprise &amp; SOAR</li>
-              <li>Phishing Simulation</li>
-              <li>Firewall Hardening</li>
-              <li>Threat Monitoring</li>
-            </ul>
-          </div>
-        </article>
-      </div>
-    </section>
+  <div class="grid-top">
+    <a class="card bio" href="about.html">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// ABOUT</span><span class="r">ONLINE</span></div>
+      <hr class="dashed">
+      <div class="eye">STUDENT SECURITY RESEARCHER · UTSA</div>
+      <h1 class="bio-title">Hey, I'm <u>Will DeDominico</u>.</h1>
+      <p class="bio-lead">Cyber security student at UTSA researching red team operations and adversary emulation. I break things, write up what I learn, and publish it here.</p>
+      <dl class="bio-meta">
+        <div><dt>Focus</dt><dd>Adversary emulation<br>Web exploitation<br>GNU/Linux</dd></div>
+        <div><dt>Current</dt><dd>Bug bounty<br>Learning blue team</dd></div>
+      </dl>
+      <div class="card-footer"><span>FULL BIO + EDUCATION</span><span class="go">/about →</span></div>
+    </a>
 
-    <section id="projects" class="section" aria-labelledby="projects-title">
-      <div class="section-heading">
-        <h2 id="projects-title">Projects</h2>
-        <p>Field write-ups that walk through the tooling, lessons, and tradecraft behind each build.</p>
+    <a class="card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// LEDGER · HTB</span><span class="r">LIVE · 04H AGO</span></div>
+      <hr class="dashed">
+      <div class="big-num">72</div>
+      <div class="big-sub">BOXES PWNED · TOP 4.1% GLOBAL</div>
+      <div class="bars">
+        <div class="bar-row"><span class="lbl">EASY</span><span class="track"><span class="fill ok" style="width:56%"></span></span><span class="val">40</span></div>
+        <div class="bar-row"><span class="lbl">MEDIUM</span><span class="track"><span class="fill cool" style="width:28%"></span></span><span class="val">20</span></div>
+        <div class="bar-row"><span class="lbl">HARD</span><span class="track"><span class="fill warn" style="width:13%"></span></span><span class="val">09</span></div>
+        <div class="bar-row"><span class="lbl">INSANE</span><span class="track"><span class="fill hot" style="width:4%"></span></span><span class="val">03</span></div>
       </div>
-      <div class="blog-carousel" data-blog-carousel data-post-source="assets/data/posts.json">
-        <button class="carousel-nav is-prev" type="button" aria-label="Previous post" data-carousel-prev>
-          <span aria-hidden="true">&#8592;</span>
-        </button>
-        <div class="carousel-window">
-          <div class="carousel-track" data-carousel-track>
-            <article class="blog-card" data-slug="cyber-range-homelab" data-title="Building a Cyber Range Homelab" data-date="2025-02-10" data-read="8 min" data-summary="How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.">
-              <a class="blog-card-link" href="posts/cyber-range-homelab.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/homelab.jpg" alt="Server racks lit with violet accent lights representing a homelab cluster" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-02-10">Feb 10, 2025</time>
-                    <span>8 min read</span>
-                  </div>
-                  <h3>Building a Cyber Range Homelab</h3>
-                  <p>How I stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>Proxmox</li>
-                    <li>Cisco</li>
-                    <li>OffSec</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
-            <article class="blog-card" data-slug="3d-printed-satellite-antenna" data-title="Printing a Satellite Antenna for NOAA & GOES" data-date="2025-01-18" data-read="6 min" data-summary="Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.">
-              <a class="blog-card-link" href="posts/3d-printed-satellite-antenna.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/antenna.jpg" alt="Hand-built helical antenna pointed at the sky for satellite downlink" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-01-18">Jan 18, 2025</time>
-                    <span>6 min read</span>
-                  </div>
-                  <h3>Printing a Satellite Antenna for NOAA &amp; GOES</h3>
-                  <p>Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly weather downlink possible.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>SDR</li>
-                    <li>RF</li>
-                    <li>Python</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
-            <article class="blog-card" data-slug="melody-match" data-title="Melody Match: Swift Client + Python Server" data-date="2024-12-03" data-read="7 min" data-summary="Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.">
-              <a class="blog-card-link" href="posts/melody-match.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/melody.jpg" alt="Person testing a wearable device and companion mobile app" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2024-12-03">Dec 3, 2024</time>
-                    <span>7 min read</span>
-                  </div>
-                  <h3>Melody Match: Swift Client + Python Server</h3>
-                  <p>Built at RowdyHacks X: a Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>Swift</li>
-                    <li>Python</li>
-                    <li>ESP8266</li>
-                    <li>Hackathon</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
+      <div class="inset">
+        <div class="inset-lbl">▸ RECENT CAPTURE</div>
+        <div class="inset-title">LOGGING</div>
+        <div class="inset-meta">WIN · MEDIUM · Windows · 3D AGO</div>
+      </div>
+      <div class="card-footer"><span>FULL PROFILE</span><span class="go">htb profile ↗</span></div>
+    </a>
+  </div>
+
+  <div class="grid-bottom">
+
+    <a class="card" href="about.html#ctfs">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// LEDGER · CTF</span><span class="r">05 COMPS · 2 PODIUMS</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo timeline-sm">
+        <div class="tl-row up">
+          <div class="tl-logo"><img src="assets/img/cit.svg" alt="CIT@CTF"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">CIT@CTF</span><span class="tl-date">APR &#x27;26</span></div>
+            <div class="tl-sub">Cyber-CIT Club · collegiate jeopardy</div>
+            <span class="tl-tag win">5TH</span><span class="tl-tag teal">TEAM</span>
           </div>
         </div>
-        <button class="carousel-nav is-next" type="button" aria-label="Next post" data-carousel-next>
-          <span aria-hidden="true">&#8594;</span>
-        </button>
-        <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
-      </div>
-      <div class="carousel-status" data-carousel-status role="status" aria-live="polite"></div>
-    </section>
-
-    <section id="writeups" class="section" aria-labelledby="writeups-title">
-      <div class="section-heading">
-        <h2 id="writeups-title">Writeups</h2>
-        <p>HTB-style walkthroughs documenting enumeration, exploitation paths, and clean reporting takeaways.</p>
-      </div>
-      <div class="blog-carousel" data-blog-carousel data-post-source="assets/data/writeups.json">
-        <button class="carousel-nav is-prev" type="button" aria-label="Previous writeup" data-carousel-prev>
-          <span aria-hidden="true">&#8592;</span>
-        </button>
-        <div class="carousel-window">
-          <div class="carousel-track" data-carousel-track>
-            <article class="blog-card" data-slug="htb-certificate-writeup" data-title="HTB Certificate Writeup" data-date="2025-06-08" data-read="11 min" data-summary="Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.">
-              <a class="blog-card-link" href="posts/htb-certificate-writeup.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/writeups/htb-certificate.png" alt="First page preview of the HTB Certificate writeup PDF report" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-06-08">Jun 8, 2025</time>
-                    <span>11 min read</span>
-                  </div>
-                  <h3>HTB Certificate Writeup</h3>
-                  <p>Hard Windows target centered on upload bypasses, foothold stability, AD enumeration, and SYSTEM escalation.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>HTB</li>
-                    <li>Windows</li>
-                    <li>Web Exploitation</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
-            <article class="blog-card" data-slug="htb-escapetwo-writeup" data-title="HTB EscapeTwo Writeup" data-date="2025-06-08" data-read="14 min" data-summary="Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.">
-              <a class="blog-card-link" href="posts/htb-escapetwo-writeup.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/writeups/htb-escapetwo.png" alt="First page preview of the HTB EscapeTwo writeup PDF report" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-06-08">Jun 8, 2025</time>
-                    <span>14 min read</span>
-                  </div>
-                  <h3>HTB EscapeTwo Writeup</h3>
-                  <p>Easy Windows AD lab with LDAP/SMB recon, spreadsheet credential recovery, SQL abuse, and AD privilege chaining.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>HTB</li>
-                    <li>Windows</li>
-                    <li>LDAP</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
-            <article class="blog-card" data-slug="htb-heal-writeup" data-title="HTB Heal Writeup" data-date="2025-06-08" data-read="10 min" data-summary="Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.">
-              <a class="blog-card-link" href="posts/htb-heal-writeup.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/writeups/htb-heal.png" alt="First page preview of the HTB Heal writeup PDF report" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-06-08">Jun 8, 2025</time>
-                    <span>10 min read</span>
-                  </div>
-                  <h3>HTB Heal Writeup</h3>
-                  <p>Medium Linux machine covering LFI, API mapping, sqlite credential extraction, cracking, and plugin-driven RCE.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>HTB</li>
-                    <li>Linux</li>
-                    <li>LFI</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
-            <article class="blog-card" data-slug="htb-planning-writeup" data-title="HTB Planning Writeup" data-date="2025-06-08" data-read="7 min" data-summary="Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.">
-              <a class="blog-card-link" href="posts/htb-planning-writeup.html">
-                <div class="blog-card-media">
-                  <img src="assets/img/writeups/htb-planning.png" alt="First page preview of the HTB Planning writeup PDF report" loading="lazy" />
-                </div>
-                <div class="blog-card-body">
-                  <div class="blog-card-meta">
-                    <time datetime="2025-06-08">Jun 8, 2025</time>
-                    <span>7 min read</span>
-                  </div>
-                  <h3>HTB Planning Writeup</h3>
-                  <p>Easy Linux box focused on web recon, Grafana exploitation, container context checks, and root escalation.</p>
-                  <ul class="tag-list blog-card-tags">
-                    <li>HTB</li>
-                    <li>Linux</li>
-                    <li>Grafana</li>
-                  </ul>
-                </div>
-              </a>
-            </article>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/htb.svg" alt="Hack The Madness 2026"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">HACK THE MADNESS 2026</span><span class="tl-date">MAR &#x27;26</span></div>
+            <div class="tl-sub">HTB · Captain, 1337 F0SS BR0K3RS</div>
+            <span class="tl-tag win">SWEET 16</span><span class="tl-tag purple">CAPTAIN</span>
           </div>
         </div>
-        <button class="carousel-nav is-next" type="button" aria-label="Next writeup" data-carousel-next>
-          <span aria-hidden="true">&#8594;</span>
-        </button>
-        <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
-      </div>
-      <div class="carousel-status" data-carousel-status role="status" aria-live="polite"></div>
-    </section>
-
-    <section id="github" class="section" aria-labelledby="github-title">
-      <div class="section-heading">
-        <h2 id="github-title">GitHub Highlights</h2>
-        <p>My current pinned repo's showing the projects im most proud of!</p>
-      </div>
-      <div class="github-panel">
-        <div class="github-status" data-github-status>Pulling intel from GitHub API…</div>
-        <div class="grid repo-grid" data-github-grid data-github-user="moriz82" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <section id="ctf" class="section" aria-labelledby="ctf-title">
-      <div class="section-heading">
-        <h2 id="ctf-title">Competitions &amp; CTFs</h2>
-        <p>Field notes from team-based competitions that sharpen exploit chains, reporting, and presentation chops.</p>
-      </div>
-      <div class="timeline">
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="assets/img/utsa.png" alt="UTSA logo" loading="lazy" />
-                          </div>
-                          <h3 class="timeline-company">Hack The Madness 2026</h3>
-                          <p class="timeline-role">Captain - 1337 F0SS BR0K3RS</p>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">2026 · Hack The Box · UTSA</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--ctf">CTF</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Led UTSA&apos;s <code>1337 F0SS BR0K3RS</code> roster during Hack The Box&apos;s Hack The Madness 2026 and placed in the <code>31337 16</code>, also known as the <code>ELEET 16</code>.</p>
-                  <ul class="timeline-skill-tags">
-                      <li>Team Leadership</li>
-                      <li>CTF Strategy</li>
-                      <li>Offensive Security</li>
-                      <li>Collaboration</li>
-                  </ul>
-              </div>
-          </article>
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="assets/img/cptc.webp" alt="Apple logo" loading="lazy" />
-                          </div>
-                          <h3 class="timeline-company">CPTC</h3>
-                          <p class="timeline-role">Team Member - Linux/Web</p>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">Fall 2025 · Collegiate Penetration Testing Competition</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--hardware-red-team">Red Team</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Deliver full-scope Penetration Test assessment with executive briefings, remediation guidance, and collaborative reporting.</p>
-                  <ul class="timeline-skill-tags">
-                      <li>Client Reporting</li>
-                      <li>Adversary Simulation</li>
-                      <li>Presentation</li>
-                  </ul>
-              </div>
-          </article>
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="assets/img/und.webp" alt="Apple logo" loading="lazy" />
-                          </div>
-                          <h3 class="timeline-company">UND CyberHawks Finals</h3>
-                          <p class="timeline-role">Finalist - Team Member / Mentor</p>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">Fall 2025 · UND CyberHawks National CTF</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--ctf">CTF</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Competed in a Capture the Flag event which covered Web hacking, Cryptography, Reverse Engineering, and Binary Exploitation. Some highlights were static and dynamic malware analysis where we deobfuscated vbs scripts created by a binary. Another was bypassing a php command blacklist in a web application's parameters.</p>
-                  <ul class="timeline-skill-tags">
-                      <li>Web Hacking</li>
-                      <li>Cryptography</li>
-                      <li>Reverse Engineering</li>
-                      <li>Binary Exploitation</li>
-                  </ul>
-              </div>
-          </article>
-          <article class="timeline-item">
-              <div class="timeline-marker"></div>
-              <div class="timeline-content">
-                  <div class="timeline-header">
-                      <div class="timeline-header-main">
-                          <div class="timeline-logos">
-                              <img src="assets/img/utsa.png" alt="Apple logo" loading="lazy" />
-                          </div>
-                          <h3 class="timeline-company">UTSA IoT Pen Testing</h3>
-                          <p class="timeline-role">2nd Place - Team Captain</p>
-                      </div>
-                      <div class="timeline-header-meta">
-                          <span class="timeline-meta">Summer 2025 · UTSA IoT Penetration Testing</span>
-                          <div class="timeline-tabs">
-                              <span class="timeline-tab timeline-tab--hardware-red-team">Red Team</span>
-                          </div>
-                      </div>
-                  </div>
-                  <p>Lead a group of classmates in a small scale Penetration Test with a Professional report. We navigated common AD attacks such as kerberosting, and utilised tools like Bloodhound to enumerate ACL misconfigurations. We also gained command execution through a website's search field; This allowed us to gain shell access to their linux machines. </p>
-                  <ul class="timeline-skill-tags">
-                      <li>Active Directory Hacking</li>
-                      <li>Linux Hacking</li>
-                      <li>Client Reporting</li>
-                      <li>Team Coordination</li>
-                  </ul>
-              </div>
-          </article>
-      </div>
-    </section>
-
-    <section id="htb" class="section" aria-labelledby="htb-title">
-      <div class="section-heading">
-        <h2 id="htb-title">Hack The Box Highlights</h2>
-        <p>Tracking certifications, lab grinds, and competitive boxes as the HTB journey levels up.</p>
-      </div>
-      <div class="htb-highlights-grid">
-        <article class="card compact">
-          <div class="card-body">
-            <div class="badge badge--purple">Certification</div>
-            <h3>HTB CPTS (Completed)</h3>
-            <p>Earned the HTB Certified Penetration Testing Specialist credential through practical adversary-style assessment and reporting.</p>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/und.webp" alt="UND CyberHawks Finals"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">UND CYBERHAWKS FINALS</span><span class="tl-date">FALL &#x27;25</span></div>
+            <div class="tl-sub">National CTF · Team member / mentor</div>
+            <span class="tl-tag win">FINALIST</span><span class="tl-tag teal">MENTOR</span><span class="tl-tag purple">WEB / CRYPTO / RE / PWN</span>
           </div>
-        </article>
-        <article class="card compact">
-          <div class="card-body">
-            <div class="badge badge--teal">Mini Pro Lab</div>
-            <h3>Full House</h3>
-            <p>Completed multi-host red team lab focused on chained pivots, AD escalation, and opsec discipline.</p>
-          </div>
-        </article>
-        <article class="card compact">
-          <div class="card-body">
-            <div class="badge badge--amber">Season 8</div>
-            <h3>Platinum Rank</h3>
-            <p>Maintained a top-tier season rank by systematically clearing advanced boxes.</p>
-          </div>
-        </article>
-      </div>
-      <div class="htb-chart-section">
-        <div class="htb-chart-card">
-          <h3>Pwned by Difficulty</h3>
-          <div class="htb-pie" data-htb-pie></div>
-          <ul class="htb-chart-legend" data-htb-legend></ul>
         </div>
-        <div class="htb-timeline-card">
-          <h3>Recent Boxes</h3>
-          <div class="htb-timeline" data-htb-timeline></div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/cptc.webp" alt="CPTC"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">CPTC</span><span class="tl-date">FALL &#x27;25</span></div>
+            <div class="tl-sub">Collegiate Penetration Testing Competition · UTSA NetRunners</div>
+            <span class="tl-tag teal">LINUX / WEB</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/utsa-iot.svg" alt="UTSA IoT Pen Testing"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">UTSA IOT PEN TESTING</span><span class="tl-date">SUMMER &#x27;25</span></div>
+            <div class="tl-sub">UTSA IoT Penetration Testing · Team Captain</div>
+            <span class="tl-tag win">2ND</span><span class="tl-tag purple">CAPTAIN</span><span class="tl-tag amber">AD / LINUX</span>
+          </div>
         </div>
       </div>
-    </section>
+      <div class="card-footer"><span>ALL COMPETITIONS</span><span class="go">/about#ctfs →</span></div>
+    </a>
 
-    <section id="clubs" class="section" aria-labelledby="clubs-title">
-      <div class="section-heading">
-        <h2 id="clubs-title">Clubs &amp; Teams</h2>
-        <p>Crewmates who sharpen the blade—bridging student orgs and national competitions.</p>
-      </div>
-      <div class="grid clubs">
-          <article class="club-card">
-              <div class="club-header">
-                  <div class="club-logo">
-                      <img src="assets/img/cptc.webp" alt="National Collegiate Cyber Defense Competition logo" loading="lazy" />
-                  </div>
-                  <div>
-                      <h3>UTSA Collegiate Penetration Testing Team (CPTC) "UTSA NetRunners"</h3>
-                      <p class="club-role">Adversary Simulation & Client PenTest</p>
-                  </div>
-              </div>
-              <p>Attacking enterprise-scale enviroments and preparing Red Team Injects</p>
-          </article>
-        <article class="club-card">
-          <div class="club-header">
-            <div class="club-logo">
-              <img src="assets/img/und.webp" alt="Collegiate Penetration Testing Competition logo" loading="lazy" />
-            </div>
-            <div>
-              <h3>UTSA UND CyberHawks CTF Team "El33t-ish"</h3>
-              <p class="club-role">Capture The Flag Team</p>
-            </div>
+    <a class="card" href="about.html#experience">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// EXPERIENCE</span><span class="r">04 ROLES</span></div>
+      <hr class="dashed">
+      <div class="timeline timeline-logo timeline-sm">
+        <div class="tl-row up">
+          <div class="tl-logo"><img src="assets/img/crowdstrike.svg" alt="CrowdStrike"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">CROWDSTRIKE</span><span class="tl-date">JUN &#x27;26 →</span></div>
+            <div class="tl-sub">Falcon Complete Intern · MDR</div>
+            <span class="tl-tag warn">UPCOMING</span><span class="tl-tag teal">DETECTION</span><span class="tl-tag purple">TRIAGE</span>
           </div>
-          <p>Delivering end-to-end assessments with stakeholder briefings and collaborative reporting workflows.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="education" class="section" aria-labelledby="education-title">
-      <div class="section-heading">
-        <h2 id="education-title">Education &amp; Certifications</h2>
-        <p>Academic track + credentials that underpin the operator mindset.</p>
-      </div>
-      <div class="education-grid">
-        <div class="education-card">
-          <div class="education-logo">
-            <img src="assets/img/utsa.png" alt="UTSA logo" loading="lazy" />
-          </div>
-          <h3>The University of Texas at San Antonio</h3>
-          <p class="education-meta">B.B.A. Cyber Security &amp; Information Systems · Expected Dec 2026</p>
-          <p>Balancing offensive labs, defensive analytics, and IS coursework to bridge operators and stakeholders.</p>
         </div>
-        <div class="education-card">
-          <h3>Certifications</h3>
-          <ul>
-            <li>CompTIA Network+</li>
-            <li>CompTIA Security+</li>
-            <li>Google Cybersecurity Professional</li>
-            <li>HTB Mini Pro Lab Full House</li>
-            <li>HTB Certified Penetration Testing Specialist (CPTS)</li>
-          </ul>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/verizon.png" alt="Verizon Business"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">VERIZON BUSINESS</span><span class="tl-date">MAY – AUG &#x27;25</span></div>
+            <div class="tl-sub">Install Contractor · Field Services</div>
+            <span class="tl-tag amber">FIELD</span><span class="tl-tag teal">NETWORK</span><span class="tl-tag purple">FIBER</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/Apple_logo_black.svg" alt="Apple"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">APPLE</span><span class="tl-date">MAY &#x27;24 – JAN &#x27;25</span></div>
+            <div class="tl-sub">Technical Support Advisor</div>
+            <span class="tl-tag teal">IT SUPPORT</span><span class="tl-tag purple">MACOS</span><span class="tl-tag amber">ESCALATIONS</span>
+          </div>
+        </div>
+        <div class="tl-row past">
+          <div class="tl-logo"><img src="assets/img/tx_dps_logo.png" alt="Texas DPS"></div>
+          <div class="tl-body-wrap">
+            <div class="tl-head"><span class="tl-title">TEXAS DPS</span><span class="tl-date">JUL – AUG &#x27;22</span></div>
+            <div class="tl-sub">Cyber Operations Intern</div>
+            <span class="tl-tag team">BLUE TEAM</span><span class="tl-tag purple">SPLUNK</span><span class="tl-tag amber">SOAR</span>
+          </div>
         </div>
       </div>
-    </section>
+      <div class="card-footer"><span>FULL WORK HISTORY</span><span class="go">/about#experience →</span></div>
+    </a>
 
-  </main>
+    <a class="card" href="about.html#certs">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// LEDGER · CERTS</span><span class="r">04/04 · ACTIVE</span></div>
+      <hr class="dashed">
+      <div class="big-num"><span>04</span><span class="big-num-sub">/04</span></div>
+      <div class="big-sub">CERTIFIED · 0 IN PROGRESS</div>
+      <div class="cert-list">
+        <div class="cert-row"><span class="n">HTB CPTS</span><span class="s done">✓ PASS &#x27;26</span></div>
+        <div class="cert-row"><span class="n">HTB Mini Pro Lab · Full House</span><span class="s done">✓ PASS &#x27;26</span></div>
+        <div class="cert-row"><span class="n">CompTIA Security+</span><span class="s done">✓ PASS &#x27;25</span></div>
+        <div class="cert-row"><span class="n">CompTIA Network+</span><span class="s done">✓ PASS &#x27;24</span></div>
+      </div>
+      <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
+    </a>
 
-  <footer class="site-footer">
-    <p> Will's Portfolio · Crafted with the help of ChatGPT Codex</p>
-  </footer>
+    <a class="card" href="posts/htb-devarea-writeup.html">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">3W AGO</span></div>
+      <hr class="dashed">
+      <div class="latest-meta">HTB · MEDIUM · LINUX</div>
+      <div class="latest-title">HTB DEVAREA</div>
+      <p class="latest-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
+      <div class="latest-tags">
+        <span class="chip">CVE</span><span class="chip">SOAP</span><span class="chip">FLASK</span>
+      </div>
+      <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
+    </a>
 
-  <script src="assets/js/main.js"></script>
+  </div>
+
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">72 OWNED</span>
+  </a>
+  <a class="stat-card" href="about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-04-22 18:33 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
