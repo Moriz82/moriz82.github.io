@@ -10,7 +10,7 @@
     },
     {
       "label": "Insane",
-      "value": 3
+      "value": 4
     },
     {
       "label": "Medium",
@@ -18,6 +18,12 @@
     }
   ],
   "boxes": [
+    {
+      "name": "PingPong",
+      "difficulty": "Insane",
+      "date": "2026-04-25T19:00:00.000000Z",
+      "summary": "Windows"
+    },
     {
       "name": "Logging",
       "difficulty": "Medium",
@@ -29,12 +35,6 @@
       "difficulty": "Easy",
       "date": "2026-04-11T19:00:00.000000Z",
       "summary": "Linux"
-    },
-    {
-      "name": "Garfield",
-      "difficulty": "Hard",
-      "date": "2026-04-04T19:00:00.000000Z",
-      "summary": "Windows"
     }
   ]
 }
