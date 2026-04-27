@@ -3,6 +3,7 @@ title: HTB Heal
 slug: htb-heal-writeup
 type: writeup
 category: htb
+avatar: htb-heal.png
 date: 2025-05-13
 difficulty: medium
 os: linux

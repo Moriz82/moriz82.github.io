@@ -3,6 +3,7 @@ title: HTB Planning
 slug: htb-planning-writeup
 type: writeup
 category: htb
+avatar: htb-planning.png
 date: 2025-05-15
 difficulty: easy
 os: linux

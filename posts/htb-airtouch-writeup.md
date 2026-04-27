@@ -3,6 +3,7 @@ title: HTB Airtouch
 slug: htb-airtouch-writeup
 type: writeup
 category: htb
+avatar: htb-airtouch.png
 date: 2025-10-22
 difficulty: medium
 os: linux

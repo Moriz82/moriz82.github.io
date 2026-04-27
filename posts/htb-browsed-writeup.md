@@ -3,6 +3,7 @@ title: HTB Browsed
 slug: htb-browsed-writeup
 type: writeup
 category: htb
+avatar: htb-browsed.png
 date: 2025-08-18
 difficulty: medium
 os: linux

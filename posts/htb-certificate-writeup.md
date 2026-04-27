@@ -3,6 +3,7 @@ title: HTB Certificate
 slug: htb-certificate-writeup
 type: writeup
 category: htb
+avatar: htb-certificate.png
 date: 2025-06-02
 difficulty: hard
 os: windows

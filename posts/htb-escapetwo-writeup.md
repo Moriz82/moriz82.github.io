@@ -3,6 +3,7 @@ title: HTB EscapeTwo
 slug: htb-escapetwo-writeup
 type: writeup
 category: htb
+avatar: htb-escapetwo.png
 date: 2025-05-15
 difficulty: easy
 os: windows

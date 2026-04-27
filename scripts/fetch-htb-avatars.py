@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEST = ROOT / "assets" / "img" / "writeups"
 API_KEY = open(os.path.expanduser("~/.config/htb-operator/config.ini")).read().split("api_key = ")[1].split("\n")[0].strip()
 HDR = {"Authorization": f"Bearer {API_KEY}", "User-Agent": "htb-operator/1.4.3"}
-CDN = "https://www.hackthebox.com/storage"
+CDN = "https://htb-mp-prod-public-storage.s3.eu-central-1.amazonaws.com"
 
 BOXES = {
     "htb-pingpong": 891,
