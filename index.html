@@ -65,7 +65,7 @@
       <div class="inset">
         <div class="inset-lbl">▸ RECENT CAPTURE</div>
         <div class="inset-title">LOGGING</div>
-        <div class="inset-meta">WIN · MEDIUM · Windows · 3D AGO</div>
+        <div class="inset-meta">WIN · MEDIUM · Windows · 1W AGO</div>
       </div>
       <div class="card-footer"><span>FULL PROFILE</span><span class="go">htb profile ↗</span></div>
     </a>
@@ -178,15 +178,15 @@
       <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
     </a>
 
-    <a class="card" href="posts/htb-devarea-writeup.html">
+    <a class="card" href="posts/htb-pingpong-writeup.html">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">3W AGO</span></div>
+      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">2D AGO</span></div>
       <hr class="dashed">
-      <div class="latest-meta">HTB · MEDIUM · LINUX</div>
-      <div class="latest-title">HTB DEVAREA</div>
-      <p class="latest-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
+      <div class="latest-meta">HTB · INSANE · WINDOWS</div>
+      <div class="latest-title">HTB PINGPONG</div>
+      <p class="latest-summary">Two-domain cross-forest trust chain — ESC13 cert for WinRM, WriteDACL on cross-realm owned group for gMSA read, RBCD + S4U2Proxy into MSSQL sysadmin, GodPotato to SYSTEM, DCSync PONG, then ESC4 via foreign security principal to forge Administrator cert on PING.</p>
       <div class="latest-tags">
-        <span class="chip">CVE</span><span class="chip">SOAP</span><span class="chip">FLASK</span>
+        <span class="chip">AD</span><span class="chip">ADCS</span><span class="chip">KERBEROS</span><span class="chip">CROSS-TRUST</span>
       </div>
       <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
     </a>
@@ -214,7 +214,7 @@
 </footer>
 <div class="colophon">
   <span>// 2026 Will DeDominico · built on markdown</span>
-  <span>2026-04-22 18:38 UTC</span>
+  <span>2026-04-27 08:53 UTC</span>
 </div>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>

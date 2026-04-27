@@ -1,5 +1,58 @@
 [
   {
+    "slug": "htb-pingpong-writeup",
+    "title": "HTB PingPong",
+    "summary": "Two-domain cross-forest trust chain — ESC13 cert for WinRM, WriteDACL on cross-realm owned group for gMSA read, RBCD + S4U2Proxy into MSSQL sysadmin, GodPotato to SYSTEM, DCSync PONG, then ESC4 via foreign security principal to forge Administrator cert on PING.",
+    "date": "2026-04-25T00:00:00.000Z",
+    "readTime": "25 min read",
+    "tags": [
+      "AD",
+      "ADCS",
+      "KERBEROS",
+      "CROSS-TRUST",
+      "RBCD",
+      "gMSA",
+      "MSSQL",
+      "ESC13",
+      "ESC4"
+    ],
+    "difficulty": "insane",
+    "os": "windows"
+  },
+  {
+    "slug": "htb-silentium-writeup",
+    "title": "HTB Silentium",
+    "summary": "Flowise AI staging leak exposes a password reset token, RCE via `Function()` eval drops into Docker, credential reuse pivots to SSH, and a Gogs symlink path traversal overwrites a git hook for root.",
+    "date": "2026-04-25T00:00:00.000Z",
+    "readTime": "9 min read",
+    "tags": [
+      "WEB",
+      "API",
+      "DOCKER",
+      "GIT",
+      "LINUX"
+    ],
+    "difficulty": "easy",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-logging-writeup",
+    "title": "HTB Logging",
+    "summary": "Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.",
+    "date": "2026-04-19T00:00:00.000Z",
+    "readTime": "14 min read",
+    "tags": [
+      "AD",
+      "SMB",
+      "SHADOW-CREDS",
+      "DLL-HIJACK",
+      "ADCS",
+      "WSUS"
+    ],
+    "difficulty": "medium",
+    "os": "windows"
+  },
+  {
     "slug": "htb-devarea-writeup",
     "title": "HTB DevArea",
     "summary": "Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak `/etc/systemd/system/hoverfly.service` → admin creds → CVE-2025-54123 middleware RCE → SSH as `dev_ryan`. Root chains a leaked Flask `SECRET_KEY` (session forge) + a regex-allow-listed `|` pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.",
