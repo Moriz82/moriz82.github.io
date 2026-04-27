@@ -21,10 +21,10 @@
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
       <div class="wp-hero-row">
         <div class="wp-hero-logo cat-{{category}}">
-          {{#ifeq category "htb"}}<img src="../assets/img/htb.svg" alt="HTB">{{/ifeq}}
+          {{#if avatar}}<img src="../assets/img/writeups/{{avatar}}" alt="{{postTitle}}" class="wp-hero-avatar">{{else}}{{#ifeq category "htb"}}<img src="../assets/img/htb.svg" alt="HTB">{{/ifeq}}
           {{#ifeq category "cit-ctf"}}<img src="../assets/img/cit.svg" alt="CIT@CTF">{{/ifeq}}
           {{#ifeq category "utsa-iot"}}<img src="../assets/img/utsa-iot.svg" alt="UTSA IoT">{{/ifeq}}
-          {{#unless category}}<span class="wp-hero-mono">OPS</span>{{/unless}}
+          {{#unless category}}<span class="wp-hero-mono">OPS</span>{{/unless}}{{/if}}
         </div>
         <div class="wp-hero-text">
           <div class="wp-chips">

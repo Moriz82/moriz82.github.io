@@ -292,6 +292,8 @@ for (const p of posts) {
     readTime: p.readTime || '',
     tags: p.tags || [],
     summary: p.summary || '',
+    category: (p.category || '').toLowerCase(),
+    avatar: p.avatar || '',
     body: p.body,
     navActive: isWriteup ? 'writeups' : 'projects',
     indexHref: isWriteup ? 'writeups/index.html' : 'projects/index.html',
