@@ -12,3 +12,6 @@ dev/
 # OS
 .DS_Store
 Thumbs.db
+
+# Draft key (never commit)
+.htb-draft-key

@@ -178,19 +178,5 @@
     ],
     "difficulty": "easy",
     "os": "linux"
-  },
-  {
-    "slug": "htb-heal-writeup",
-    "title": "HTB Heal",
-    "summary": "Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as `www-data` → unauthenticated HashiCorp Consul service-registration → root.",
-    "date": "2025-05-13T00:00:00.000Z",
-    "readTime": "10 min read",
-    "tags": [
-      "LFI",
-      "API",
-      "RCE"
-    ],
-    "difficulty": "medium",
-    "os": "linux"
   }
 ]

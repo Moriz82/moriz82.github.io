@@ -68,6 +68,10 @@ if (fs.existsSync(POSTS_DIR)) {
       console.warn(`[skip] ${file} — missing front-matter (slug/title/type)`);
       continue;
     }
+    if (fm.draft) {
+      console.warn(`[draft] ${file} — skipping (draft: true)`);
+      continue;
+    }
     const rawBody = preprocess(parsed.content);
     posts.push({
       ...fm,

@@ -1,0 +1,85 @@
+name: Publish Retired HTB Writeups
+
+# Runs every 6 hours. For each drafts/htb-*.md.enc, decrypts to read
+# the htbId, checks the HTB API — if the machine is retired, decrypts
+# into posts/ (without draft flag) and removes the encrypted draft.
+# The commit triggers build-site.yml which publishes the HTML.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 */6 * * *"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check drafts against HTB API
+        env:
+          HTB_APPKEY: ${{ secrets.HTB_APPKEY }}
+          DRAFT_KEY: ${{ secrets.DRAFT_KEY }}
+        run: |
+          set -euo pipefail
+          auth="Authorization: Bearer ${HTB_APPKEY}"
+          published=0
+
+          for enc in drafts/htb-*.md.enc; do
+            [ -f "$enc" ] || continue
+            base="$(basename "$enc" .enc)"
+
+            # Decrypt to temp file to read front-matter
+            tmp="$(mktemp)"
+            if ! openssl enc -aes-256-cbc -pbkdf2 -d -in "$enc" -out "$tmp" -pass "pass:$DRAFT_KEY" 2>/dev/null; then
+              echo "✗ $enc — decryption failed, skipping"
+              rm -f "$tmp"
+              continue
+            fi
+
+            # Extract htbId from front-matter
+            htb_id=$(grep -oP '^htbId:\s*\K\d+' "$tmp" || true)
+            if [ -z "$htb_id" ]; then
+              echo "· $enc — no htbId, skipping"
+              rm -f "$tmp"
+              continue
+            fi
+
+            # Query HTB API for machine status
+            resp=$(curl -sS -H "$auth" -H "Accept: application/json" \
+              "https://labs.hackthebox.com/api/v4/machine/profile/$htb_id" 2>/dev/null || echo '{}')
+
+            retired=$(echo "$resp" | jq -r '.info.retired // false')
+
+            if [ "$retired" = "true" ]; then
+              name=$(echo "$resp" | jq -r '.info.name // "unknown"')
+              echo "✓ $enc (id=$htb_id, $name) — RETIRED, publishing"
+
+              # Remove draft: true and htbId lines, move to posts/
+              sed -i '/^draft:\s*true/d' "$tmp"
+              mv "$tmp" "posts/$base"
+
+              # Remove encrypted version
+              rm "$enc"
+              published=$((published + 1))
+            else
+              echo "· $enc (id=$htb_id) — still active, skipping"
+              rm -f "$tmp"
+            fi
+          done
+
+          echo "published=$published" >> "$GITHUB_ENV"
+          echo "Published $published writeup(s)"
+
+      - name: Commit + push
+        if: env.published != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts/ drafts/
+          git commit -m "publish: auto-release retired HTB writeups"
+          git push
