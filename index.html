@@ -178,15 +178,15 @@
       <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
     </a>
 
-    <a class="card" href="posts/htb-pingpong-writeup.html">
+    <a class="card" href="posts/htb-airtouch-writeup.html">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">1W AGO</span></div>
+      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">6MO AGO</span></div>
       <hr class="dashed">
-      <div class="latest-meta">HTB · INSANE · WINDOWS</div>
-      <div class="latest-title">HTB PINGPONG</div>
-      <p class="latest-summary">Two-domain cross-forest trust chain — ESC13 cert for WinRM, WriteDACL on cross-realm owned group for gMSA read, RBCD + S4U2Proxy into MSSQL sysadmin, GodPotato to SYSTEM, DCSync PONG, then ESC4 via foreign security principal to forge Administrator cert on PING.</p>
+      <div class="latest-meta">HTB · MEDIUM · LINUX</div>
+      <div class="latest-title">HTB AIRTOUCH</div>
+      <p class="latest-summary">SNMP coughs up a &#x60;consultant&#x60; cred → passwordless sudo on the consultant host. From there, &#x60;airodump-ng&#x60; captures the WPA2-PSK handshake for &#x60;AirTouch-Internet&#x60; (crack → &#x60;[REDACTED]&#x60;), &#x60;airdecap-ng&#x60; exposes the router&#x27;s &#x60;UserRole&#x3D;admin&#x60; cookie, a &#x60;.phtml&#x60; upload lands RCE, and the router&#x27;s &#x60;/root/certs-backup/&#x60; + &#x60;send_certs.sh&#x60; are the keys to the WPA-Enterprise office net and the final management host.</p>
       <div class="latest-tags">
-        <span class="chip">AD</span><span class="chip">ADCS</span><span class="chip">KERBEROS</span><span class="chip">CROSS-TRUST</span>
+        <span class="chip">WIFI</span><span class="chip">WPA</span><span class="chip">PIVOT</span>
       </div>
       <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
     </a>
@@ -214,7 +214,7 @@
 </footer>
 <div class="colophon">
   <span>// 2026 Will DeDominico · built on markdown</span>
-  <span>2026-05-04 01:08 UTC</span>
+  <span>2026-05-04 01:19 UTC</span>
 </div>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
