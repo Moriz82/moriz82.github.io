@@ -2,7 +2,7 @@
   "difficulties": [
     {
       "label": "Easy",
-      "value": 40
+      "value": 41
     },
     {
       "label": "Hard",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "Connected",
+      "difficulty": "Easy",
+      "date": "2026-06-06T19:00:00.000000Z",
+      "summary": "Linux"
+    },
+    {
       "name": "PingPong",
       "difficulty": "Insane",
       "date": "2026-04-25T19:00:00.000000Z",
@@ -29,12 +35,6 @@
       "difficulty": "Medium",
       "date": "2026-04-18T19:00:00.000000Z",
       "summary": "Windows"
-    },
-    {
-      "name": "Silentium",
-      "difficulty": "Easy",
-      "date": "2026-04-11T19:00:00.000000Z",
-      "summary": "Linux"
     }
   ]
 }
