@@ -6,7 +6,7 @@
     },
     {
       "label": "Hard",
-      "value": 9
+      "value": 10
     },
     {
       "label": "Insane",
@@ -19,6 +19,12 @@
   ],
   "boxes": [
     {
+      "name": "Nimbus",
+      "difficulty": "Hard",
+      "date": "2026-06-20T19:00:00.000000Z",
+      "summary": "linux"
+    },
+    {
       "name": "Connected",
       "difficulty": "Easy",
       "date": "2026-06-06T19:00:00.000000Z",
@@ -28,12 +34,6 @@
       "name": "PingPong",
       "difficulty": "Insane",
       "date": "2026-04-25T19:00:00.000000Z",
-      "summary": "Windows"
-    },
-    {
-      "name": "Logging",
-      "difficulty": "Medium",
-      "date": "2026-04-18T19:00:00.000000Z",
       "summary": "Windows"
     }
   ]
