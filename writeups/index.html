@@ -37,17 +37,39 @@
   <section class="page-head">
     <div class="eye">// WRITEUPS</div>
     <h1 class="page-title">Research &amp; walkthroughs.</h1>
-    <p class="page-lead">6 posts across 1 categories. Newest first.</p>
+    <p class="page-lead">9 posts across 1 categories. Newest first.</p>
   </section>
 
   <section class="wp-group" id="htb">
     <div class="wp-group-head">
       <span class="wp-group-label">// HACK THE BOX</span>
-      <span class="wp-group-count">06 POSTS</span>
+      <span class="wp-group-count">09 POSTS</span>
     </div>
     <hr class="dashed-thick">
 
     <div class="post-grid">
+      <a class="card post-card medium" href="../posts/htb-logging-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · WINDOWS</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Logging</div>
+        <p class="post-summary">Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.</p>
+        <div class="post-tags">
+          <span class="chip">AD</span><span class="chip">SMB</span><span class="chip">SHADOW-CREDS</span><span class="chip">DLL-HIJACK</span><span class="chip">ADCS</span><span class="chip">WSUS</span>
+        </div>
+        <div class="card-footer"><span>April 19, 2026 · 14 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-devarea-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB DevArea</div>
+        <p class="post-summary">Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak &#x60;/etc/systemd/system/hoverfly.service&#x60; → admin creds → CVE-2025-54123 middleware RCE → SSH as &#x60;dev_ryan&#x60;. Root chains a leaked Flask &#x60;SECRET_KEY&#x60; (session forge) + a regex-allow-listed &#x60;|&#x60; pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.</p>
+        <div class="post-tags">
+          <span class="chip">CVE</span><span class="chip">SOAP</span><span class="chip">FLASK</span>
+        </div>
+        <div class="card-footer"><span>March 28, 2026 · 14 min read</span><span class="go">READ →</span></div>
+      </a>
       <a class="card post-card medium" href="../posts/htb-airtouch-writeup.html">
         <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
         <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
@@ -69,6 +91,17 @@
           <span class="chip">CHROME</span><span class="chip">BASH</span><span class="chip">PYCACHE</span>
         </div>
         <div class="card-footer"><span>August 18, 2025 · 10 min read</span><span class="go">READ →</span></div>
+      </a>
+      <a class="card post-card medium" href="../posts/htb-interpreter-writeup.html">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="card-head"><span class="l">// WRITEUP</span><span class="r">MEDIUM · LINUX</span></div>
+        <hr class="dashed">
+        <div class="post-title">HTB Interpreter</div>
+        <p class="post-summary">Unauth Mirth Connect RCE (CVE-2023-43208) for &#x60;mirth&#x60; shell → DB creds from &#x60;mirth.properties&#x60; → crack PBKDF2-SHA256 &#x60;sedric&#x60; hash with 600K iterations → SSH in → local Flask notifier service with an f-string template injection through an &#x60;&lt;lastname&gt;&#x60; XML field pops &#x60;/root/root.txt&#x60;.</p>
+        <div class="post-tags">
+          <span class="chip">CVE</span><span class="chip">RCE</span><span class="chip">SSTI</span>
+        </div>
+        <div class="card-footer"><span>July 20, 2025 · 8 min read</span><span class="go">READ →</span></div>
       </a>
       <a class="card post-card hard" href="../posts/htb-certificate-writeup.html">
         <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
@@ -144,7 +177,7 @@
   <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
     <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
     <span class="stat-label">HTB</span>
-    <span class="stat-value">73 OWNED</span>
+    <span class="stat-value">75 OWNED</span>
   </a>
   <a class="stat-card" href="../about.html#ctfs">
     <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
@@ -159,7 +192,7 @@
 </footer>
 <div class="colophon">
   <span>// 2026 Will DeDominico · built on markdown</span>
-  <span>2026-05-04 01:19 UTC</span>
+  <span>2026-08-29 04:24 UTC</span>
 </div>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>

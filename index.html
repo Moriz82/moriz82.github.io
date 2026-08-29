@@ -54,18 +54,18 @@
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
       <div class="card-head"><span class="l">// LEDGER · HTB</span><span class="r">LIVE · 04H AGO</span></div>
       <hr class="dashed">
-      <div class="big-num">73</div>
+      <div class="big-num">75</div>
       <div class="big-sub">BOXES PWNED · TOP 4.1% GLOBAL</div>
       <div class="bars">
-        <div class="bar-row"><span class="lbl">EASY</span><span class="track"><span class="fill ok" style="width:55%"></span></span><span class="val">40</span></div>
+        <div class="bar-row"><span class="lbl">EASY</span><span class="track"><span class="fill ok" style="width:55%"></span></span><span class="val">41</span></div>
         <div class="bar-row"><span class="lbl">MEDIUM</span><span class="track"><span class="fill cool" style="width:27%"></span></span><span class="val">20</span></div>
-        <div class="bar-row"><span class="lbl">HARD</span><span class="track"><span class="fill warn" style="width:12%"></span></span><span class="val">09</span></div>
+        <div class="bar-row"><span class="lbl">HARD</span><span class="track"><span class="fill warn" style="width:13%"></span></span><span class="val">10</span></div>
         <div class="bar-row"><span class="lbl">INSANE</span><span class="track"><span class="fill hot" style="width:5%"></span></span><span class="val">04</span></div>
       </div>
       <div class="inset">
         <div class="inset-lbl">▸ RECENT CAPTURE</div>
-        <div class="inset-title">PINGPONG</div>
-        <div class="inset-meta">WIN · INSANE · Windows · 1W AGO</div>
+        <div class="inset-title">NIMBUS</div>
+        <div class="inset-meta">WIN · HARD · Linux · 2MO AGO</div>
       </div>
       <div class="card-footer"><span>FULL PROFILE</span><span class="go">htb profile ↗</span></div>
     </a>
@@ -178,15 +178,15 @@
       <div class="card-footer"><span>DETAILS + BADGES</span><span class="go">/about#certs →</span></div>
     </a>
 
-    <a class="card" href="posts/htb-airtouch-writeup.html">
+    <a class="card" href="posts/htb-logging-writeup.html">
       <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">6MO AGO</span></div>
+      <div class="card-head"><span class="l">// LATEST WRITEUP</span><span class="r">4MO AGO</span></div>
       <hr class="dashed">
-      <div class="latest-meta">HTB · MEDIUM · LINUX</div>
-      <div class="latest-title">HTB AIRTOUCH</div>
-      <p class="latest-summary">SNMP coughs up a &#x60;consultant&#x60; cred → passwordless sudo on the consultant host. From there, &#x60;airodump-ng&#x60; captures the WPA2-PSK handshake for &#x60;AirTouch-Internet&#x60; (crack → &#x60;[REDACTED]&#x60;), &#x60;airdecap-ng&#x60; exposes the router&#x27;s &#x60;UserRole&#x3D;admin&#x60; cookie, a &#x60;.phtml&#x60; upload lands RCE, and the router&#x27;s &#x60;/root/certs-backup/&#x60; + &#x60;send_certs.sh&#x60; are the keys to the WPA-Enterprise office net and the final management host.</p>
+      <div class="latest-meta">HTB · MEDIUM · WINDOWS</div>
+      <div class="latest-title">HTB LOGGING</div>
+      <p class="latest-summary">Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.</p>
       <div class="latest-tags">
-        <span class="chip">WIFI</span><span class="chip">WPA</span><span class="chip">PIVOT</span>
+        <span class="chip">AD</span><span class="chip">SMB</span><span class="chip">SHADOW-CREDS</span><span class="chip">DLL-HIJACK</span>
       </div>
       <div class="card-footer"><span>READ ALL</span><span class="go">/writeups →</span></div>
     </a>
@@ -199,7 +199,7 @@
   <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
     <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
     <span class="stat-label">HTB</span>
-    <span class="stat-value">73 OWNED</span>
+    <span class="stat-value">75 OWNED</span>
   </a>
   <a class="stat-card" href="about.html#ctfs">
     <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
@@ -214,7 +214,7 @@
 </footer>
 <div class="colophon">
   <span>// 2026 Will DeDominico · built on markdown</span>
-  <span>2026-05-04 01:19 UTC</span>
+  <span>2026-08-29 04:24 UTC</span>
 </div>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>

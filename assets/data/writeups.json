@@ -1,5 +1,36 @@
 [
   {
+    "slug": "htb-logging-writeup",
+    "title": "HTB Logging",
+    "summary": "Seed creds into SMB log disclosure, shadow credentials pivot, scheduled-task DLL hijack, AD CS ESC1 cert for a fake WSUS endpoint, and a poisoned update to SYSTEM on the DC.",
+    "date": "2026-04-19T00:00:00.000Z",
+    "readTime": "14 min read",
+    "tags": [
+      "AD",
+      "SMB",
+      "SHADOW-CREDS",
+      "DLL-HIJACK",
+      "ADCS",
+      "WSUS"
+    ],
+    "difficulty": "medium",
+    "os": "windows"
+  },
+  {
+    "slug": "htb-devarea-writeup",
+    "title": "HTB DevArea",
+    "summary": "Anonymous FTP drops an employee-service JAR whose embedded Apache CXF (Jetty 9.4.27) is vulnerable to CVE-2022-46364 MTOM XOP file read. Use it to leak `/etc/systemd/system/hoverfly.service` → admin creds → CVE-2025-54123 middleware RCE → SSH as `dev_ryan`. Root chains a leaked Flask `SECRET_KEY` (session forge) + a regex-allow-listed `|` pipe injection in a SysWatch web endpoint + a double-symlink in a sudo-allowed logs command.",
+    "date": "2026-03-28T00:00:00.000Z",
+    "readTime": "14 min read",
+    "tags": [
+      "CVE",
+      "SOAP",
+      "FLASK"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
     "slug": "htb-airtouch-writeup",
     "title": "HTB Airtouch",
     "summary": "SNMP coughs up a `consultant` cred → passwordless sudo on the consultant host. From there, `airodump-ng` captures the WPA2-PSK handshake for `AirTouch-Internet` (crack → `[REDACTED]`), `airdecap-ng` exposes the router's `UserRole=admin` cookie, a `.phtml` upload lands RCE, and the router's `/root/certs-backup/` + `send_certs.sh` are the keys to the WPA-Enterprise office net and the final management host.",
@@ -23,6 +54,20 @@
       "CHROME",
       "BASH",
       "PYCACHE"
+    ],
+    "difficulty": "medium",
+    "os": "linux"
+  },
+  {
+    "slug": "htb-interpreter-writeup",
+    "title": "HTB Interpreter",
+    "summary": "Unauth Mirth Connect RCE (CVE-2023-43208) for `mirth` shell → DB creds from `mirth.properties` → crack PBKDF2-SHA256 `sedric` hash with 600K iterations → SSH in → local Flask notifier service with an f-string template injection through an `<lastname>` XML field pops `/root/root.txt`.",
+    "date": "2025-07-20T00:00:00.000Z",
+    "readTime": "8 min read",
+    "tags": [
+      "CVE",
+      "RCE",
+      "SSTI"
     ],
     "difficulty": "medium",
     "os": "linux"
