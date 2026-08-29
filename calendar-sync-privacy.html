@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Privacy policy for UTSA CyberComp Calendar Sync.">
+<title>Calendar Sync Privacy Policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-sun" aria-hidden="true">☀</span>
+      <span class="theme-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
+  <nav id="nav-links" class="nav-links">
+    <a href="index.html" class="">HOME</a>
+    <a href="writeups/index.html" class="">WRITEUPS</a>
+    <a href="projects/index.html" class="">PROJECTS</a>
+    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
+    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
+    <a href="about.html" class="">ABOUT</a>
+    <a href="contact.html" class="">CONTACT</a>
+  </nav>
+</header>
+
+<main class="shell post-shell">
+  <article class="post">
+    <div class="card post-meta-card">
+      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="card-head"><span class="l">// PRIVACY</span><span class="r">EFFECTIVE AUG 28, 2026</span></div>
+      <hr class="dashed">
+      <h1 class="post-title-big">Calendar Sync Privacy Policy</h1>
+      <p class="post-summary">How UTSA CyberComp Calendar Sync accesses, uses, stores, and deletes Google user data.</p>
+    </div>
+
+    <div class="post-body">
+      <h2>Scope</h2>
+      <p>UTSA CyberComp Calendar Sync is a private local utility for one authorized user. It is not offered as a public service.</p>
+
+      <h2>Google user data accessed</h2>
+      <p>The utility accesses the approved Google account's OpenID subject identifier and events on calendars the user owns. It uses the identifier only to prevent writing to the wrong account. It reads, creates, and updates only marked calendar copies managed by this utility.</p>
+
+      <h2>How data is used</h2>
+      <p>Calendar data is used only to mirror the user's UTSA CyberComp Nextcloud events into the user's primary Google Calendar, prevent duplicate copies, preserve all-day dates and recurrence, and audit the resulting Google events. The utility does not create guests, invitations, or Google Meet links.</p>
+
+      <h2>Storage and retention</h2>
+      <p>The OAuth client credential and refresh token are stored in the owner's macOS Keychain. Short-lived access tokens remain only in process memory. Private local files store managed Google event identifiers, source content digests, and audit timestamps. Event content also exists in the user's Google Calendar copies.</p>
+      <p>Managed Google copies remain until the user explicitly approves their deletion. Local state and Keychain credentials remain until the owner removes them or uninstalls the utility.</p>
+
+      <h2>Sharing</h2>
+      <p>Google user data is not sold, rented, used for advertising, or shared with third parties. Data is sent only between the user's local Mac, Google Calendar, and the user's authorized Nextcloud service as required for the requested synchronization.</p>
+
+      <h2>Security and control</h2>
+      <p>The utility requests the narrow Google Calendar permission for events on calendars the user owns. It creates private events, stores credentials in Keychain, and stops on account mismatches, incomplete source reads, unexpected invitations, missing copies, or destination drift.</p>
+      <p>The user can revoke Google access from their Google Account permissions, remove the named Keychain credential, or uninstall the local scheduler. Revocation stops future synchronization but does not automatically delete existing Google events.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy can be sent through the site's <a href="contact.html">contact page</a>.</p>
+      <p><a href="calendar-sync.html">Return to the app homepage</a>.</p>
+    </div>
+  </article>
+</main>
+
+<footer class="stats-strip">
+  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">HTB</span>
+    <span class="stat-value">75 OWNED</span>
+  </a>
+  <a class="stat-card" href="about.html#ctfs">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">CTFs</span>
+    <span class="stat-value">5 PLAYED</span>
+  </a>
+  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <span class="stat-label">GITHUB</span>
+    <span class="stat-value">@moriz82</span>
+  </a>
+</footer>
+<div class="colophon">
+  <span>// 2026 Will DeDominico · built on markdown</span>
+  <span>2026-08-29 04:23 UTC</span>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
+<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active=""}}
+
+<main class="shell post-shell">
+  <article class="post">
+    <div class="card post-meta-card">
+      {{> card}}
+      <div class="card-head"><span class="l">// LOCAL UTILITY</span><span class="r">MACOS</span></div>
+      <hr class="dashed">
+      <div class="eye post-eye">READ-ONLY SOURCE · PRIVATE DESTINATION</div>
+      <h1 class="post-title-big">UTSA CyberComp Calendar Sync</h1>
+      <p class="post-summary">A private local utility that mirrors one authorized user's UTSA CyberComp Nextcloud events into their primary Google Calendar.</p>
+    </div>
+
+    <div class="post-body">
+      <h2>What it does</h2>
+      <p>The program runs on the owner's Mac. It reads calendar events from the owner's UTSA CyberComp Nextcloud account and creates or updates marked copies in the owner's primary Google Calendar.</p>
+      <p>Nextcloud access is strictly read only. Google copies are private, contain no guests or conferencing, and never write changes back to Nextcloud. Removed source events are retained until the owner explicitly approves deleting the matching Google copies.</p>
+
+      <h2>Google access</h2>
+      <p>The utility requests only OpenID identity and permission to manage events on Google calendars the user owns. OpenID identifies the approved account; calendar access is used only to read, create, and update this utility's marked copies in the primary calendar.</p>
+
+      <h2>Data handling</h2>
+      <p>OAuth credentials stay in the owner's macOS Keychain. Short-lived access tokens remain in process memory. Local private state contains event identifiers, content digests, and audit timestamps needed to prevent duplicates and verify synchronization.</p>
+      <p>The utility does not sell, advertise with, or share Google user data. See the <a href="calendar-sync-privacy.html">Privacy Policy</a> and <a href="calendar-sync-terms.html">Terms of Service</a>.</p>
+    </div>
+  </article>
+</main>
+
+{{> footer}}
+<script src="assets/js/main.js"></script>
+</body>
+</html>

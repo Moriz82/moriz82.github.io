@@ -16,6 +16,9 @@ const OUT = {
   home: path.join(ROOT, 'index.html'),
   about: path.join(ROOT, 'about.html'),
   contact: path.join(ROOT, 'contact.html'),
+  calendarSync: path.join(ROOT, 'calendar-sync.html'),
+  calendarPrivacy: path.join(ROOT, 'calendar-sync-privacy.html'),
+  calendarTerms: path.join(ROOT, 'calendar-sync-terms.html'),
   writeupsIndex: path.join(ROOT, 'writeups', 'index.html'),
   projectsIndex: path.join(ROOT, 'projects', 'index.html'),
 };
@@ -200,6 +203,16 @@ fs.writeFileSync(
   })
 );
 console.log('[ok] contact.html');
+
+// Calendar sync OAuth pages
+for (const [output, template, title, description] of [
+  [OUT.calendarSync, 'calendar-sync', 'UTSA CyberComp Calendar Sync', 'Local calendar mirror for one authorized user.'],
+  [OUT.calendarPrivacy, 'calendar-sync-privacy', 'Calendar Sync Privacy Policy', 'Privacy policy for UTSA CyberComp Calendar Sync.'],
+  [OUT.calendarTerms, 'calendar-sync-terms', 'Calendar Sync Terms', 'Terms for UTSA CyberComp Calendar Sync.'],
+]) {
+  fs.writeFileSync(output, tpl[template]({ ...baseCtx('', ''), title, description }));
+  console.log(`[ok] ${path.basename(output)}`);
+}
 
 // Writeups index (grouped by category)
 ensureDir(OUT.writeupsIndex);

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active=""}}
+
+<main class="shell post-shell">
+  <article class="post">
+    <div class="card post-meta-card">
+      {{> card}}
+      <div class="card-head"><span class="l">// PRIVACY</span><span class="r">EFFECTIVE AUG 28, 2026</span></div>
+      <hr class="dashed">
+      <h1 class="post-title-big">Calendar Sync Privacy Policy</h1>
+      <p class="post-summary">How UTSA CyberComp Calendar Sync accesses, uses, stores, and deletes Google user data.</p>
+    </div>
+
+    <div class="post-body">
+      <h2>Scope</h2>
+      <p>UTSA CyberComp Calendar Sync is a private local utility for one authorized user. It is not offered as a public service.</p>
+
+      <h2>Google user data accessed</h2>
+      <p>The utility accesses the approved Google account's OpenID subject identifier and events on calendars the user owns. It uses the identifier only to prevent writing to the wrong account. It reads, creates, and updates only marked calendar copies managed by this utility.</p>
+
+      <h2>How data is used</h2>
+      <p>Calendar data is used only to mirror the user's UTSA CyberComp Nextcloud events into the user's primary Google Calendar, prevent duplicate copies, preserve all-day dates and recurrence, and audit the resulting Google events. The utility does not create guests, invitations, or Google Meet links.</p>
+
+      <h2>Storage and retention</h2>
+      <p>The OAuth client credential and refresh token are stored in the owner's macOS Keychain. Short-lived access tokens remain only in process memory. Private local files store managed Google event identifiers, source content digests, and audit timestamps. Event content also exists in the user's Google Calendar copies.</p>
+      <p>Managed Google copies remain until the user explicitly approves their deletion. Local state and Keychain credentials remain until the owner removes them or uninstalls the utility.</p>
+
+      <h2>Sharing</h2>
+      <p>Google user data is not sold, rented, used for advertising, or shared with third parties. Data is sent only between the user's local Mac, Google Calendar, and the user's authorized Nextcloud service as required for the requested synchronization.</p>
+
+      <h2>Security and control</h2>
+      <p>The utility requests the narrow Google Calendar permission for events on calendars the user owns. It creates private events, stores credentials in Keychain, and stops on account mismatches, incomplete source reads, unexpected invitations, missing copies, or destination drift.</p>
+      <p>The user can revoke Google access from their Google Account permissions, remove the named Keychain credential, or uninstall the local scheduler. Revocation stops future synchronization but does not automatically delete existing Google events.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy can be sent through the site's <a href="contact.html">contact page</a>.</p>
+      <p><a href="calendar-sync.html">Return to the app homepage</a>.</p>
+    </div>
+  </article>
+</main>
+
+{{> footer}}
+<script src="assets/js/main.js"></script>
+</body>
+</html>

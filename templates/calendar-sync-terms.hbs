@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+{{> nav active=""}}
+
+<main class="shell post-shell">
+  <article class="post">
+    <div class="card post-meta-card">
+      {{> card}}
+      <div class="card-head"><span class="l">// TERMS</span><span class="r">EFFECTIVE AUG 28, 2026</span></div>
+      <hr class="dashed">
+      <h1 class="post-title-big">Calendar Sync Terms of Service</h1>
+      <p class="post-summary">Terms for the private local UTSA CyberComp Calendar Sync utility.</p>
+    </div>
+
+    <div class="post-body">
+      <h2>Authorized use</h2>
+      <p>This utility is provided only for the account owner's personal, authorized calendar synchronization. The user must have permission to access every connected account and calendar.</p>
+
+      <h2>Operation</h2>
+      <p>The utility reads the authorized Nextcloud calendars and manages only its marked copies in the authorized Google Calendar. It does not promise continuous availability; synchronization depends on the local Mac, network, Keychain, Google APIs, and Nextcloud service.</p>
+
+      <h2>User control</h2>
+      <p>The user may stop the local scheduler or revoke Google access at any time. Source removals do not delete Google copies without explicit approval.</p>
+
+      <h2>No warranty</h2>
+      <p>The utility is provided as is, without warranties. The owner should independently verify important calendar information and maintain appropriate account security.</p>
+
+      <h2>Privacy</h2>
+      <p>Use of Google user data is described in the <a href="calendar-sync-privacy.html">Privacy Policy</a>.</p>
+      <p><a href="calendar-sync.html">Return to the app homepage</a>.</p>
+    </div>
+  </article>
+</main>
+
+{{> footer}}
+<script src="assets/js/main.js"></script>
+</body>
+</html>
