@@ -29,12 +29,6 @@
       "difficulty": "Easy",
       "date": "2026-06-06T19:00:00.000000Z",
       "summary": "Linux"
-    },
-    {
-      "name": "PingPong",
-      "difficulty": "Insane",
-      "date": "2026-04-25T19:00:00.000000Z",
-      "summary": "Windows"
     }
   ]
 }
