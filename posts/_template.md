@@ -2,7 +2,7 @@
 title: HTB Target Name
 slug: htb-target-slug
 type: writeup
-category: htb              # htb | cit-ctf | other
+category: htb
 draft: true                # auto-cleared when machine retires (publish-retired.yml)
 htbId: 000                 # HTB machine ID — used by publish-retired workflow
 date: 2026-04-21
