@@ -15,7 +15,7 @@ export const APPS = {
   files: { title: 'Files', icon: () => I.files, w: 900, h: 560, render: filesApp, desc: 'Browse posts', reopen: (w, o) => o.path && w.nav(o.path) },
   term: { title: 'Console', icon: () => I.term, w: 760, h: 460, render: termApp, onfocus: termFocus, desc: 'will@archlinux shell' },
   web: { title: 'Web', icon: () => I.web, w: 1200, h: 800, center: true, single: true, render: webApp, desc: 'Read posts',
-    reopen: (w, o) => o.path && w.go(o.path, { newTab: !!o.newTab, push: o.push !== false }), onresize: (w) => w.syncRail && w.syncRail(), onfocus: webOnFocus },
+    reopen: (w, o) => o.path && w.go(o.path, { newTab: !!o.newTab, push: o.push !== false, anchor: o.anchor }), onresize: (w) => w.syncRail && w.syncRail(), onfocus: webOnFocus },
   editor: { title: 'Text Editor', icon: () => I.editor, w: 780, h: 560, render: editorApp, desc: 'View post source' },
   about: { title: 'whoami', icon: () => I.about, w: 900, h: 620, center: true, single: true, render: aboutApp, desc: 'Experience, competitions, certifications', reopen: (w, o) => o.sec && w.sec(o.sec) },
   certs: { title: 'Certificates', icon: () => I.certs, w: 860, h: 560, center: true, single: true, render: certsApp, desc: 'Certifications' },

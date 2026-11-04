@@ -122,5 +122,26 @@ check('every page loads the desktop and works without it', () => {
   }
 });
 
+console.log('publishing');
+check('Jekyll on GitHub Pages excludes markdown sources and build inputs', () => {
+  assert(exists('_config.yml'), '_config.yml missing: Pages would turn every posts/*.md (drafts included) into a page');
+  const cfg = read('_config.yml');
+  for (const pat of ['posts/*.md', '*.md', 'drafts', 'scripts', 'templates', 'data', 'node_modules']) {
+    assert(cfg.includes(`"${pat}"`), `_config.yml does not exclude ${pat}`);
+  }
+});
+check('re-drafting a published post removes its page', () => {
+  const os = require('os');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-'));
+  for (const d of ['posts', 'templates', 'data']) fs.cpSync(path.join(ROOT, d), path.join(tmp, d), { recursive: true });
+  fs.mkdirSync(path.join(tmp, 'assets/img/writeups/avatars'), { recursive: true });
+  const src = path.join(tmp, 'posts/htb-heal-writeup.md');
+  fs.writeFileSync(src, fs.readFileSync(src, 'utf8').replace(/^type: writeup$/m, 'type: writeup\ndraft: true'));
+  execFileSync('node', [path.join(ROOT, 'scripts/build.js')], { env: { ...process.env, BUILD_ROOT: tmp }, stdio: 'ignore' });
+  const left = fs.existsSync(path.join(tmp, 'posts/htb-heal-writeup.html'));
+  fs.rmSync(tmp, { recursive: true, force: true });
+  assert(!left, 'posts/htb-heal-writeup.html still exists after the post became a draft');
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

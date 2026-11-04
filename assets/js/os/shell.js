@@ -381,13 +381,15 @@ function initRouting() {
     const webWin = (() => { const el = t.closest('.win'); return el && WM.wins.find((w) => w.el === el && w.app === 'web'); })();
     if (t.dataset.open) { e.preventDefault(); hidePops(); if (webWin) webWin.nav(t.dataset.open); else OS.route(t.dataset.open); return; }
     if (t.tagName !== 'A' || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    if ((t.target && t.target !== '_self') || t.hasAttribute('download')) return;
     const href = t.getAttribute('href') || '';
     if (href.startsWith('#')) {
       const page = t.closest('.page');
       if (page && href.length > 1) {
         e.preventDefault();
         const target = page.querySelector('#' + CSS.escape(decodeURIComponent(href.slice(1))));
-        if (target) page.scrollTo({ top: target.offsetTop - 10, behavior: mq.reduced.matches ? 'auto' : 'smooth' });
+        if (target) page.dataset.full = '1';
+        if (target) page.scrollTo({ top: target.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop - 10, behavior: mq.reduced.matches ? 'auto' : 'smooth' });
       }
       return;
     }
@@ -399,18 +401,19 @@ function initRouting() {
     if (webWin && !['/', '/index.html', '/about.html', '/contact.html'].includes(url.pathname)) webWin.nav(url.pathname, url.hash.slice(1));
     else OS.route(url.pathname);
   });
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', (e) => {
+    if (WM.popMobile(e.state)) return;
     const p = location.pathname;
     const web = WM.wins.find((w) => w.app === 'web');
     if (p === '/' || p === '/index.html') { if (web && web.path) WM.minimize(web); return; }
-    OS.route(p, { push: false });
+    OS.route(p, { push: false, anchor: decodeURIComponent(location.hash.slice(1)) });
   });
   document.addEventListener('contextmenu', (e) => {
     if (e.target.closest('input,textarea,.pop,.win,.topbar,.dock,.grid-ov,.ovl,.ctx,.dicon')) return;
     e.preventDefault();
     showCtx(e.clientX, e.clientY, [
       ['Open in Console', () => WM.open('term'), 'Alt+Enter'], ['Show Desktop in Files', () => OS.openFiles('~')], '-',
-      ['Arrange Icons', () => { iconPos = {}; LS.set('rc-icons', '{}'); layoutIcons(); }], ['Tile Windows', () => WM.tile(), 'Alt+T'], ['Show Desktop', () => WM.showDesktop(), 'Alt+D'], '-',
+      ['Arrange Icons', () => { iconPos = {}; LS.set('rc-icons', '{}'); layoutIcons(); }], ['Tile Windows', () => WM.tile()], ['Show Desktop', () => WM.showDesktop()], '-',
       ['Settings', () => WM.open('settings')], ['About This System', () => WM.open('about')],
     ]);
   });
@@ -426,14 +429,13 @@ function initKeys() {
     if (e.key === 'Meta' || e.key === 'OS') { metaUsed = false; return; }
     if (e.metaKey) metaUsed = true;
     if (!typing && !e.altKey && !e.ctrlKey && !e.metaKey && e.key === '/') { e.preventDefault(); enterOverview(); return; }
-    if (!e.altKey || e.ctrlKey || e.metaKey) return;
+    // Only Alt combos browsers don't use (Alt+Arrows is Back/Forward, Alt+D/F/T open browser UI),
+    // and never while typing, where Alt/Option+Arrow moves by word.
+    if (!e.altKey || e.ctrlKey || e.metaKey || typing) return;
     const k = e.key.toLowerCase(), act = WM.active;
     const map = {
       f1: () => (inOverview() ? exitOverview() : enterOverview()), enter: () => WM.open('term'),
-      q: () => act && WM.close(act), f: () => act && WM.maximize(act), m: () => act && WM.minimize(act),
-      t: () => WM.tile(), d: () => WM.showDesktop(), a: () => toggleGrid(),
-      arrowleft: () => act && WM.snapHalf(act, 'left'), arrowright: () => act && WM.snapHalf(act, 'right'),
-      arrowup: () => act && WM.maximize(act, true), arrowdown: () => act && WM.maximize(act, false),
+      q: () => act && WM.close(act), m: () => act && WM.minimize(act), a: () => toggleGrid(),
     };
     if (map[k]) { e.preventDefault(); map[k](); }
   });

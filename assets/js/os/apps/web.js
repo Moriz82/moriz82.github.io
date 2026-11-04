@@ -58,7 +58,8 @@ export function webApp(w, o) {
     syncRail(true);
     scrollSpy();
     const target = anchor && page.querySelector('#' + CSS.escape(anchor));
-    page.scrollTop = target ? target.offsetTop - 10 : 0;
+    if (target) page.dataset.full = '1'; else delete page.dataset.full;
+    page.scrollTop = target ? target.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop - 10 : 0;
     w.title = title;
     w.el.setAttribute('aria-label', title);
     WM.changed();
@@ -113,7 +114,7 @@ export function webApp(w, o) {
   $('.nr', w.el).addEventListener('click', () => render(false));
   $('.nt', w.el).addEventListener('click', () => w.go(NEWTAB, { newTab: true }));
 
-  w.go(o.path || '/writeups/', { newTab: true, push: o.push !== false });
+  w.go(o.path || '/writeups/', { newTab: true, push: o.push !== false, anchor: o.anchor });
 }
 
 export function webOnFocus(w) {

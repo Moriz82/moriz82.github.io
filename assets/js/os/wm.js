@@ -18,6 +18,9 @@ function snapPreview(kind) {
 
 export const hbtn = (icon, label, cls) => `<button class="hbtn ${cls || ''}" type="button" aria-label="${label}" title="${label}">${icon}</button>`;
 
+// Window ids opened on a phone, each with its own history entry (newest last).
+const mstack = [];
+
 export const WM = {
   wins: [], z: 100, seq: 0, active: null,
   area() { return layer().getBoundingClientRect(); },
@@ -51,6 +54,10 @@ export const WM = {
     if (!w.customTitle) this.setTitle(w, w.title);
     if (o.max || A.max) this.maximize(w, true);
     this.focus(w);
+    if (isMobile() && app !== 'web' && o.push !== false) {
+      mstack.push(w.id);
+      history.pushState({ m: w.id }, '', location.href);
+    }
     return w;
   },
 
@@ -97,6 +104,12 @@ export const WM = {
   },
   snapHalf(w, side) { const ar = this.area(); this.place(w, side === 'left' ? 0 : ar.width / 2, 0, ar.width / 2, ar.height, side); },
   close(w) {
+    const mi = mstack.indexOf(w.id);
+    if (mi !== -1 && !w.popping) {
+      // let Back do the closing so the history entry goes away with the window
+      if (mi === mstack.length - 1 && history.state && history.state.m === w.id) { history.back(); return; }
+      mstack.splice(mi, 1);
+    }
     const A = OS.APPS[w.app];
     if (A.onclose) A.onclose(w);
     w.el.remove();
@@ -108,6 +121,17 @@ export const WM = {
       document.title = OS.data.site.name;
     }
     this.changed();
+  },
+  // popstate on a phone: close the newest app if its entry was just popped.
+  popMobile(state) {
+    if (state && state.m && !mstack.includes(state.m)) return true; // forward into a closed app: ignore
+    if (!mstack.length) return false;
+    const top = mstack[mstack.length - 1];
+    if (state && state.m === top) return false;
+    mstack.pop();
+    const w = this.wins.find((x) => x.id === top);
+    if (w) { w.popping = true; this.close(w); }
+    return true;
   },
   tile() {
     const vis = this.wins.filter((w) => !w.min).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex);

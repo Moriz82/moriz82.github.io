@@ -44,3 +44,5 @@
 
 /* Long writeups: let the browser skip layout/paint of stages until they're near the viewport. */
 .wp-stage + .wp-stage { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* jumping to an anchor needs real heights above the target */
+.page[data-full] .wp-stage + .wp-stage { content-visibility: visible; }

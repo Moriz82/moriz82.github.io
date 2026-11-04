@@ -21,7 +21,7 @@ import { startSession } from './session.js';
   let initial = null;
   if (bw) {
     const wb = bw.querySelector('.wb');
-    initial = { app: bw.dataset.app, path: bw.dataset.path, max: bw.classList.contains('max') };
+    initial = { app: bw.dataset.app, path: bw.dataset.path, max: bw.classList.contains('max'), anchor: decodeURIComponent(location.hash.slice(1)) };
     cachePage(initial.path, wb.innerHTML, bw.getAttribute('aria-label'), document.title);
     // hand the already-laid-out nodes to the first window so the article isn't rendered twice
     OS.adopt = { path: initial.path, nodes: document.createDocumentFragment() };

@@ -116,7 +116,7 @@ Inline: `{red:text}`, `{ok:text}`, `{warn:text}`, `{cool:text}`, `{dim:text}`, `
 
 Two kinds:
 
-- **`draft: true`** in front-matter. The build skips the post entirely: no page, no listing, no source JSON. Flip it to `false` (or delete the line) to publish. The markdown is still visible in the public repo.
+- **`draft: true`** in front-matter. The build skips the post entirely: no page, no listing, no source JSON, and it deletes the page if the post was published before. Flip it to `false` (or delete the line) to publish. The markdown is still visible in the public repo, but `_config.yml` keeps GitHub Pages' Jekyll from turning it into a page. Keep the filename equal to the slug.
 - **Encrypted HTB drafts** for active machines live in `drafts/*.md.enc`. Use `scripts/draft.sh lock|unlock|edit`. The Publish Retired workflow decrypts and publishes them automatically when HTB retires the machine. Never commit an unlocked active-machine writeup.
 
 ## Checks

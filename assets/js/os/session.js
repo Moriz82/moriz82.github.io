@@ -74,7 +74,7 @@ function showLogin(isLock) {
 }
 function openInitial() {
   if (!bootWin || bootWin.app === 'welcome') { WM.open('welcome'); return; }
-  OS.route(bootWin.path, { max: bootWin.max, push: false });
+  OS.route(bootWin.path, { max: bootWin.max, push: false, anchor: bootWin.anchor });
 }
 function enter() {
   clearInterval(autoT); clearTimers();

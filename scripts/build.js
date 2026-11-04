@@ -75,6 +75,8 @@ for (const file of fs.readdirSync(POSTS_DIR).sort()) {
   }
   if (fm.draft) {
     console.warn(`[draft] ${file} — skipping (draft: true)`);
+    const stale = path.join(POSTS_DIR, `${fm.slug}.html`);
+    if (fs.existsSync(stale)) { fs.rmSync(stale); console.warn(`[draft] removed posts/${fm.slug}.html`); }
     continue;
   }
   const sec = TYPE_TO_SECTION[fm.type];
