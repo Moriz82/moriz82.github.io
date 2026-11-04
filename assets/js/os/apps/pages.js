@@ -1,11 +1,13 @@
 // pages.js — apps whose content is a server-rendered page: Welcome (/), whoami (/about.html), Contacts (/contact.html).
 
-import { OS, $, $$, esc, fetchPage, mail } from '../lib.js';
+import { OS, $, $$, esc, fetchPage, mail, takeAdopted } from '../lib.js';
 import { WM } from '../wm.js';
 import { I, Y, folderIcon } from '../icons.js';
 
 async function load(w, path, then) {
   w.path = path;
+  const adopted = takeAdopted(path);
+  if (adopted) { w.body.appendChild(adopted); then && then(); return; }
   w.body.innerHTML = '<div class="loading">Loading…</div>';
   try {
     const { html } = await fetchPage(path);

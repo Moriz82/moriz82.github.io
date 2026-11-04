@@ -41,3 +41,6 @@
 .hljs-title, .hljs-section, .hljs-function .hljs-title { color: #99c1f1; }
 .hljs-meta, .hljs-symbol, .hljs-bullet { color: #dc8add; }
 .hljs-deletion { color: #f66151; }
+
+/* Long writeups: let the browser skip layout/paint of stages until they're near the viewport. */
+.wp-stage + .wp-stage { content-visibility: auto; contain-intrinsic-size: auto 900px; }

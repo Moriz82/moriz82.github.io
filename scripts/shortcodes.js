@@ -10,6 +10,30 @@
  */
 
 const { marked } = require('marked');
+const hljs = require('highlight.js');
+
+// Syntax highlighting happens at build time so pages ship no highlighter and
+// code blocks don't repaint after load.
+function highlightCode(code, lang) {
+  const l = String(lang || '').toLowerCase();
+  if (l && hljs.getLanguage(l)) {
+    try { return { html: hljs.highlight(code, { language: l, ignoreIllegals: true }).value, lang: l }; } catch (e) { /* fall through */ }
+  }
+  if (!l) {
+    const auto = hljs.highlightAuto(code);
+    return { html: auto.value, lang: auto.language || 'plaintext' };
+  }
+  return { html: escapeHtml(code), lang: l };
+}
+
+marked.use({
+  renderer: {
+    code(code, infostring) {
+      const h = highlightCode(code, String(infostring || '').trim().split(/\s+/)[0]);
+      return `<pre><code class="hljs language-${h.lang}">${h.html}</code></pre>\n`;
+    },
+  },
+});
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
@@ -49,10 +73,17 @@ function renderTerminal(a, content) {
   const tx = a.tx ? `<span class="t-tx">TX ${escapeHtml(a.tx)}</span>` : '';
   const rx = a.rx ? `<span class="t-rx">RX ${escapeHtml(a.rx)}</span>` : '';
   const meter = tx || rx ? `<span class="t-meter">${tx}${rx ? ' &middot; ' + rx : ''}</span>` : '';
-  const body = escapeHtml(content);
+  // keep {red:...} marks intact through the highlighter
+  const marks = [];
+  const raw = content.replace(/\{(red|ok|warn|cool|dim|ink):([^}]+)\}/g, (_, color, text) => {
+    marks.push(`<span class="hl-${color}">${escapeHtml(text)}</span>`);
+    return `RCMARK${marks.length - 1}X`;
+  });
+  const h = highlightCode(raw, lang);
+  const body = h.html.replace(/RCMARK(\d+)X/g, (_, i) => marks[+i]);
   return `<div class="wp-term">
 <div class="wp-term-head"><span class="t-title">${title}</span>${meter}</div>
-<pre class="wp-term-body"><code class="language-${lang}">${body}</code></pre>
+<pre class="wp-term-body"><code class="hljs language-${h.lang}">${body}</code></pre>
 </div>`;
 }
 

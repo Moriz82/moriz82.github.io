@@ -41,6 +41,16 @@ check('stage titles render inline markdown', () => {
   const html = pre.restore(marked.parse(pre.md));
   assert(html.includes('<h2 class="wp-stage-title">The <code>filename</code> param.</h2>'), 'title not rendered: ' + html);
 });
+check('terminals and fenced code are highlighted at build time', () => {
+  const pre = preprocess('::: terminal title="t" lang="python"\nimport os  # {red:pwned}\n:::\n\n```bash\necho hi\n```\n');
+  const html = pre.restore(marked.parse(pre.md));
+  assert(/<code class="hljs language-python">[\s\S]*<span class="hljs-keyword">import<\/span>/.test(html), 'terminal not highlighted: ' + html);
+  assert(html.includes('<span class="hl-red">pwned</span>'), 'inline color lost inside highlighted terminal');
+  assert(/<code class="hljs language-bash">/.test(html), 'fenced block not highlighted: ' + html);
+});
+check('pages do not load highlight.js in the browser', () => {
+  assert(!/highlight(\.min)?\.js/.test(fs.readFileSync(path.join(ROOT, 'templates/page.hbs'), 'utf8')), 'page.hbs still loads highlight.js');
+});
 check('mixed-case callout titles keep their case', () => {
   const pre = preprocess('::: note title="Why BloodHound matters"\nx\n:::\n');
   assert(pre.restore(marked.parse(pre.md)).includes('Why BloodHound matters'), 'title was re-cased');

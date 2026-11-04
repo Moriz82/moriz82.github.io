@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -77,9 +83,6 @@
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -84,11 +90,11 @@
 <div class="wp-stage-body"><p>ESP8266 over Wi-Fi, an off-the-shelf PPG heart-rate sensor, a LiPo and charging circuit. Telemetry sent as JSON every 2 seconds to the backend.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">esp8266 · serial</span></div>
-<pre class="wp-term-body"><code class="language-bash">[wearable] booted · wifi=ok · ip=192.168.42.17
+<pre class="wp-term-body"><code class="hljs language-bash">[wearable] booted · wifi=ok · ip=192.168.42.17
 [wearable] sensor ready · baseline 72 bpm
-[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:74,&quot;ts&quot;:1701212101}
-[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:76,&quot;ts&quot;:1701212103}
-[wearable] → POST /telemetry  {&quot;user&quot;:&quot;will&quot;,&quot;bpm&quot;:81,&quot;ts&quot;:1701212105}</code></pre>
+[wearable] → POST /telemetry  {<span class="hljs-string">&quot;user&quot;</span>:<span class="hljs-string">&quot;will&quot;</span>,<span class="hljs-string">&quot;bpm&quot;</span>:74,<span class="hljs-string">&quot;ts&quot;</span>:1701212101}
+[wearable] → POST /telemetry  {<span class="hljs-string">&quot;user&quot;</span>:<span class="hljs-string">&quot;will&quot;</span>,<span class="hljs-string">&quot;bpm&quot;</span>:76,<span class="hljs-string">&quot;ts&quot;</span>:1701212103}
+[wearable] → POST /telemetry  {<span class="hljs-string">&quot;user&quot;</span>:<span class="hljs-string">&quot;will&quot;</span>,<span class="hljs-string">&quot;bpm&quot;</span>:81,<span class="hljs-string">&quot;ts&quot;</span>:1701212105}</code></pre>
 </div></div>
 </section>
 
@@ -100,12 +106,12 @@
 <h2 class="wp-stage-title">FastAPI because we had 32 hours.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · server · python</span></div>
-<pre class="wp-term-body"><code class="language-python">@app.post(&quot;/telemetry&quot;)
-async def telemetry(packet: Telemetry, db: Session = Depends(get_db)):
-    window = await db.recent_bpm(packet.user, seconds=30)
-    state = infer_state(window)   # rest | active | peak
-    await catalog.suggest(packet.user, bpm=packet.bpm, state=state)
-    return {&quot;ok&quot;: True, &quot;state&quot;: state}</code></pre>
+<pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-meta">@app.post(<span class="hljs-params"><span class="hljs-string">&quot;/telemetry&quot;</span></span>)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">telemetry</span>(<span class="hljs-params">packet: Telemetry, db: Session = Depends(<span class="hljs-params">get_db</span>)</span>):
+    window = <span class="hljs-keyword">await</span> db.recent_bpm(packet.user, seconds=<span class="hljs-number">30</span>)
+    state = infer_state(window)   <span class="hljs-comment"># rest | active | peak</span>
+    <span class="hljs-keyword">await</span> catalog.suggest(packet.user, bpm=packet.bpm, state=state)
+    <span class="hljs-keyword">return</span> {<span class="hljs-string">&quot;ok&quot;</span>: <span class="hljs-literal">True</span>, <span class="hljs-string">&quot;state&quot;</span>: state}</code></pre>
 </div>
 
 
@@ -121,15 +127,15 @@ async def telemetry(packet: Telemetry, db: Session = Depends(get_db)):
 <h2 class="wp-stage-title">SwiftUI + Spotify SDK, because iPhones were the demo platform.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">swift · ios app</span></div>
-<pre class="wp-term-body"><code class="language-swift">struct NowPlayingView: View {
-    @EnvironmentObject var session: Session
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(&quot;\(session.bpm) BPM&quot;)
-                .font(.system(size: 72, weight: .heavy, design: .monospaced))
-            Text(session.state.rawValue.uppercased())
+<pre class="wp-term-body"><code class="hljs language-swift"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">NowPlayingView</span>: <span class="hljs-title class_">View</span> {
+    <span class="hljs-meta">@EnvironmentObject</span> <span class="hljs-keyword">var</span> session: <span class="hljs-type">Session</span>
+    <span class="hljs-keyword">var</span> body: <span class="hljs-keyword">some</span> <span class="hljs-type">View</span> {
+        <span class="hljs-type">VStack</span>(alignment: .leading) {
+            <span class="hljs-type">Text</span>(<span class="hljs-string">&quot;<span class="hljs-subst">\(session.bpm)</span> BPM&quot;</span>)
+                .font(.system(size: <span class="hljs-number">72</span>, weight: .heavy, design: .monospaced))
+            <span class="hljs-type">Text</span>(session.state.rawValue.uppercased())
                 .foregroundColor(session.state.color)
-            TrackRow(track: session.nextTrack)
+            <span class="hljs-type">TrackRow</span>(track: session.nextTrack)
         }
     }
 }</code></pre>
@@ -184,9 +190,6 @@ async def telemetry(packet: Telemetry, db: Session = Depends(get_db)):
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

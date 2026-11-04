@@ -37,16 +37,19 @@ export async function fetchPage(path) {
   return out;
 }
 
+// The first window to show the page the browser loaded takes its DOM nodes as-is.
+export function takeAdopted(path) {
+  if (!OS.adopt || OS.adopt.path !== path) return null;
+  const nodes = OS.adopt.nodes;
+  OS.adopt = null;
+  return nodes;
+}
+
 export const posts = () => (OS.data ? OS.data.posts : []);
 export const postByUrl = (url) => posts().find((p) => p.url === url);
 // virtual filesystem path: writeups/htb-heal-writeup, projects/homelab/cyber-range-homelab
 export const fsPath = (p) => `${p.sec}/${p.sub ? p.sub + '/' : ''}${p.slug}`;
 export const mail = () => { const m = OS.data.site.emailParts; return `${m[2]}${String.fromCharCode(64)}${m[1]}.${m[0]}`; };
 
-export function highlight(el) {
-  if (!window.hljs) return;
-  try { window.hljs.configure({ ignoreUnescapedHTML: true }); } catch (e) {}
-  el.querySelectorAll('pre code').forEach((b) => { if (!b.dataset.highlighted) { try { window.hljs.highlightElement(b); } catch (e) {} } });
-}
 
 export const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');

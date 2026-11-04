@@ -1,7 +1,7 @@
 // web.js — the Web app: tabs, back/forward, real URLs in the address bar. Page bodies come
 // from the server-rendered HTML of each URL (fetchPage), so there is one source of truth.
 
-import { OS, $, $$, esc, fetchPage, highlight, posts } from '../lib.js';
+import { OS, $, $$, esc, fetchPage, posts, takeAdopted } from '../lib.js';
 import { WM, hbtn } from '../wm.js';
 import { Y } from '../icons.js';
 
@@ -40,7 +40,7 @@ export function webApp(w, o) {
     let html, title, docTitle;
     if (path === NEWTAB) { html = newTabHtml(); title = 'New tab'; docTitle = OS.data.site.name; }
     else {
-      page.innerHTML = '<div class="loading">Loading…</div>';
+      if (!OS.adopt) page.innerHTML = '<div class="loading">Loading…</div>';
       try { ({ html, title, docTitle } = await fetchPage(path)); }
       catch (e) {
         if (my !== token) return;
@@ -49,8 +49,8 @@ export function webApp(w, o) {
       }
     }
     if (my !== token) return;
-    page.innerHTML = html;
-    highlight(page);
+    const adopted = takeAdopted(path);
+    if (adopted) { page.textContent = ''; page.appendChild(adopted); } else page.innerHTML = html;
     t.title = title;
     w.docTitle = docTitle;
     w.path = path === NEWTAB ? null : path;

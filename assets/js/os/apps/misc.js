@@ -30,6 +30,14 @@ export function setAccent(c) {
 }
 export function restoreAccent() { const a = LS.get('rc-accent'); if (a && /^#[0-9a-f]{6}$/i.test(a)) setAccent(a); }
 
+function loadSansFont() {
+  if (document.getElementById('font-sans')) return;
+  const l = document.createElement('link');
+  l.id = 'font-sans'; l.rel = 'stylesheet';
+  l.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+  document.head.appendChild(l);
+}
+
 export function settingsApp(w) {
   w.body.innerHTML = `<div class="pref">
     <div><h3>Accent color</h3><div class="boxed"><div class="acc">${ACCENTS.map(([c, n]) => `<button type="button" data-acc="${c}" title="${n}" aria-label="${n}" style="background:${c}"></button>`).join('')}</div></div></div>
@@ -47,7 +55,11 @@ export function settingsApp(w) {
     const a = e.target.closest('[data-acc]');
     if (a) { LS.set('rc-accent', a.dataset.acc); setAccent(a.dataset.acc); }
     const s = e.target.closest('.seg button');
-    if (s) { if (s.dataset.v === 'serif') delete root.dataset.body; else root.dataset.body = s.dataset.v; LS.set('rc-body', s.dataset.v); }
+    if (s) {
+      if (s.dataset.v === 'serif') delete root.dataset.body;
+      else { loadSansFont(); root.dataset.body = s.dataset.v; }
+      LS.set('rc-body', s.dataset.v);
+    }
     const d = e.target.closest('[data-do]');
     if (d) ({ reboot: () => OS.boot(), lock: () => OS.lock(), tile: () => WM.tile() })[d.dataset.do]();
     sync();

