@@ -8,7 +8,7 @@ on:
       - 'templates/**'
       - 'data/**'
       - 'assets/**'
-      - 'scripts/build.js'
+      - 'scripts/**'
       - 'package.json'
       - '.github/workflows/build-site.yml'
   workflow_dispatch:
@@ -35,14 +35,14 @@ jobs:
       - name: Install deps
         run: npm ci || npm install
 
-      - name: Build
-        run: node scripts/build.js
+      - name: Build and check
+        run: npm test
 
       - name: Commit generated HTML
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html about.html contact.html writeups/ projects/ posts/*.html assets/data/
+          git add index.html about.html contact.html blog/ writeups/ competitions/ projects/ posts/ assets/data/ assets/src/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

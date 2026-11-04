@@ -1,0 +1,12 @@
+# GitHub Pages runs Jekyll on this repo. The site is pre-built by scripts/build.js,
+# so Jekyll must not turn markdown sources (drafts included) or build inputs into pages.
+exclude:
+  - "*.md"
+  - "posts/*.md"
+  - "drafts"
+  - "scripts"
+  - "templates"
+  - "data"
+  - "node_modules"
+  - "package.json"
+  - "package-lock.json"

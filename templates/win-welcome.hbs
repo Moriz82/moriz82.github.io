@@ -1,0 +1,26 @@
+<div class="wel">
+  <header class="wel-hero">
+    <img class="av" src="/assets/img/avatar.svg" alt="" width="88" height="88">
+    <div><h1>{{site.name}}</h1><p>{{site.intro}}</p></div>
+  </header>
+  <section>
+    <h2>Folders</h2>
+    <ul class="boxed">
+      {{#each site.sections}}
+      <li><a class="row" href="/{{id}}/" data-files="{{id}}"><span class="ri" data-icon="folder:{{id}}"></span><span class="tx"><b>{{title}}</b><span>{{desc}}</span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      {{/each}}
+      <li><a class="row" href="/about.html" data-app="about"><span class="ri" data-icon="app:about"></span><span class="tx"><b>whoami</b><span>Experience, certifications, competitions</span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+  </section>
+  {{#if recent.length}}
+  <section>
+    <h2>Recent</h2>
+    <ul class="boxed">
+      {{#each recent}}
+      <li><a class="row" href="{{url}}"><span class="tx"><b>{{title}}</b><span>{{summary}}</span></span><time class="sfx" datetime="{{date}}">{{date}}</time></a></li>
+      {{/each}}
+    </ul>
+  </section>
+  {{/if}}
+  <p class="wel-tip js-only">Double-click a desktop icon, use the dock, or open <a href="#console" data-app="term">Console</a> and type <kbd>help</kbd>. Activities in the top-left corner searches everything.</p>
+</div>

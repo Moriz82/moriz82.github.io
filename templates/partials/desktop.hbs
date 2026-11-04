@@ -1,0 +1,26 @@
+<div class="wall" aria-hidden="true"><svg viewBox="0 0 1200 1520"><use href="#ba"/></svg></div>
+
+<header class="topbar" id="topbar">
+  <div class="tb-l" id="tb-l">
+    <a class="tb-home" href="/">Will DeDominico</a>
+    <button class="tbp js-only" id="act-btn" type="button">Activities</button>
+  </div>
+  <div class="tb-c js-only"><button class="tbp" id="clock-btn" type="button"><span id="clk"></span></button></div>
+  <div class="tb-r js-only">
+    <button class="tbp htb-ind" id="htb-btn" type="button" title="Hack The Box stats"><span class="cube"></span><b>{{desktop.htbOwned}}</b></button>
+    <button class="tbp status" id="qs-btn" type="button" aria-label="System menu"></button>
+  </div>
+</header>
+
+<nav class="icons" id="icons" aria-label="Desktop">
+  <a class="dicon" data-id="home" href="/"><span class="g" aria-hidden="true"></span><span class="lb">Home</span></a>
+  {{#each desktop.sections}}
+  <a class="dicon" data-id="{{id}}" href="/{{id}}/"><span class="g" aria-hidden="true"></span><span class="lb">{{title}}</span></a>
+  {{/each}}
+  <a class="dicon js-only" data-id="term" href="#console"><span class="g" aria-hidden="true"></span><span class="lb">Console</span></a>
+  <a class="dicon js-only" data-id="web" href="/writeups/"><span class="g" aria-hidden="true"></span><span class="lb">Web</span></a>
+  <a class="dicon" data-id="about" href="/about.html"><span class="g" aria-hidden="true"></span><span class="lb">whoami</span></a>
+  <a class="dicon js-only" data-id="certs" href="/about.html"><span class="g" aria-hidden="true"></span><span class="lb">Certificates</span></a>
+  <a class="dicon" data-id="contacts" href="/contact.html"><span class="g" aria-hidden="true"></span><span class="lb">Contact</span></a>
+  <a class="dicon js-only" data-id="trash" href="#trash"><span class="g" aria-hidden="true"></span><span class="lb">Trash</span></a>
+</nav>

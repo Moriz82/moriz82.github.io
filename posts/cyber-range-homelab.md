@@ -2,6 +2,7 @@
 title: Cyber Range Homelab
 slug: cyber-range-homelab
 type: project
+sub: homelab
 date: 2025-02-10
 readTime: 8 min read
 tags: [PROXMOX, CISCO, LAB]
