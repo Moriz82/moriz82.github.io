@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" class="nojs" data-view="{{view}}">
+<head>
+{{> head}}
+</head>
+<body>
+{{> symbols}}
+{{> desktop}}
+<main class="layer" id="layer">
+  <section class="win focus{{#if win.max}} max{{/if}}" id="boot-win" data-app="{{win.app}}" data-path="{{win.path}}" aria-label="{{win.title}}">
+    <header class="hb"><div class="ttl">{{win.title}}</div></header>
+    <div class="wb">{{{win.inner}}}</div>
+  </section>
+</main>
+<footer class="nojs-foot">© {{year}} Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
+<script type="module" src="/assets/js/os/main.js"></script>
+</body>
+</html>

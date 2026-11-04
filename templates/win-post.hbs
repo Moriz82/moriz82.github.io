@@ -1,0 +1,42 @@
+<div class="pg{{#unless rail}} solo{{/unless}}">
+  <article class="art">
+    <nav class="art-k" aria-label="Breadcrumb"><a href="/{{section.id}}/">{{section.title}}</a>{{#if p.sub}} / {{p.sub}}{{/if}} / <time datetime="{{p.date}}">{{p.dateLong}}</time></nav>
+    <header class="art-h">
+      <div>
+        <h1>{{p.title}}</h1>
+        {{#if p.summary}}<p class="lede">{{{p.summaryHtml}}}</p>{{/if}}
+      </div>
+      {{#if avatar}}<img class="art-av" src="{{avatar}}" alt="" width="72" height="72">{{/if}}
+    </header>
+    {{#if meta.length}}<p class="meta">{{#each meta}}<span{{#if cls}} class="{{cls}}"{{/if}}>{{text}}</span>{{/each}}</p>{{/if}}
+    {{#if repo}}<p class="repo"><a href="{{repo}}" rel="noopener">{{repo}}</a></p>{{/if}}
+    <div class="body">
+{{{p.body}}}
+    </div>
+    <nav class="pn" aria-label="More {{section.title}}">
+      {{#if prev}}<a class="prev" href="{{prev.url}}"><span>Older</span>{{prev.title}}</a>{{else}}<span></span>{{/if}}
+      {{#if next}}<a class="next" href="{{next.url}}"><span>Newer</span>{{next.title}}</a>{{/if}}
+    </nav>
+  </article>
+  {{#if rail}}
+  <details class="rail" open>
+    <summary><span>{{#if rail.rows.length}}Engagement · {{/if}}{{rail.kcTitle}}{{#if rail.loadout.length}} · Loadout{{/if}}</span><span aria-hidden="true">+</span></summary>
+    <div class="rail-in">
+      {{#if rail.rows.length}}
+      <section class="rc"><h3>Engagement</h3><dl>{{#each rail.rows}}<dt>{{k}}</dt><dd{{#if cls}} class="{{cls}}"{{/if}}>{{v}}</dd>{{/each}}</dl></section>
+      {{/if}}
+      {{#if rail.kc.length}}
+      <section class="rc"><h3>{{rail.kcTitle}} <span>{{rail.kc.length}} stages</span></h3>
+        <ol class="kc">{{#each rail.kc}}<li{{#if goal}} class="goal"{{/if}}><a href="#{{anchor}}"><span class="n">{{n}}</span><span><span class="s">{{stage}}</span><span class="sub">{{sub}}</span></span></a></li>{{/each}}</ol>
+      </section>
+      {{/if}}
+      {{#if rail.loadout.length}}
+      <section class="rc"><h3>Loadout</h3><dl class="lo">{{#each rail.loadout}}<dt>{{tool}}</dt><dd>{{purpose}}</dd>{{/each}}</dl></section>
+      {{/if}}
+      {{#if rail.remediation.length}}
+      <section class="rc"><h3>Remediation</h3><ul class="rem">{{#each rail.remediation}}<li>{{{this}}}</li>{{/each}}</ul></section>
+      {{/if}}
+    </div>
+  </details>
+  {{/if}}
+</div>

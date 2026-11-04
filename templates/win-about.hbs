@@ -1,0 +1,97 @@
+<div class="ab">
+  <nav class="ab-side js-only" aria-label="Sections"></nav>
+  <div class="ab-main">
+    <section class="ab-sec pref" data-sec="profile" data-title="Profile" data-icon="person">
+      <div class="hero">
+        <img class="av" src="/assets/img/avatar.svg" alt="" width="110" height="110">
+        <h2>{{site.name}}</h2>
+        <span>{{site.location}}</span>
+        <p>{{site.bio}}</p>
+      </div>
+      <div>
+        <h3>Links</h3>
+        <ul class="boxed">
+          <li><a class="row" href="{{site.links.github}}" rel="noopener"><span class="tx"><b>GitHub</b><span>github.com/Moriz82</span></span><span class="chev" aria-hidden="true">↗</span></a></li>
+          <li><a class="row" href="{{site.links.linkedin}}" rel="noopener"><span class="tx"><b>LinkedIn</b><span>linkedin.com/in/wdedo</span></span><span class="chev" aria-hidden="true">↗</span></a></li>
+          <li><a class="row" href="{{site.links.htb}}" rel="noopener"><span class="tx"><b>Hack The Box</b><span>moriz82 · {{htb.owned}} machines owned</span></span><span class="chev" aria-hidden="true">↗</span></a></li>
+          <li><a class="row" href="/contact.html" data-app="contacts"><span class="tx"><b>Email</b><span>Shown in Contacts</span></span><span class="chev" aria-hidden="true">›</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="ab-sec pref" data-sec="exp" data-title="Experience" data-icon="brief">
+      <div>
+        <h3>Experience</h3>
+        <ul class="boxed xp">
+          {{#each site.experience}}
+          <li class="row">
+            <span class="logo">{{#if logo}}<img src="{{logo}}" alt="" width="24" height="24">{{/if}}</span>
+            <span class="tx"><b>{{company}}</b><span>{{role}}{{#if place}} · {{place}}{{/if}}</span>
+              <ul>{{#each bullets}}<li>{{this}}</li>{{/each}}</ul>
+            </span>
+            <span class="sfx">{{date}}</span>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      <div>
+        <h3>Open source</h3>
+        <ul class="boxed">
+          {{#each site.openSource}}
+          <li><a class="row" href="{{url}}" rel="noopener"><span class="tx"><b>{{name}}</b><span>{{text}}</span></span><span class="chev" aria-hidden="true">↗</span></a></li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="ab-sec pref" data-sec="comps" data-title="Competitions" data-icon="trophy">
+      <div>
+        <h3>Leadership</h3>
+        <ul class="boxed">
+          {{#each site.leadership}}
+          <li class="row"><span class="tx"><b>{{title}}</b><span>{{text}}</span></span><span class="sfx">{{date}}</span></li>
+          {{/each}}
+        </ul>
+      </div>
+      <div>
+        <h3>Results</h3>
+        <ul class="boxed">
+          {{#each site.competitions}}
+          <li class="row"><span class="logo">{{#if logo}}<img src="{{logo}}" alt="" width="24" height="24">{{/if}}</span><span class="tx"><b>{{result}}</b><span>{{name}}</span></span><span class="sfx">{{date}}</span></li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="ab-sec pref" data-sec="certs" data-title="Certifications" data-icon="medal">
+      <div>
+        <h3>Certifications</h3>
+        <ul class="boxed">
+          {{#each site.certs}}
+          <li class="row"><span class="badge" style="background:{{color}}">{{name}}</span><span class="tx"><b>{{full}}</b><span>{{issuer}}</span></span></li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="ab-sec pref" data-sec="skills" data-title="Skills" data-icon="code">
+      <div>
+        <h3>Skills</h3>
+        <ul class="boxed">
+          {{#each site.skills}}
+          <li class="row"><span class="tx"><b>{{area}}</b><span>{{items}}</span></span></li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="ab-sec pref" data-sec="edu" data-title="Education" data-icon="cap">
+      <div>
+        <h3>Education</h3>
+        <ul class="boxed">
+          <li class="row"><span class="logo"><img src="/assets/img/utsa.png" alt="" width="24" height="24"></span><span class="tx"><b>{{site.education.school}}</b><span>{{site.education.degree}}</span></span><span class="sfx">{{site.education.expected}}</span></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

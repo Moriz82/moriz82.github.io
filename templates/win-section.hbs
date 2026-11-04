@@ -1,0 +1,19 @@
+<div class="pg solo">
+  <article class="art">
+    <nav class="art-k" aria-label="Breadcrumb"><a href="/">home</a> / {{section.title}}</nav>
+    <h1>{{section.title}}</h1>
+    <p class="lede">{{section.desc}}.</p>
+    {{#if count}}
+      {{#each groups}}
+      {{#if title}}<h2 class="grp">{{title}}</h2>{{/if}}
+      <ul class="idx">
+        {{#each posts}}
+        <li><a href="{{url}}"><b>{{title}}</b>{{#if summary}}<span class="s">{{summary}}</span>{{/if}}<span class="d">{{#if diff}}<span class="{{diffCls}}">{{diff}}</span> · {{/if}}<time datetime="{{date}}">{{date}}</time></span></a></li>
+        {{/each}}
+      </ul>
+      {{/each}}
+    {{else}}
+      <p class="empty">Nothing published here yet.</p>
+    {{/if}}
+  </article>
+</div>

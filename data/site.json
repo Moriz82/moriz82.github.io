@@ -1,158 +1,120 @@
 {
+  "name": "Will DeDominico",
+  "handle": "moriz82",
+  "user": "will",
+  "host": "archlinux",
+  "location": "San Antonio, TX",
+  "description": "Will DeDominico: penetration tester (CRTO, CPTS) writing about security research, Hack The Box machines, competitions and the things he builds.",
+  "intro": "Penetration tester (CRTO, CPTS), CPTC team captain at UTSA, and a former CrowdStrike Falcon Complete intern. I write about security research, Hack The Box machines and competitions, and document the things I build.",
+  "bio": "CRTO and CPTS certified penetration tester and former CrowdStrike Falcon Complete intern. Web and Active Directory pentesting, reporting, and Python/Node.js automation. Open-source contributor to Sliver and bloodyAD. CPTC team captain.",
+  "links": {
+    "github": "https://github.com/Moriz82",
+    "linkedin": "https://www.linkedin.com/in/wdedo/",
+    "htb": "https://app.hackthebox.com/users/666550"
+  },
+  "emailParts": ["me", "proton", "willdedominico"],
   "htb": {
     "profileId": "666550",
     "profileHandle": "moriz82",
     "profileUrl": "https://app.hackthebox.com/users/666550",
     "percent": "4.1"
   },
-  "ctfs": {
-    "count": 5,
-    "podiums": 2,
-    "items": [
-      {
-        "name": "CIT@CTF",
-        "date": "APR '26",
-        "state": "up",
-        "logo": "assets/img/cit.svg",
-        "sub": "Cyber-CIT Club · collegiate jeopardy",
-        "url": "https://ctf.cyber-cit.club/scoreboard",
-        "body": "Five-category jeopardy CTF hosted by the Cyber-CIT collegiate club. Solid performance across web and OSINT tracks.",
-        "tags": [
-          { "label": "5TH", "cls": "win" },
-          { "label": "TEAM", "cls": "teal" }
-        ]
-      },
-      {
-        "name": "Hack The Madness 2026",
-        "date": "MAR '26",
-        "state": "past",
-        "logo": "assets/img/htb.svg",
-        "sub": "HTB · Captain, 1337 F0SS BR0K3RS",
-        "body": "Led UTSA's 1337 F0SS BR0K3RS roster during Hack The Box's Hack The Madness 2026 and advanced to the Sweet 16.",
-        "tags": [
-          { "label": "SWEET 16", "cls": "win" },
-          { "label": "CAPTAIN", "cls": "purple" }
-        ]
-      },
-      {
-        "name": "UND CyberHawks Finals",
-        "date": "FALL '25",
-        "state": "past",
-        "logo": "assets/img/und.webp",
-        "sub": "National CTF · Team member / mentor",
-        "body": "Finalist in the UND CyberHawks National CTF. Covered web hacking, cryptography, reverse engineering, and binary exploitation. Highlights: static + dynamic malware analysis deobfuscating VBS scripts dropped by a binary, and bypassing a PHP command blacklist in a web app's search parameter.",
-        "tags": [
-          { "label": "FINALIST", "cls": "win" },
-          { "label": "MENTOR", "cls": "teal" },
-          { "label": "WEB / CRYPTO / RE / PWN", "cls": "purple" }
-        ]
-      },
-      {
-        "name": "CPTC",
-        "date": "FALL '25",
-        "state": "past",
-        "logo": "assets/img/cptc.webp",
-        "sub": "Collegiate Penetration Testing Competition · UTSA NetRunners",
-        "body": "Team member on UTSA NetRunners for the Collegiate Penetration Testing Competition. Linux + web track. Delivered a full pentest report with executive briefings, remediation guidance, and collaborative reporting.",
-        "tags": [
-          { "label": "LINUX / WEB", "cls": "teal" }
-        ]
-      },
-      {
-        "name": "UTSA IoT Pen Testing",
-        "date": "SUMMER '25",
-        "state": "past",
-        "logo": "assets/img/utsa-iot.svg",
-        "sub": "UTSA IoT Penetration Testing · Team Captain",
-        "body": "Led a small-scale penetration test with a professional report. Chained common AD attacks (Kerberoasting), used BloodHound to enumerate ACL misconfigurations, and gained command execution via a web search parameter to land shells on the Linux targets.",
-        "tags": [
-          { "label": "2ND", "cls": "win" },
-          { "label": "CAPTAIN", "cls": "purple" },
-          { "label": "AD / LINUX", "cls": "amber" }
-        ]
-      }
-    ]
-  },
-  "experience": {
-    "count": 4,
-    "items": [
-      {
-        "company": "CrowdStrike",
-        "role": "Falcon Complete Intern · MDR",
-        "date": "JUN '26 →",
-        "state": "up",
-        "logo": "assets/img/crowdstrike.svg",
-        "body": "Incoming Falcon Complete intern focused on real-world alert triage, investigation workflows, and customer-facing response operations.",
-        "tags": [
-          { "label": "UPCOMING", "cls": "warn" },
-          { "label": "DETECTION", "cls": "teal" },
-          { "label": "TRIAGE", "cls": "purple" }
-        ]
-      },
-      {
-        "company": "Verizon Business",
-        "role": "Install Contractor · Field Services",
-        "date": "MAY – AUG '25",
-        "state": "past",
-        "logo": "assets/img/verizon.png",
-        "body": "Surveyed commercial sites, deployed cellular extenders, and installed CAT5e, fiber, phone lines, and network hardware to keep enterprise clients online. Austin, TX / San Antonio, TX.",
-        "tags": [
-          { "label": "FIELD", "cls": "amber" },
-          { "label": "NETWORK", "cls": "teal" },
-          { "label": "FIBER", "cls": "purple" }
-        ]
-      },
-      {
-        "company": "Apple",
-        "role": "Technical Support Advisor",
-        "date": "MAY '24 – JAN '25",
-        "state": "past",
-        "logo": "assets/img/Apple_logo_black.svg",
-        "body": "Troubleshot 30+ complex cases a day across macOS/iOS, coached customers on account hardening, and partnered with cross-functional teams to drive a 45% faster resolution time and 100% CSAT. Remote.",
-        "tags": [
-          { "label": "IT SUPPORT", "cls": "teal" },
-          { "label": "MACOS", "cls": "purple" },
-          { "label": "ESCALATIONS", "cls": "amber" }
-        ]
-      },
-      {
-        "company": "Texas DPS",
-        "role": "Cyber Operations Intern",
-        "date": "JUL – AUG '22",
-        "state": "past",
-        "logo": "assets/img/tx_dps_logo.png",
-        "body": "Ran phishing simulations, built Splunk/SOAR automations, and tuned perimeter controls (Fortinet, Palo Alto, Cisco) to harden statewide infrastructure. Austin, TX.",
-        "tags": [
-          { "label": "BLUE TEAM", "cls": "team" },
-          { "label": "SPLUNK", "cls": "purple" },
-          { "label": "SOAR", "cls": "amber" }
-        ]
-      }
-    ]
-  },
-  "certs": {
-    "done": 4,
-    "total": 4,
-    "wip": 0,
-    "items": [
-      { "name": "HTB CPTS", "status": "✓ PASS '26", "state": "done" },
-      { "name": "HTB Mini Pro Lab · Full House", "status": "✓ PASS '26", "state": "done" },
-      { "name": "CompTIA Security+", "status": "✓ PASS '25", "state": "done" },
-      { "name": "CompTIA Network+", "status": "✓ PASS '24", "state": "done" }
-    ]
-  },
+  "experience": [
+    {
+      "company": "CrowdStrike",
+      "role": "Falcon Complete Analyst Intern",
+      "place": "San Antonio, TX (hybrid)",
+      "date": "Jun – Aug 2026",
+      "logo": "/assets/img/crowdstrike.svg",
+      "bullets": [
+        "Designed, built and maintained an AI ticket assistant in Python/Node.js; integrated SOC feedback to guide SOP-based responses and actions, reducing response time by an estimated 50%.",
+        "Contributed enhancements to an AI-assisted threat-response tool correlating TTPs, IOCs and telemetry from reviewed detections to support human-reviewed threat-actor attribution.",
+        "Handled customer messages and administration tickets in the Falcon Complete Messaging Portal."
+      ]
+    },
+    {
+      "company": "Independent penetration testing",
+      "role": "Two web application assessments",
+      "place": "",
+      "date": "Feb & Apr 2026",
+      "logo": "",
+      "bullets": [
+        "Assessed web applications across VPS/SQL and Vercel/Next.js environments; identified an IDOR exposing other users' content and configuration-related disclosure of names and emails.",
+        "Delivered technical reports and executive summaries documenting findings and demonstrated impact."
+      ]
+    },
+    {
+      "company": "Verizon Business",
+      "role": "Install Contractor, Field Services",
+      "place": "Austin and San Antonio, TX",
+      "date": "May – Aug 2025",
+      "logo": "/assets/img/verizon.png",
+      "bullets": [
+        "Surveyed commercial sites, deployed cellular extenders, and installed CAT5e, fiber, phone lines and network hardware for enterprise clients."
+      ]
+    },
+    {
+      "company": "Apple",
+      "role": "Technical Support Advisor",
+      "place": "Remote",
+      "date": "May 2024 – Jan 2025",
+      "logo": "/assets/img/Apple_logo_black.svg",
+      "bullets": [
+        "Troubleshot 30+ daily hardware, software, network and account-security issues; escalated complex cases to specialist teams."
+      ]
+    },
+    {
+      "company": "Texas Department of Public Safety",
+      "role": "Cyber Operations Intern",
+      "place": "Austin, TX",
+      "date": "Jul – Aug 2022",
+      "logo": "/assets/img/tx_dps_logo.png",
+      "bullets": [
+        "Executed internal phishing simulations and monitored security events with Splunk Enterprise/SOAR; configured firewalls, filtering and IPS/IDS controls."
+      ]
+    }
+  ],
+  "openSource": [
+    { "name": "Sliver", "url": "https://github.com/BishopFox/sliver", "text": "Two merged fixes for Linux/macOS task isolation and Windows service enumeration, with regression tests (#2244, #2249)." },
+    { "name": "bloodyAD", "url": "https://github.com/CravateRouge/bloodyAD", "text": "Contributed a reproducible Active Directory test lab and unit-test CI (#120)." },
+    { "name": "Edamame-NG", "url": "https://github.com/Moriz82/Edamame-NG", "text": "Linux/Windows privilege-escalation enumerator and verified-recipe runner." }
+  ],
+  "leadership": [
+    { "title": "CPTC Team Captain", "date": "May 2026 – present", "text": "Lead penetration-testing instruction for 20–30 students across web applications, Linux, Windows/Active Directory, operational technology and report writing. Web team member in 2025." }
+  ],
+  "competitions": [
+    { "result": "5th place globally", "name": "CIT CTF", "date": "2026", "logo": "/assets/img/cit.svg" },
+    { "result": "Finalist", "name": "UND CyberHawks National CTF", "date": "Fall 2025, Fall 2026", "logo": "/assets/img/und.webp" },
+    { "result": "Holo tier", "name": "Hack The Box Season 10", "date": "May 2026", "logo": "/assets/img/htb.svg" },
+    { "result": "Sweet 16, captain", "name": "Hack The Madness 2026 (1337 F0SS BR0K3RS)", "date": "Mar 2026", "logo": "/assets/img/htb.svg" },
+    { "result": "Platinum", "name": "Hack The Box Season 8", "date": "May – Aug 2025", "logo": "/assets/img/htb.svg" },
+    { "result": "2nd place", "name": "UTSA IoT Penetration Testing Competition", "date": "Summer 2025", "logo": "/assets/img/utsa-iot.svg" }
+  ],
+  "certs": [
+    { "name": "CRTO", "full": "Certified Red Team Operator", "issuer": "Zero-Point Security", "color": "#a51d2d" },
+    { "name": "CPTS", "full": "Certified Penetration Testing Specialist", "issuer": "Hack The Box", "color": "#26a269" },
+    { "name": "Security+", "full": "CompTIA Security+", "issuer": "CompTIA", "color": "#c64600" },
+    { "name": "Network+", "full": "CompTIA Network+", "issuer": "CompTIA", "color": "#c64600" },
+    { "name": "CCFA", "full": "CrowdStrike Certified Falcon Administrator", "issuer": "CrowdStrike", "color": "#c01c28" },
+    { "name": "CCFR", "full": "CrowdStrike Certified Falcon Responder", "issuer": "CrowdStrike", "color": "#c01c28" },
+    { "name": "CCFH", "full": "CrowdStrike Certified Falcon Hunter", "issuer": "CrowdStrike", "color": "#c01c28" },
+    { "name": "Full House", "full": "HTB Mini Pro Lab: Full House", "issuer": "Hack The Box", "color": "#26a269" }
+  ],
+  "skills": [
+    { "area": "Penetration testing", "items": "Web applications, Active Directory, Windows/Linux, vulnerability reporting, adversary emulation and simulation" },
+    { "area": "Tools", "items": "Metasploit, Nmap, Nessus, Burp Suite, Sliver, bloodyAD, Cobalt Strike" },
+    { "area": "Programming", "items": "Python, Go, Node.js, JavaScript/TypeScript, Bash, PowerShell, SQL" },
+    { "area": "Platforms and AI", "items": "Kali Linux, Proxmox, GOAD, Elastic, Splunk Enterprise/SOAR, Claude Code, local LLM deployment, OpenAI and Anthropic APIs" }
+  ],
   "education": {
     "school": "The University of Texas at San Antonio",
-    "degree": "B.B.A. Cyber Security & Information Systems",
-    "focus": "Red team operations · adversary emulation",
-    "dates": "Expected Dec 2026",
-    "status": "ENROLLED"
+    "degree": "BBA, Cyber Security and Information Systems",
+    "expected": "Expected Dec 2026"
   },
-  "clubs": {
-    "count": 2,
-    "items": [
-      { "name": "UTSA CPTC — NetRunners", "role": "Adversary simulation & client pentest" },
-      { "name": "UTSA UND CyberHawks — El33t-ish", "role": "Capture The Flag team" }
-    ]
-  }
+  "sections": [
+    { "id": "blog", "title": "blog", "desc": "Research, security topics and industry talking points" },
+    { "id": "writeups", "title": "writeups", "desc": "Hack The Box machines and Pro Labs" },
+    { "id": "competitions", "title": "competitions", "desc": "CTF and pentest competition recaps" },
+    { "id": "projects", "title": "projects", "desc": "Builds, tools and homelab shenanigans" }
+  ]
 }
