@@ -4,6 +4,7 @@
   "user": "will",
   "host": "archlinux",
   "location": "San Antonio, TX",
+  "wip": "Some sections are still empty and more posts are on the way.",
   "description": "Will DeDominico: penetration tester (CRTO, CPTS) writing about security research, Hack The Box machines, competitions and the things he builds.",
   "intro": "Penetration tester (CRTO, CPTS), CPTC team captain at UTSA, and a former CrowdStrike Falcon Complete intern. I write about security research, Hack The Box machines and competitions, and document the things I build.",
   "bio": "CRTO and CPTS certified penetration tester and former CrowdStrike Falcon Complete intern. Web and Active Directory pentesting, reporting, and Python/Node.js automation. Open-source contributor to Sliver and bloodyAD. CPTC team captain.",

@@ -332,6 +332,8 @@ kbd, .kbd { font: 12px var(--mono); padding: 2px 7px; border-radius: 6px; backgr
 .ab-side button:hover { background: rgba(255,255,255,.07); }
 .ab-side button.on { background: rgba(255,255,255,.12); }
 .ab-main { overflow: auto; }
+.ab-wip { position: sticky; top: 0; z-index: 1; margin: 0; padding: 9px 16px; background: #3a0d0d; border-bottom: 1px solid rgba(255,92,92,.25); color: #ffd9d9; font-size: 13px; line-height: 1.4; text-align: center; }
+.ab-wip b { color: #fff; margin-right: 4px; }
 .js .ab-sec:not(.on) { display: none; }
 .xp > li.row { align-items: flex-start; padding: 12px 14px; }
 .xp ul { margin: 6px 0 0; padding-left: 18px; color: #cfcfd4; font-size: 13px; line-height: 1.5; font-family: var(--body); }

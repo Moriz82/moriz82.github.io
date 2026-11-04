@@ -1,6 +1,7 @@
 <div class="ab">
   <nav class="ab-side js-only" aria-label="Sections"></nav>
   <div class="ab-main">
+    {{#if site.wip}}<p class="ab-wip" role="status"><b>Under construction</b> <span>{{site.wip}}</span></p>{{/if}}
     <section class="ab-sec pref" data-sec="profile" data-title="Profile" data-icon="person">
       <div class="hero">
         <img class="av" src="/assets/img/avatar.svg" alt="" width="110" height="110">
