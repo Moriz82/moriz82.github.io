@@ -1,0 +1,286 @@
+{
+  "built": "2026-11-04T02:38:37.611Z",
+  "sections": [
+    {
+      "id": "blog",
+      "title": "blog",
+      "desc": "Research, security topics and industry talking points"
+    },
+    {
+      "id": "writeups",
+      "title": "writeups",
+      "desc": "Hack The Box machines and Pro Labs"
+    },
+    {
+      "id": "competitions",
+      "title": "competitions",
+      "desc": "CTF and pentest competition recaps"
+    },
+    {
+      "id": "projects",
+      "title": "projects",
+      "desc": "Builds, tools and homelab shenanigans"
+    }
+  ],
+  "posts": [
+    {
+      "title": "HTB Airtouch",
+      "slug": "htb-airtouch-writeup",
+      "sec": "writeups",
+      "date": "2025-10-22",
+      "summary": "SNMP coughs up a consultant cred → passwordless sudo on the consultant host. From there, airodump-ng captures the WPA2-PSK handshake for AirTouch-Internet (crack → [REDACTED]), airdecap-ng exposes the router's UserRole=admin cookie, a .phtml upload lands RCE, and the router's /root/certs-backup/ + send_certs.sh are the keys to the WPA-Enterprise office net and the final management host.",
+      "tags": [
+        "wifi",
+        "wpa",
+        "pivot"
+      ],
+      "url": "/posts/htb-airtouch-writeup.html",
+      "src": "/assets/src/htb-airtouch-writeup.json",
+      "file": "htb-airtouch-writeup.md",
+      "diff": "medium",
+      "os": "linux",
+      "readTime": "12 min read"
+    },
+    {
+      "title": "HTB Browsed",
+      "slug": "htb-browsed-writeup",
+      "sec": "writeups",
+      "date": "2025-08-18",
+      "summary": "Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost — abuse that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777 — drop a poisoned .pyc and SUID bash.",
+      "tags": [
+        "chrome",
+        "bash",
+        "pycache"
+      ],
+      "url": "/posts/htb-browsed-writeup.html",
+      "src": "/assets/src/htb-browsed-writeup.json",
+      "file": "htb-browsed-writeup.md",
+      "diff": "medium",
+      "os": "linux",
+      "readTime": "10 min read"
+    },
+    {
+      "title": "HTB Certificate",
+      "slug": "htb-certificate-writeup",
+      "sec": "writeups",
+      "date": "2025-06-02",
+      "summary": "Course portal quiz uploader into a .php shell via zip + null-byte trick, bcrypt crack, GenericAll pivot to Ryan.K, and SeManageVolumePrivilege → diaghub LOLBAS → Administrator NT hash.",
+      "tags": [
+        "ad",
+        "web",
+        "windows"
+      ],
+      "url": "/posts/htb-certificate-writeup.html",
+      "src": "/assets/src/htb-certificate-writeup.json",
+      "file": "htb-certificate-writeup.md",
+      "diff": "hard",
+      "os": "windows",
+      "readTime": "12 min read"
+    },
+    {
+      "title": "HTB EscapeTwo",
+      "slug": "htb-escapetwo-writeup",
+      "sec": "writeups",
+      "date": "2025-05-15",
+      "summary": "Default rose creds → SMB share with spreadsheet secrets → sa MSSQL → sql_svc config file leak → password spray to ryan → ADCS ESC-style chain via ca_svc to Administrator NT hash.",
+      "tags": [
+        "ad",
+        "ldap",
+        "smb",
+        "adcs"
+      ],
+      "url": "/posts/htb-escapetwo-writeup.html",
+      "src": "/assets/src/htb-escapetwo-writeup.json",
+      "file": "htb-escapetwo-writeup.md",
+      "diff": "easy",
+      "os": "windows",
+      "readTime": "14 min read"
+    },
+    {
+      "title": "HTB Planning",
+      "slug": "htb-planning-writeup",
+      "sec": "writeups",
+      "date": "2025-05-15",
+      "summary": "Default creds on a Grafana panel → CVE-2024-9264 RCE → docker container foothold → plaintext GF_SECURITY_ADMIN_PASSWORD reused for enzo SSH → linpeas spots a root crontab.db → crontab-ui on localhost:8000 with same creds → arbitrary root scheduled jobs.",
+      "tags": [
+        "grafana",
+        "docker",
+        "cron"
+      ],
+      "url": "/posts/htb-planning-writeup.html",
+      "src": "/assets/src/htb-planning-writeup.json",
+      "file": "htb-planning-writeup.md",
+      "diff": "easy",
+      "os": "linux",
+      "readTime": "7 min read"
+    },
+    {
+      "title": "HTB Heal",
+      "slug": "htb-heal-writeup",
+      "sec": "writeups",
+      "date": "2025-05-13",
+      "summary": "Resume download endpoint on a Ruby-on-Rails API is a raw LFI. Leak Rails config + sqlite dev DB → crack LimeSurvey admin bcrypt → plugin-upload RCE as www-data → unauthenticated HashiCorp Consul service-registration → root.",
+      "tags": [
+        "lfi",
+        "api",
+        "rce"
+      ],
+      "url": "/posts/htb-heal-writeup.html",
+      "src": "/assets/src/htb-heal-writeup.json",
+      "file": "htb-heal-writeup.md",
+      "diff": "medium",
+      "os": "linux",
+      "readTime": "10 min read"
+    },
+    {
+      "title": "Cyber Range Homelab",
+      "slug": "cyber-range-homelab",
+      "sec": "projects",
+      "sub": "homelab",
+      "date": "2025-02-10",
+      "summary": "Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.",
+      "tags": [
+        "proxmox",
+        "cisco",
+        "lab"
+      ],
+      "url": "/posts/cyber-range-homelab.html",
+      "src": "/assets/src/cyber-range-homelab.json",
+      "file": "cyber-range-homelab.md",
+      "readTime": "8 min read"
+    },
+    {
+      "title": "3D-Printed Satellite Antenna",
+      "slug": "3d-printed-satellite-antenna",
+      "sec": "projects",
+      "date": "2025-01-18",
+      "summary": "Breaking down the SDR stack, CAD iterations, and signal-cleanup pipeline that made a budget-friendly NOAA/GOES weather downlink possible.",
+      "tags": [
+        "sdr",
+        "rf",
+        "noaa"
+      ],
+      "url": "/posts/3d-printed-satellite-antenna.html",
+      "src": "/assets/src/3d-printed-satellite-antenna.json",
+      "file": "3d-printed-satellite-antenna.md",
+      "readTime": "6 min read"
+    },
+    {
+      "title": "Melody Match",
+      "slug": "melody-match",
+      "sec": "projects",
+      "date": "2024-12-03",
+      "summary": "Built at RowdyHacks X. A Swift iOS client and Python backend coordinate BPM-aware track selection through ESP8266 telemetry.",
+      "tags": [
+        "swift",
+        "python",
+        "esp8266"
+      ],
+      "url": "/posts/melody-match.html",
+      "src": "/assets/src/melody-match.json",
+      "file": "melody-match.md",
+      "readTime": "7 min read"
+    }
+  ],
+  "htb": {
+    "owned": 73,
+    "percent": "4.1",
+    "profileUrl": "https://app.hackthebox.com/users/666550",
+    "bars": [
+      {
+        "label": "Easy",
+        "value": 40,
+        "pct": 55
+      },
+      {
+        "label": "Medium",
+        "value": 20,
+        "pct": 27
+      },
+      {
+        "label": "Hard",
+        "value": 9,
+        "pct": 12
+      },
+      {
+        "label": "Insane",
+        "value": 4,
+        "pct": 5
+      }
+    ],
+    "last": {
+      "name": "PingPong",
+      "difficulty": "Insane",
+      "os": "Windows",
+      "date": "2026-04-25"
+    }
+  },
+  "site": {
+    "name": "Will DeDominico",
+    "user": "will",
+    "host": "archlinux",
+    "location": "San Antonio, TX",
+    "intro": "Penetration tester (CRTO, CPTS), CPTC team captain at UTSA, and a former CrowdStrike Falcon Complete intern. I write about security research, Hack The Box machines and competitions, and document the things I build.",
+    "bio": "CRTO and CPTS certified penetration tester and former CrowdStrike Falcon Complete intern. Web and Active Directory pentesting, reporting, and Python/Node.js automation. Open-source contributor to Sliver and bloodyAD. CPTC team captain.",
+    "links": {
+      "github": "https://github.com/Moriz82",
+      "linkedin": "https://www.linkedin.com/in/wdedo/",
+      "htb": "https://app.hackthebox.com/users/666550"
+    },
+    "emailParts": [
+      "me",
+      "proton",
+      "willdedominico"
+    ],
+    "certs": [
+      {
+        "name": "CRTO",
+        "full": "Certified Red Team Operator",
+        "issuer": "Zero-Point Security",
+        "color": "#a51d2d"
+      },
+      {
+        "name": "CPTS",
+        "full": "Certified Penetration Testing Specialist",
+        "issuer": "Hack The Box",
+        "color": "#26a269"
+      },
+      {
+        "name": "Security+",
+        "full": "CompTIA Security+",
+        "issuer": "CompTIA",
+        "color": "#c64600"
+      },
+      {
+        "name": "Network+",
+        "full": "CompTIA Network+",
+        "issuer": "CompTIA",
+        "color": "#c64600"
+      },
+      {
+        "name": "CCFA",
+        "full": "CrowdStrike Certified Falcon Administrator",
+        "issuer": "CrowdStrike",
+        "color": "#c01c28"
+      },
+      {
+        "name": "CCFR",
+        "full": "CrowdStrike Certified Falcon Responder",
+        "issuer": "CrowdStrike",
+        "color": "#c01c28"
+      },
+      {
+        "name": "CCFH",
+        "full": "CrowdStrike Certified Falcon Hunter",
+        "issuer": "CrowdStrike",
+        "color": "#c01c28"
+      },
+      {
+        "name": "Full House",
+        "full": "HTB Mini Pro Lab: Full House",
+        "issuer": "Hack The Box",
+        "color": "#26a269"
+      }
+    ]
+  }
+}

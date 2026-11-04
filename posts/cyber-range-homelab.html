@@ -1,187 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="nojs" data-view="post">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cyber Range Homelab · Will DeDominico</title>
+<meta name="description" content="Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.">
+<link rel="canonical" href="https://blog.divineintellect.cc/posts/cyber-range-homelab.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cyber Range Homelab · Will DeDominico">
+<meta property="og:description" content="Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.">
+<meta property="og:url" content="https://blog.divineintellect.cc/posts/cyber-range-homelab.html">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css">
-<script>(function(){try{var s=localStorage.getItem('theme');var l=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s||(l?'light':'dark'));}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/os.css">
+<link rel="stylesheet" href="/assets/css/article.css">
+<link rel="stylesheet" href="/assets/css/blocks.css">
+<script>
+(function () {
+  var d = document.documentElement;
+  d.className = d.className.replace('nojs', 'js');
+  try {
+    if (localStorage.getItem('rc-body') === 'sans') d.setAttribute('data-body', 'sans');
+    var root = location.pathname === '/' || location.pathname === '/index.html';
+    if (root && !sessionStorage.getItem('rc-booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      d.classList.add('booting');
+      setTimeout(function () { d.classList.remove('booting'); }, 6000);
+    }
+  } catch (e) {}
+})();
+</script>
 </head>
-<body class="wp-body">
-<div class="grain" aria-hidden="true"></div>
-<header class="nav">
-  <div class="nav-left">
-    <a href="../index.html" class="nav-logo"><span class="nav-mark">W</span><span class="nav-name">Will</span><span class="nav-surname">DeDominico</span></a>
-    <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
-      <span class="theme-sun" aria-hidden="true">☀</span>
-      <span class="theme-moon" aria-hidden="true">☾</span>
-    </button>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="ba-r" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d80000"/><stop offset=".12" stop-color="#a80000"/><stop offset="1" stop-color="#860000"/></linearGradient><linearGradient id="ba-s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a3a3a"/><stop offset=".5" stop-color="#5a5a5a"/><stop offset="1" stop-color="#383838"/></linearGradient></defs><symbol id="ba" viewBox="0 0 1200 1520"><g transform="translate(0 1520) scale(.1 -.1)"><path fill="url(#ba-s)" d="M5710 14571 c-19 -10 -46 -38 -60 -60 -22 -36 -28 -40 -50 -34 -50 15 -132 5 -157 -19 -22 -21 -33 -23 -111 -20 -84 3 -88 2 -129 -28 -28 -21 -43 -39 -43 -54 0 -11 -9 -38 -20 -59 -11 -20 -20 -46 -20 -57 0 -12 -9 -38 -19 -59 -22 -43 -14 -61 26 -61 12 0 40 -7 60 -15 21 -8 65 -19 98 -24 33 -6 92 -17 130 -25 39 -9 89 -16 112 -16 23 0 45 -5 49 -11 16 -27 -4 -1249 -26 -1569 -19 -271 -32 -396 -44 -420 -11 -23 -20 -26 -116 -37 -57 -7 -124 -19 -149 -28 -24 -8 -54 -15 -65 -15 -18 0 -104 -25 -181 -52 -16 -5 -52 -16 -80 -23 -27 -7 -71 -21 -97 -31 -52 -20 -61 -41 -33 -78 8 -11 15 -29 15 -41 0 -11 7 -31 17 -44 9 -13 19 -38 22 -55 8 -40 41 -45 108 -17 26 11 65 22 85 26 20 3 50 12 65 20 15 8 42 15 59 15 17 0 51 7 74 15 54 19 120 19 146 1 18 -14 19 -33 24 -457 4 -341 8 -443 17 -447 7 -2 16 5 19 15 3 10 14 36 24 58 51 115 60 137 60 154 0 10 9 30 20 44 11 14 20 33 20 44 0 10 9 32 20 48 11 17 20 39 20 50 0 11 9 35 20 53 11 18 20 40 20 50 0 9 9 31 20 47 11 17 20 39 20 50 0 11 9 34 20 50 11 17 20 37 20 45 0 8 9 32 20 53 11 20 20 48 20 61 0 54 47 35 70 -27 6 -18 20 -50 31 -73 10 -23 19 -47 19 -53 0 -7 9 -30 20 -52 11 -21 29 -57 40 -78 11 -22 20 -47 20 -56 0 -9 8 -33 19 -53 24 -48 54 -114 81 -182 12 -30 31 -73 41 -96 11 -23 19 -48 19 -56 0 -17 20 -38 36 -38 6 0 14 10 18 23 3 13 10 202 16 421 6 219 13 402 16 407 8 14 94 10 148 -6 27 -8 63 -15 80 -15 17 -1 49 -9 71 -20 22 -11 50 -19 61 -20 12 0 41 -9 65 -20 24 -11 54 -20 66 -20 27 0 63 36 63 65 0 11 9 37 20 57 11 21 22 54 26 75 l6 39 -54 22 c-29 12 -63 22 -75 22 -13 0 -42 9 -65 19 -24 10 -65 23 -93 29 -27 5 -63 14 -80 20 -16 6 -52 15 -80 20 -27 6 -70 15 -94 21 -24 7 -71 13 -106 15 -34 2 -67 6 -72 9 -18 11 -27 118 -51 629 -6 108 -13 209 -16 225 -6 33 -21 696 -21 973 l0 195 60 7 c33 3 83 11 110 17 28 6 77 16 110 21 33 6 92 18 130 28 l70 19 -3 48 c-1 26 -11 62 -22 80 -11 18 -20 48 -20 68 0 30 -8 42 -47 77 l-48 42 -85 -5 c-81 -4 -86 -3 -113 22 -26 24 -35 26 -119 26 l-90 0 -17 34 c-28 58 -146 87 -211 52z M5470 7817 c0 -42 23 -63 115 -106 39 -18 88 -42 109 -53 26 -13 42 -16 49 -9 12 12 -8 41 -29 41 -8 0 -14 4 -14 9 0 4 -17 20 -39 34 -21 14 -64 46 -95 71 -69 57 -96 60 -96 13z M5650 5680 c-74 -18 -122 -37 -130 -51 -9 -19 6 -1305 19 -1574 6 -115 13 -408 16 -650 10 -877 16 -1148 30 -1575 14 -396 21 -494 45 -645 5 -27 9 -75 9 -105 1 -30 10 -87 21 -125 11 -38 20 -88 20 -110 0 -23 9 -66 20 -98 11 -31 20 -72 20 -91 0 -18 9 -53 20 -77 11 -24 20 -60 20 -79 0 -41 13 -65 29 -56 18 11 51 83 51 109 0 13 8 48 18 78 11 30 22 79 25 110 4 31 14 75 22 99 8 23 15 61 15 85 0 23 7 64 15 91 8 27 20 102 25 166 5 65 15 137 20 160 7 25 15 262 20 563 5 286 14 650 20 808 5 158 13 507 16 775 5 476 12 808 34 1696 9 361 9 441 -2 451 -33 31 -114 47 -248 51 -74 1 -151 -1 -170 -6z"/><path fill="url(#ba-r)" d="M5767 11643 c-4 -3 -7 -18 -7 -32 0 -14 -9 -39 -20 -56 -11 -16 -20 -39 -20 -50 0 -11 -9 -33 -20 -50 -11 -16 -20 -36 -20 -44 0 -8 -8 -32 -19 -55 -18 -39 -37 -86 -82 -198 -11 -29 -29 -70 -40 -90 -10 -20 -19 -44 -19 -53 0 -8 -9 -32 -20 -52 -11 -21 -20 -45 -20 -53 0 -8 -9 -28 -20 -45 -11 -16 -20 -39 -20 -50 0 -11 -9 -33 -20 -50 -11 -16 -20 -38 -20 -48 0 -17 -7 -33 -59 -134 -11 -23 -21 -53 -21 -66 0 -13 -9 -32 -20 -42 -11 -10 -20 -30 -20 -44 0 -14 -9 -39 -20 -56 -11 -16 -20 -40 -20 -51 0 -12 -9 -33 -20 -47 -11 -14 -20 -36 -20 -50 0 -13 -9 -36 -20 -50 -11 -14 -20 -33 -20 -44 0 -10 -9 -31 -20 -48 -11 -16 -20 -38 -20 -48 0 -17 -7 -33 -59 -134 -11 -23 -21 -49 -21 -58 0 -9 -8 -33 -19 -53 -10 -20 -29 -59 -41 -87 -12 -27 -31 -67 -41 -87 -11 -20 -19 -44 -19 -53 0 -9 -8 -33 -19 -53 -10 -20 -29 -59 -41 -87 -12 -27 -31 -67 -41 -87 -11 -20 -19 -43 -19 -50 0 -7 -9 -24 -20 -38 -11 -14 -20 -33 -20 -43 0 -11 -9 -30 -20 -44 -11 -14 -20 -36 -20 -48 0 -12 -9 -30 -20 -40 -11 -10 -20 -27 -20 -37 0 -11 -8 -36 -19 -56 -10 -20 -29 -59 -41 -87 -12 -27 -31 -67 -41 -87 -39 -77 -37 -80 217 -334 218 -218 531 -488 824 -712 30 -23 62 -48 70 -55 8 -8 25 -20 38 -26 12 -6 22 -16 22 -21 0 -13 -35 -13 -58 0 -9 5 -66 32 -127 60 -60 28 -117 55 -125 61 -8 5 -22 12 -30 15 -8 3 -22 9 -30 14 -8 5 -44 23 -80 41 -36 17 -72 35 -80 40 -8 5 -33 18 -55 29 -63 31 -148 81 -174 101 -13 11 -29 19 -36 19 -6 0 -20 9 -30 20 -10 11 -23 20 -30 20 -6 0 -37 18 -69 40 -31 22 -61 40 -66 40 -5 0 -15 6 -22 13 -27 25 -137 107 -143 107 -4 0 -42 29 -85 65 -43 36 -87 65 -98 65 -22 0 -52 -34 -52 -58 0 -8 -9 -25 -20 -39 -11 -14 -20 -32 -20 -40 0 -8 -9 -26 -20 -40 -11 -14 -20 -35 -20 -47 0 -11 -9 -32 -20 -46 -11 -14 -20 -32 -20 -40 0 -8 -9 -26 -20 -40 -11 -14 -20 -32 -20 -40 0 -8 -9 -26 -20 -40 -11 -14 -20 -32 -20 -41 0 -9 -9 -28 -20 -42 -11 -14 -20 -29 -20 -34 0 -8 -42 -95 -69 -143 -5 -8 -14 -26 -20 -40 -6 -14 -15 -32 -20 -40 -5 -8 -23 -44 -40 -80 -18 -36 -37 -74 -43 -85 -6 -11 -15 -27 -20 -35 -4 -8 -13 -26 -19 -40 -6 -14 -15 -32 -20 -40 -5 -8 -14 -26 -20 -40 -6 -14 -15 -32 -20 -40 -5 -8 -15 -26 -21 -40 -7 -14 -20 -36 -30 -49 -10 -13 -18 -30 -18 -38 0 -8 -9 -26 -20 -40 -11 -14 -20 -33 -20 -43 0 -9 -9 -25 -20 -35 -11 -10 -20 -28 -20 -40 0 -12 -9 -30 -20 -40 -11 -10 -20 -26 -20 -35 0 -10 -9 -29 -20 -43 -11 -14 -20 -32 -20 -40 0 -8 -9 -26 -20 -40 -11 -14 -20 -32 -20 -40 0 -8 -9 -26 -20 -40 -11 -14 -20 -32 -20 -40 0 -9 -4 -19 -10 -22 -5 -3 -28 -43 -51 -88 -22 -45 -60 -118 -84 -162 -24 -44 -47 -87 -51 -95 -4 -8 -16 -26 -26 -39 -10 -13 -18 -30 -18 -38 0 -8 -9 -26 -20 -40 -11 -14 -20 -33 -20 -43 0 -9 -9 -25 -20 -35 -11 -10 -20 -28 -20 -40 0 -12 -9 -30 -20 -40 -11 -10 -20 -25 -20 -32 0 -8 -9 -26 -20 -40 -11 -14 -20 -34 -20 -44 0 -10 -4 -20 -9 -23 -5 -3 -26 -39 -47 -78 -21 -40 -48 -93 -61 -118 -27 -52 -41 -76 -65 -109 -10 -13 -18 -31 -18 -41 0 -9 -9 -25 -20 -35 -11 -10 -20 -26 -20 -35 0 -10 -9 -29 -20 -43 -11 -14 -20 -32 -20 -40 0 -9 -4 -18 -9 -22 -5 -3 -27 -40 -49 -83 -56 -111 -102 -193 -123 -221 -11 -13 -19 -31 -19 -41 0 -9 -9 -25 -20 -35 -11 -10 -20 -28 -20 -40 0 -12 -9 -30 -20 -40 -11 -10 -20 -26 -20 -36 0 -10 -4 -21 -10 -24 -5 -3 -26 -38 -46 -78 -20 -40 -49 -94 -64 -122 -16 -27 -33 -59 -38 -70 -6 -12 -17 -27 -26 -34 -9 -7 -16 -23 -16 -36 0 -12 -9 -30 -20 -40 -11 -10 -20 -26 -20 -36 0 -10 -4 -21 -10 -24 -5 -3 -26 -38 -46 -78 -20 -40 -49 -94 -65 -122 -16 -27 -32 -57 -36 -65 -3 -8 -15 -26 -25 -39 -10 -13 -18 -31 -18 -41 0 -9 -9 -25 -20 -35 -11 -10 -20 -26 -20 -36 0 -10 -4 -21 -10 -24 -5 -3 -26 -38 -46 -78 -20 -40 -49 -94 -65 -122 -16 -27 -33 -59 -38 -70 -5 -12 -16 -27 -25 -34 -9 -7 -16 -23 -16 -36 0 -12 -9 -30 -20 -40 -11 -10 -20 -26 -20 -36 0 -10 -5 -21 -11 -25 -6 -3 -19 -25 -30 -48 -26 -56 -77 -146 -100 -175 -11 -13 -19 -31 -19 -41 0 -9 -9 -25 -20 -35 -11 -10 -20 -26 -20 -36 0 -10 -4 -21 -10 -24 -5 -3 -20 -27 -33 -53 -12 -26 -40 -78 -61 -117 -22 -38 -45 -82 -53 -96 -7 -15 -20 -32 -28 -39 -8 -7 -15 -20 -15 -30 0 -9 -9 -29 -20 -43 -11 -14 -20 -32 -20 -40 0 -7 -9 -22 -20 -32 -11 -10 -20 -26 -20 -35 0 -10 -8 -28 -18 -41 -10 -13 -22 -31 -25 -39 -4 -8 -18 -33 -32 -55 -14 -22 -34 -59 -44 -81 -11 -23 -24 -45 -30 -48 -6 -4 -11 -15 -11 -25 0 -10 -9 -26 -20 -36 -11 -10 -20 -26 -20 -35 0 -10 -9 -29 -20 -43 -11 -14 -20 -29 -20 -34 0 -5 -16 -33 -36 -63 -19 -29 -42 -67 -49 -84 -8 -17 -19 -39 -25 -48 -26 -46 -32 -56 -50 -93 -11 -22 -31 -58 -44 -80 -13 -22 -39 -68 -57 -103 -19 -35 -40 -68 -46 -74 -7 -6 -13 -18 -13 -28 0 -9 -9 -25 -20 -35 -11 -10 -20 -26 -20 -35 0 -10 -8 -28 -18 -41 -32 -44 -63 -109 -57 -119 10 -15 21 -12 67 19 42 28 219 129 348 199 36 19 70 38 75 42 6 4 55 31 110 60 55 29 107 59 116 66 8 8 18 14 21 14 3 0 104 52 224 116 216 114 694 353 909 454 320 151 849 366 1085 442 52 16 114 39 138 49 23 10 50 19 60 19 9 0 39 9 67 19 67 26 198 63 425 121 47 12 108 28 135 35 28 7 70 16 95 20 25 3 69 11 98 17 65 14 73 34 47 127 -10 37 -21 102 -25 146 -5 44 -14 118 -20 165 -16 108 -16 389 -1 500 7 47 16 126 21 175 5 50 16 112 25 139 8 27 15 64 15 82 0 18 9 56 20 84 11 28 20 62 20 76 0 14 9 42 20 64 11 22 20 46 20 54 0 9 10 37 21 63 12 27 29 66 39 88 10 22 23 51 29 65 6 14 15 32 20 40 5 8 14 26 20 40 6 14 20 39 31 55 11 17 25 41 32 55 26 50 139 191 213 263 118 116 239 192 385 240 54 18 88 22 205 22 119 0 151 -4 215 -24 165 -52 327 -164 465 -322 36 -41 117 -148 128 -169 4 -8 19 -33 32 -55 14 -22 33 -59 44 -81 11 -23 24 -45 30 -48 6 -4 11 -16 11 -28 0 -11 9 -31 20 -45 11 -14 20 -33 20 -42 0 -9 9 -29 20 -46 11 -16 20 -41 20 -55 0 -14 9 -38 20 -55 11 -16 20 -41 20 -55 0 -14 9 -45 20 -69 11 -24 20 -56 20 -71 0 -15 7 -47 16 -71 9 -24 20 -73 24 -109 4 -36 15 -101 25 -145 14 -66 17 -136 17 -405 0 -294 -2 -335 -21 -429 -12 -57 -21 -129 -19 -160 3 -55 3 -56 38 -63 92 -19 280 -61 320 -73 25 -7 83 -22 130 -35 75 -19 232 -67 445 -135 61 -20 223 -78 405 -146 30 -11 73 -29 96 -40 23 -10 44 -19 47 -19 15 0 448 -187 652 -282 155 -73 657 -322 780 -388 39 -21 104 -55 145 -77 201 -107 351 -189 738 -408 95 -53 175 -96 177 -93 6 6 -26 108 -34 108 -4 0 -22 28 -40 62 -81 153 -72 142 -127 148 l-49 5 -5 100 c-5 85 -10 107 -33 145 -14 25 -36 64 -48 88 -12 23 -25 45 -30 48 -5 3 -9 13 -9 23 0 10 -9 26 -20 36 -11 10 -20 26 -20 35 0 10 -9 29 -20 43 -11 14 -20 32 -20 40 0 9 -5 19 -11 23 -6 3 -19 25 -30 48 -11 22 -30 59 -43 81 -13 22 -36 65 -52 95 -16 30 -36 66 -46 79 -10 13 -18 31 -18 41 0 9 -9 25 -20 35 -11 10 -20 26 -20 35 0 9 -9 27 -20 40 -11 13 -20 31 -20 40 0 10 -7 23 -15 30 -8 6 -28 41 -45 76 -34 69 -103 138 -250 250 -41 32 -97 77 -125 102 -27 25 -66 55 -85 67 -19 13 -69 52 -110 89 -41 36 -79 66 -83 66 -5 0 -42 27 -82 60 -40 33 -76 60 -80 60 -3 0 -28 18 -56 40 -28 22 -54 40 -59 40 -5 0 -31 18 -59 40 -28 22 -55 40 -60 40 -5 0 -32 18 -60 40 -28 22 -54 40 -57 40 -4 0 -37 19 -73 43 -88 57 -102 65 -131 79 -14 7 -43 25 -64 40 -22 16 -72 44 -111 63 -40 19 -78 41 -85 50 -7 8 -23 15 -36 15 -15 0 -24 6 -24 15 0 21 21 19 120 -10 157 -45 214 -63 330 -106 63 -23 133 -48 155 -56 61 -22 167 -64 184 -74 9 -4 43 -20 76 -34 87 -38 315 -154 348 -177 15 -11 35 -17 43 -14 14 5 13 11 -5 42 -12 19 -21 40 -21 45 0 6 -9 22 -20 36 -11 14 -20 33 -20 43 0 9 -9 25 -20 35 -11 10 -20 26 -20 35 0 10 -8 28 -18 41 -10 13 -22 31 -26 39 -4 8 -27 51 -51 95 -25 44 -53 99 -64 121 -11 23 -24 45 -30 48 -6 4 -11 15 -11 25 0 10 -9 28 -20 41 -11 13 -20 31 -20 40 0 9 -9 25 -20 35 -11 10 -20 26 -20 35 0 10 -8 28 -18 41 -10 13 -23 35 -30 49 -6 14 -17 34 -24 45 -28 48 -60 110 -108 202 -23 46 -46 85 -51 88 -5 4 -9 14 -9 24 0 10 -9 28 -20 41 -11 13 -20 31 -20 40 0 9 -9 25 -20 35 -11 10 -20 28 -20 40 0 12 -9 30 -20 40 -11 10 -20 26 -20 35 0 10 -8 28 -18 41 -10 13 -22 31 -26 39 -4 8 -27 51 -51 95 -25 44 -53 99 -64 121 -11 23 -24 45 -30 48 -6 4 -11 15 -11 25 0 10 -9 30 -20 44 -11 14 -20 32 -20 40 0 7 -9 24 -20 37 -11 13 -20 31 -20 40 0 9 -9 25 -20 35 -11 10 -20 28 -20 40 0 12 -9 30 -20 40 -11 10 -20 26 -20 35 0 10 -8 28 -17 41 -33 45 -46 67 -68 119 -3 8 -19 38 -34 65 -16 28 -54 101 -85 162 -32 62 -61 115 -67 118 -5 4 -9 14 -9 24 0 10 -9 30 -20 44 -11 14 -20 32 -20 40 0 7 -9 24 -20 37 -11 13 -20 30 -20 37 0 8 -9 26 -20 40 -11 14 -20 33 -20 43 0 9 -9 25 -20 35 -11 10 -20 28 -20 40 0 12 -9 30 -20 40 -11 10 -20 26 -20 35 0 10 -9 29 -20 43 -11 14 -20 32 -20 40 0 9 -6 22 -13 29 -7 7 -20 27 -28 43 -23 45 -34 67 -52 100 -9 17 -42 80 -72 140 -60 119 -66 130 -83 160 -7 11 -17 31 -23 45 -6 14 -15 32 -20 40 -5 8 -14 26 -20 40 -6 14 -16 34 -22 45 -5 11 -15 29 -20 40 -6 11 -14 27 -18 35 -4 8 -67 134 -139 280 -73 146 -136 272 -141 280 -5 8 -14 26 -20 40 -6 14 -15 32 -20 40 -5 8 -14 26 -20 40 -6 14 -15 32 -20 40 -5 8 -14 26 -20 40 -6 14 -29 60 -50 103 -21 43 -39 83 -39 89 0 5 -9 21 -20 35 -11 14 -20 33 -20 42 0 9 -9 27 -20 41 -11 14 -20 35 -20 46 0 12 -9 33 -20 47 -11 14 -20 34 -20 45 0 10 -9 27 -20 37 -11 10 -20 28 -20 40 0 12 -9 30 -20 40 -11 10 -20 28 -20 40 0 12 -9 32 -20 45 -11 13 -20 31 -20 40 0 10 -9 29 -20 43 -11 14 -20 30 -20 37 0 10 -9 29 -59 127 -11 23 -21 48 -21 56 0 8 -9 26 -20 40 -11 14 -20 34 -20 45 0 10 -9 31 -20 45 -11 14 -20 33 -20 42 0 9 -9 28 -20 42 -11 14 -20 35 -20 45 0 11 -9 31 -20 45 -11 14 -20 32 -20 40 0 8 -9 32 -20 54 -11 21 -29 57 -40 78 -11 22 -20 46 -20 54 0 8 -9 26 -20 40 -11 14 -20 33 -20 42 0 9 -8 33 -19 53 -10 20 -27 57 -38 82 -40 89 -66 146 -84 182 -11 20 -19 44 -19 53 0 9 -8 33 -19 53 -10 20 -29 60 -41 87 -12 28 -31 67 -41 87 -11 20 -19 44 -19 53 0 9 -9 34 -20 56 -11 21 -29 57 -40 78 -11 22 -20 49 -20 59 0 11 -9 31 -20 45 -11 14 -20 33 -20 42 0 15 -7 31 -59 132 -11 23 -21 47 -21 54 0 6 -9 33 -21 58 -12 25 -30 66 -41 91 -11 25 -29 62 -39 82 -11 20 -19 44 -19 53 0 9 -8 33 -19 53 -41 81 -61 128 -61 140 0 7 -8 30 -19 50 -10 20 -29 58 -41 85 -21 44 -37 56 -53 40z"/></g></symbol></svg>
+<div class="wall" aria-hidden="true"><svg viewBox="0 0 1200 1520"><use href="#ba"/></svg></div>
+
+<header class="topbar" id="topbar">
+  <div class="tb-l" id="tb-l">
+    <a class="tb-home" href="/">Will DeDominico</a>
+    <button class="tbp js-only" id="act-btn" type="button">Activities</button>
   </div>
-  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><span></span><span></span><span></span></button>
-  <nav id="nav-links" class="nav-links">
-    <a href="../index.html" class="">HOME</a>
-    <a href="../writeups/index.html" class="is-active">WRITEUPS</a>
-    <a href="../projects/index.html" class="">PROJECTS</a>
-    <a href="https://github.com/Moriz82" class="ext" target="_blank" rel="noopener">GITHUB <span class="ext-arrow">↗</span></a>
-    <a href="https://github.com/Moriz82/Resume/blob/main/Resume.pdf" class="ext" target="_blank" rel="noopener">RESUME <span class="ext-arrow">↗</span></a>
-    <a href="../about.html" class="">ABOUT</a>
-    <a href="../contact.html" class="">CONTACT</a>
-  </nav>
+  <div class="tb-c js-only"><button class="tbp" id="clock-btn" type="button"><span id="clk"></span></button></div>
+  <div class="tb-r js-only">
+    <button class="tbp htb-ind" id="htb-btn" type="button" title="Hack The Box stats"><span class="cube"></span><b>73</b></button>
+    <button class="tbp status" id="qs-btn" type="button" aria-label="System menu"></button>
+  </div>
 </header>
 
-<div class="wp-stripe wp-stripe-top">
-  <div class="wp-stripe-inner">
-    <span class="wp-crumb"><span class="l">OPS.LOG</span> / <span>BUILDS</span> / <span class="cur">CYBER-RANGE-HOMELAB</span></span>
-    <span class="wp-crumb-r">ENG#03 &middot; UNCLASSIFIED &middot; DECLASSIFIED 25.02.10</span>
-  </div>
-</div>
-
-<main class="wp-main">
-
-  <section class="wp-hero">
-    <div class="wp-hero-left card static">
-      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="wp-hero-row">
-        <div class="wp-hero-logo cat-">
-          
-          
-          
-          <span class="wp-hero-mono">OPS</span>
-        </div>
-        <div class="wp-hero-text">
-          <div class="wp-chips">
-            
-            
-            <span class="wp-chip wp-chip-ghost tag-cycle-0">PROXMOX</span><span class="wp-chip wp-chip-ghost tag-cycle-1">CISCO</span><span class="wp-chip wp-chip-ghost tag-cycle-2">LAB</span>
-            
-          </div>
-          <h1 class="wp-title">Cyber Range Homelab<span class="wp-title-mark">&mdash;</span></h1>
-          <p class="wp-summary">Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.</p>
-        </div>
+<nav class="icons" id="icons" aria-label="Desktop">
+  <a class="dicon" data-id="home" href="/"><span class="g" aria-hidden="true"></span><span class="lb">Home</span></a>
+  <a class="dicon" data-id="blog" href="/blog/"><span class="g" aria-hidden="true"></span><span class="lb">blog</span></a>
+  <a class="dicon" data-id="writeups" href="/writeups/"><span class="g" aria-hidden="true"></span><span class="lb">writeups</span></a>
+  <a class="dicon" data-id="competitions" href="/competitions/"><span class="g" aria-hidden="true"></span><span class="lb">competitions</span></a>
+  <a class="dicon" data-id="projects" href="/projects/"><span class="g" aria-hidden="true"></span><span class="lb">projects</span></a>
+  <a class="dicon js-only" data-id="term" href="#console"><span class="g" aria-hidden="true"></span><span class="lb">Console</span></a>
+  <a class="dicon js-only" data-id="web" href="/writeups/"><span class="g" aria-hidden="true"></span><span class="lb">Web</span></a>
+  <a class="dicon" data-id="about" href="/about.html"><span class="g" aria-hidden="true"></span><span class="lb">whoami</span></a>
+  <a class="dicon js-only" data-id="certs" href="/about.html"><span class="g" aria-hidden="true"></span><span class="lb">Certificates</span></a>
+  <a class="dicon" data-id="contacts" href="/contact.html"><span class="g" aria-hidden="true"></span><span class="lb">Contact</span></a>
+  <a class="dicon js-only" data-id="trash" href="#trash"><span class="g" aria-hidden="true"></span><span class="lb">Trash</span></a>
+</nav>
+<main class="layer" id="layer">
+  <section class="win focus max" id="boot-win" data-app="web" data-path="/posts/cyber-range-homelab.html" aria-label="Cyber Range Homelab">
+    <header class="hb"><div class="ttl">Cyber Range Homelab</div></header>
+    <div class="wb"><div class="pg">
+  <article class="art">
+    <nav class="art-k" aria-label="Breadcrumb"><a href="/projects/">projects</a> / homelab / <time datetime="2025-02-10">February 10, 2025</time></nav>
+    <header class="art-h">
+      <div>
+        <h1>Cyber Range Homelab</h1>
+        <p class="lede">Stitched together Proxmox, Cisco routing, and isolated enclaves into a reliable red-team sandbox for malware triage and exploit drills.</p>
       </div>
-    </div>
-
-    <aside class="wp-meta-card card static">
-      <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="card-head"><span class="l"># ENGAGEMENT META</span></div>
-      <hr class="dashed">
-      <dl class="wp-meta-list">
-        <div><dt>PLATFORM</dt><dd>Homelab</dd></div>
-        <div><dt>TARGET</dt><dd>10.10.0.0/16 (private)</dd></div>
-        <div><dt>REF</dt><dd>r720 · proxmox 8</dd></div>
-        <div><dt>START</dt><dd>OCT &#x27;24</dd></div>
-        <div><dt>FIRST BLOOD</dt><dd>FIRST BOOT — 2 days</dd></div>
-        <div><dt>DURATION</dt><dd>8 min read</dd></div>
-        <div><dt>OPERATOR</dt><dd>WDD-01</dd></div>
-      </dl>
-    </aside>
-  </section>
-
-  <section class="wp-killchain card static">
-    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-    <div class="wp-killchain-head">
-      <span class="l"># KILL CHAIN &middot; 5 STAGES</span>
-      <span class="r">OUTCOME: <span class="hl-ok">OPS</span></span>
-    </div>
-    <hr class="dashed">
-    <div class="wp-killchain-grid">
-      <a class="wp-kc-card kc-warn" href="#hardware">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="kc-n"># STG.01</div>
-        <div class="kc-stage">HARDWARE</div>
-        <div class="kc-sub">Dell R720 · 128GB</div>
-        <div class="kc-tag kc-tag-warn">TIN</div>
-      </a>
-      <a class="wp-kc-card kc-warn" href="#hyper">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="kc-n"># STG.02</div>
-        <div class="kc-stage">HYPER</div>
-        <div class="kc-sub">Proxmox VE 8</div>
-        <div class="kc-tag kc-tag-warn">VIRT</div>
-      </a>
-      <a class="wp-kc-card kc-warn" href="#network">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="kc-n"># STG.03</div>
-        <div class="kc-stage">NETWORK</div>
-        <div class="kc-sub">Cisco + VLANs</div>
-        <div class="kc-tag kc-tag-warn">L3</div>
-      </a>
-      <a class="wp-kc-card kc-warn" href="#enclaves">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="kc-n"># STG.04</div>
-        <div class="kc-stage">ENCLAVES</div>
-        <div class="kc-sub">detonate · target</div>
-        <div class="kc-tag kc-tag-warn">SANDBOX</div>
-      </a>
-      <a class="wp-kc-card kc-ok" href="#ops">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="kc-n"># STG.05</div>
-        <div class="kc-stage">OPS</div>
-        <div class="kc-sub">CI + snapshots</div>
-        <div class="kc-tag kc-tag-ok">LIVE</div>
-      </a>
-    </div>
-  </section>
-
-  <div class="wp-grid">
-
-    <aside class="wp-toc">
-      <div class="wp-toc-head"># STAGES</div>
-      <nav>
-        <a href="#hardware" class="wp-toc-row" data-stage="01">
-          <span class="n">01</span>
-          <span class="t">HARDWARE</span>
-        </a>
-        <a href="#hyper" class="wp-toc-row" data-stage="02">
-          <span class="n">02</span>
-          <span class="t">HYPER</span>
-        </a>
-        <a href="#network" class="wp-toc-row" data-stage="03">
-          <span class="n">03</span>
-          <span class="t">NETWORK</span>
-        </a>
-        <a href="#enclaves" class="wp-toc-row" data-stage="04">
-          <span class="n">04</span>
-          <span class="t">ENCLAVES</span>
-        </a>
-        <a href="#ops" class="wp-toc-row" data-stage="05">
-          <span class="n">05</span>
-          <span class="t">OPS</span>
-        </a>
-      </nav>
-    </aside>
-
-    <article class="wp-article">
-      <section class="wp-stage" id="hardware" data-stage="01">
-<div class="wp-stage-lbl"># STG.01 &middot; HARDWARE</div>
+      
+    </header>
+    <p class="meta"><span>8 min read</span><span>proxmox, cisco, lab</span></p>
+    
+    <div class="body">
+<section class="wp-stage" id="hardware" data-stage="1">
+<div class="wp-stage-lbl">Stage 1 &middot; Hardware</div>
 <h2 class="wp-stage-title">A retired Dell R720 and a plan.</h2>
 <div class="wp-stage-body"><p>Picked up an R720 off eBay — dual Xeon E5-2670v2, 128GB of DDR3 ECC, 8× 2TB SAS. Not fast, but dense and cheap per core. Added a dual-port 10GbE NIC for the storage network.</p>
 <p>Noise was the first problem. Stock fans scream at 50%. IPMI fan curve, plus a pair of Noctua NF-A12-25 pulling from the front, dropped it to tolerable for a garage.</p>
 </div>
 </section>
-<section class="wp-stage" id="hyper" data-stage="02">
-<div class="wp-stage-lbl"># STG.02 &middot; HYPER</div>
+
+
+
+
+<section class="wp-stage" id="hyper" data-stage="2">
+<div class="wp-stage-lbl">Stage 2 &middot; Hyper</div>
 <h2 class="wp-stage-title">Proxmox 8 with ZFS — because snapshots are cheap.</h2>
-<div class="wp-stage-body"><div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-<div class="wp-term-head"><span class="t-title"># shell · root@pve</span></div>
+<div class="wp-stage-body"><div class="wp-term">
+<div class="wp-term-head"><span class="t-title">shell · root@pve</span></div>
 <pre class="wp-term-body"><code class="language-bash">$ zpool create -o ashift=12 tank raidz2 sda sdb sdc sdd sde sdf
 $ zfs create tank/vm
 $ zfs create tank/ct
 $ zfs set compression=lz4 tank
 
-<p>$ pveperf /tank
+$ pveperf /tank
 CPU BOGOMIPS:      152000
 FSYNCS/SECOND:     3842
-DNS EXT:           12.01 ms</code></pre></p>
+DNS EXT:           12.01 ms</code></pre>
 </div>
-Nested virtualization enabled for the Windows AD lab. CPU type set to `host` for feature passthrough.</div>
+
+
+<p>Nested virtualization enabled for the Windows AD lab. CPU type set to <code>host</code> for feature passthrough.</p>
+</div>
 </section>
-<section class="wp-stage" id="network" data-stage="03">
-<div class="wp-stage-lbl"># STG.03 &middot; NETWORK</div>
+
+
+
+
+<section class="wp-stage" id="network" data-stage="3">
+<div class="wp-stage-lbl">Stage 3 &middot; Network</div>
 <h2 class="wp-stage-title">VLANs and a Cisco 3560-X so the lab can&#39;t talk to anything important.</h2>
 <div class="wp-stage-body"><p>Four VLANs on the Cisco switch:</p>
 <ul>
@@ -191,96 +124,76 @@ Nested virtualization enabled for the Windows AD lab. CPU type set to `host` for
 <li><span class="hl-cool">40</span> — operator (my box, SIEM)</li>
 </ul>
 <p>pfSense edges routes between operator + lab. VLAN 30 has zero route to anywhere outside — packets die at the firewall.</p>
-<figure class="wp-img"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><img src="../assets/img/homelab.jpg" alt="Homelab server rack" loading="lazy"><figcaption>R720 + switch + pfSense · garage lab in production</figcaption></figure></div>
+<figure class="wp-img"><img src="/assets/img/homelab.jpg" alt="Homelab server rack" loading="lazy"><figcaption>R720 + switch + pfSense · garage lab in production</figcaption></figure></div>
 </section>
-<section class="wp-stage" id="enclaves" data-stage="04">
-<div class="wp-stage-lbl"># STG.04 &middot; ENCLAVES</div>
+
+
+
+
+<section class="wp-stage" id="enclaves" data-stage="4">
+<div class="wp-stage-lbl">Stage 4 &middot; Enclaves</div>
 <h2 class="wp-stage-title">Targets by template — clone, detonate, destroy.</h2>
 <div class="wp-stage-body"><p>Ansible playbooks that spin up a target profile in under three minutes:</p>
-<div class="wp-term"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-<div class="wp-term-head"><span class="t-title"># shell · operator@kali</span></div>
+<div class="wp-term">
+<div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="language-bash">$ ansible-playbook -i lab.ini targets/windows-domain.yml \
     -e domain=blackbird.lab -e users=30
 
-<p>PLAY [Provision Windows AD target]
+PLAY [Provision Windows AD target]
 TASK [hypervisor : clone template]    ok
 TASK [dns : configure]                 changed
 TASK [users : seed 30 domain accounts] changed
-TASK [siem : enroll hosts in wazuh]    changed</p>
-<p>PLAY RECAP
-targets: ok=8 changed=5 unreachable=0 failed=0</code></pre></p>
+TASK [siem : enroll hosts in wazuh]    changed
+
+PLAY RECAP
+targets: ok=8 changed=5 unreachable=0 failed=0</code></pre>
 </div>
-Snapshots before every engagement. Roll back takes 4 seconds on ZFS.</div>
+
+
+<p>Snapshots before every engagement. Roll back takes 4 seconds on ZFS.</p>
+</div>
 </section>
-<section class="wp-stage" id="ops" data-stage="05">
-<div class="wp-stage-lbl"># STG.05 &middot; OPS</div>
+
+
+
+
+<section class="wp-stage" id="ops" data-stage="5">
+<div class="wp-stage-lbl">Stage 5 &middot; OPS</div>
 <h2 class="wp-stage-title">Detection pipeline — because red only matters if blue can see.</h2>
 <div class="wp-stage-body"><p>Sysmon → Wazuh → Grafana dashboards. Every detonation emits telemetry I can later diff against real-world campaigns.</p>
-<aside class="wp-callout wp-tip"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span><div class="wp-callout-head"># TIP</div><div class="wp-callout-body"><p>Don&#39;t skip the blue side. Half the learning in a homelab is watching your own attack show up in the logs.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>Don&#39;t skip the blue side. Half the learning in a homelab is watching your own attack show up in the logs.</p>
 </div></aside>
-What's next: a containerized C2 range, and automated MITRE technique coverage reporting.</div>
-</section>
-      <nav class="wp-post-nav">
-        <a class="wp-np prev" href="3d-printed-satellite-antenna.html">
-          <span class="l">&larr; ENG#02</span>
-          <span class="t">3D-PRINTED SATELLITE ANTENNA</span>
-        </a>
-        
-        <span class="wp-np-sig">LAST SIGNAL &middot; 25.02.10</span>
-<span></span>
-      </nav>
-    </article>
 
-    <aside class="wp-side">
-      <div class="wp-side-card">
-        <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="wp-side-head"># LOADOUT</div>
-        <hr class="dashed">
-        <div class="wp-loadout">
-          <div class="wp-loadout-row"><span class="tool">proxmox</span><span class="purp">hypervisor</span></div>
-          <div class="wp-loadout-row"><span class="tool">cisco-ios</span><span class="purp">routing</span></div>
-          <div class="wp-loadout-row"><span class="tool">pfsense</span><span class="purp">edge</span></div>
-          <div class="wp-loadout-row"><span class="tool">ansible</span><span class="purp">provisioning</span></div>
-          <div class="wp-loadout-row"><span class="tool">sysmon</span><span class="purp">telemetry</span></div>
-          <div class="wp-loadout-row"><span class="tool">wazuh</span><span class="purp">siem</span></div>
-        </div>
-      </div>
 
-    </aside>
-
-  </div>
-
-</main>
-
-<footer class="stats-strip">
-  <a class="stat-card" href="https://app.hackthebox.com/users/666550" target="_blank" rel="noopener">
-    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-    <span class="stat-label">HTB</span>
-    <span class="stat-value">73 OWNED</span>
-  </a>
-  <a class="stat-card" href="../about.html#ctfs">
-    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-    <span class="stat-label">CTFs</span>
-    <span class="stat-value">5 PLAYED</span>
-  </a>
-  <a class="stat-card" href="https://github.com/Moriz82" target="_blank" rel="noopener">
-    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-    <span class="stat-label">GITHUB</span>
-    <span class="stat-value">@moriz82</span>
-  </a>
-</footer>
-<div class="colophon">
-  <span>// 2026 Will DeDominico · built on markdown</span>
-  <span>2026-05-04 01:08 UTC</span>
+<p>What&#39;s next: a containerized C2 range, and automated MITRE technique coverage reporting.</p>
 </div>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/powershell.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/swift.min.js" defer></script>
-<script>window.addEventListener('load',function(){if(window.hljs){hljs.configure({ignoreUnescapedHTML:true});document.querySelectorAll('pre code, .wp-term-body code').forEach(function(b){hljs.highlightElement(b);});}});</script>
-<script src="../assets/js/main.js"></script>
+</section>
+
+
+    </div>
+    <nav class="pn" aria-label="More projects">
+      <a class="prev" href="/posts/3d-printed-satellite-antenna.html"><span>Older</span>3D-Printed Satellite Antenna</a>
+      
+    </nav>
+  </article>
+  <details class="rail" open>
+    <summary><span>Engagement · Stages · Loadout</span><span aria-hidden="true">+</span></summary>
+    <div class="rail-in">
+      <section class="rc"><h3>Engagement</h3><dl><dt>platform</dt><dd>Homelab</dd><dt>target</dt><dd>10.10.0.0/16 (private)</dd><dt>ref</dt><dd>r720 · proxmox 8</dd></dl></section>
+      <section class="rc"><h3>Stages <span>5 stages</span></h3>
+        <ol class="kc"><li><a href="#hardware"><span class="n">1</span><span><span class="s">Hardware</span><span class="sub">Dell R720 · 128GB</span></span></a></li><li><a href="#hyper"><span class="n">2</span><span><span class="s">Hyper</span><span class="sub">Proxmox VE 8</span></span></a></li><li><a href="#network"><span class="n">3</span><span><span class="s">Network</span><span class="sub">Cisco + VLANs</span></span></a></li><li><a href="#enclaves"><span class="n">4</span><span><span class="s">Enclaves</span><span class="sub">detonate · target</span></span></a></li><li class="goal"><a href="#ops"><span class="n">5</span><span><span class="s">OPS</span><span class="sub">CI + snapshots</span></span></a></li></ol>
+      </section>
+      <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>proxmox</dt><dd>hypervisor</dd><dt>cisco-ios</dt><dd>routing</dd><dt>pfsense</dt><dd>edge</dd><dt>ansible</dt><dd>provisioning</dd><dt>sysmon</dt><dd>telemetry</dd><dt>wazuh</dt><dd>siem</dd></dl></section>
+    </div>
+  </details>
+</div>
+</div>
+  </section>
+</main>
+<footer class="nojs-foot">© 2026 Will DeDominico · <a href="https://github.com/Moriz82">GitHub</a> · <a href="https://www.linkedin.com/in/wdedo/">LinkedIn</a></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js" defer></script>
+<script type="module" src="/assets/js/os/main.js"></script>
 </body>
 </html>
