@@ -176,11 +176,23 @@ function toggleGrid(on) {
   hidePops(); exitOverview(true);
   root.classList.toggle('apps', on);
   if (on) {
-    $('#grid-ov').innerHTML = [
-      ...Object.keys(OS.APPS).filter((a) => a !== 'editor').map((a) => `<button class="ga" type="button" data-ga="${a}">${OS.APPS[a].icon()}<span>${OS.APPS[a].title}</span></button>`),
-      ...OS.data.sections.map((s) => `<button class="ga" type="button" data-gs="${s.id}">${folderIcon(s.id)}<span>${s.title}</span></button>`),
-    ].join('');
+    renderGrid();
   }
+}
+const gaBtn = (a) => `<button class="ga" type="button" data-ga="${a}">${OS.APPS[a].icon()}<span>${OS.APPS[a].title}</span></button>`;
+const inFolder = (f) => Object.keys(OS.APPS).filter((a) => OS.APPS[a].folder === f);
+function renderGrid(folder) {
+  const g = $('#grid-ov');
+  g.classList.toggle('infold', !!folder);
+  if (folder) {
+    g.innerHTML = `<div class="gfold" role="dialog" aria-label="${OS.FOLDERS[folder]}"><h3>${OS.FOLDERS[folder]}</h3><div class="gfold-g">${inFolder(folder).map(gaBtn).join('')}</div></div>`;
+    return;
+  }
+  g.innerHTML = [
+    ...Object.keys(OS.APPS).filter((a) => a !== 'editor' && !OS.APPS[a].folder).map(gaBtn),
+    ...Object.keys(OS.FOLDERS || {}).map((f) => `<button class="ga gf" type="button" data-gf="${f}"><span class="gfi">${inFolder(f).slice(0, 4).map((a) => OS.APPS[a].icon()).join('')}</span><span>${OS.FOLDERS[f]}</span></button>`),
+    ...OS.data.sections.map((s) => `<button class="ga" type="button" data-gs="${s.id}">${folderIcon(s.id)}<span>${s.title}</span></button>`),
+  ].join('');
 }
 function closeGrid() { root.classList.remove('apps'); }
 OS.closeGrid = closeGrid;
@@ -255,7 +267,10 @@ function initOverview() {
   });
   $('#ov-res').addEventListener('click', (e) => { const b = e.target.closest('[data-r]'); if (b) { const f = results[+b.dataset.r]; exitOverview(); f(); } });
   $('#grid-ov').addEventListener('click', (e) => {
-    const a = e.target.closest('[data-ga]'), s = e.target.closest('[data-gs]');
+    const a = e.target.closest('[data-ga]'), s = e.target.closest('[data-gs]'), f = e.target.closest('[data-gf]');
+    if (f) return renderGrid(f.dataset.gf);
+    // clicking beside an open folder closes the folder, not the grid
+    if (!a && $('#grid-ov').classList.contains('infold')) { if (!e.target.closest('.gfold')) renderGrid(); return; }
     closeGrid();
     if (a) OS.openApp(a.dataset.ga);
     if (s) OS.openFiles(s.dataset.gs);
@@ -425,7 +440,7 @@ function initKeys() {
   document.addEventListener('keydown', (e) => {
     if (OS.sessionLocked) return;
     const typing = document.activeElement && /INPUT|TEXTAREA|CANVAS/.test(document.activeElement.tagName);
-    if (e.key === 'Escape') { hidePops(); closeGrid(); exitOverview(); return; }
+    if (e.key === 'Escape') { if ($('#grid-ov').classList.contains('infold')) { renderGrid(); return; } hidePops(); closeGrid(); exitOverview(); return; }
     if (e.key === 'Meta' || e.key === 'OS') { metaUsed = false; return; }
     if (e.metaKey) metaUsed = true;
     if (!typing && !e.altKey && !e.ctrlKey && !e.metaKey && e.key === '/') { e.preventDefault(); enterOverview(); return; }

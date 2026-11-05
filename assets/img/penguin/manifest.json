@@ -1,0 +1,33 @@
+{
+  "frameSize": 128,
+  "anims": {
+    "idle": {
+      "src": "idle.png",
+      "frames": 2,
+      "fps": 2
+    },
+    "walk": {
+      "src": "walk.png",
+      "frames": 4,
+      "fps": 8
+    },
+    "sleep": {
+      "src": "sleep.png",
+      "frames": 2,
+      "fps": 1
+    },
+    "wave": {
+      "src": "wave.png",
+      "frames": 2,
+      "fps": 3
+    },
+    "typing": {
+      "src": "typing.png",
+      "frames": 2,
+      "fps": 4
+    }
+  },
+  "icon": "icon.png",
+  "avatar": "avatar.png",
+  "wallpaper": "wallpaper-penguin.webp"
+}

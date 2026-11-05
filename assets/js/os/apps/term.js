@@ -2,6 +2,7 @@
 
 import { OS, $, esc, isMobile, posts, fsPath } from '../lib.js';
 import { WM } from '../wm.js';
+import { calc } from './utils.js';
 
 const ARCH_ASCII = ['                   -`', '                  .o+`', '                 `ooo/', '                `+oooo:', '               `+oooooo:', '               -+oooooo+:', '             `/:-:++oooo+:', '            `/++++/+++++++:', '           `/++++++++++++++:', '          `/+++ooooooooooooo/`', '         ./ooosssso++osssssso+`', '        .oossssso-````/ossssss+`', '       -osssssso.      :ssssssso.', '      :osssssss/        osssso+++.', '     /ossssssss/        +ssssooo/-', '   `/ossssso+/:-        -:/+osssso+-', '  `+sso+:-`                 `.-/+oso:', ' `++:.                           `-/+/', ' .`                                 `/'].join('\n');
 
@@ -43,7 +44,9 @@ export function termApp(w, o) {
       print(`<span class="c-a">navigate</span>  ls [dir] · cd &lt;dir&gt; · pwd · open|cat|xdg-open &lt;post&gt; · nautilus [dir] · gedit &lt;post&gt;
 <span class="c-a">search</span>    grep &lt;term&gt;
 <span class="c-a">about</span>     whoami · neofetch · certs · htb · contact
-<span class="c-a">other</span>     clear · history · snake · exit
+<span class="c-a">apps</span>      htop · bc · cal · eog · gnome-clocks
+<span class="c-a">games</span>     snake · mines · sudoku · merge · blocks · lightsoff · four · reversi
+<span class="c-a">other</span>     tux [off] · clear · history · exit
 <span class="c-d">Tab completes. Up and down walk history.</span>`);
     },
     ls(a) {
@@ -85,6 +88,29 @@ export function termApp(w, o) {
     htb() { const h = OS.data.htb; print(`${h.owned} owned · top ${h.percent}% · ` + h.bars.map((b) => `${b.label.toLowerCase()} ${b.value}`).join(' · ')); },
     contact() { WM.open('contacts'); },
     snake() { WM.open('snake'); },
+    tux(a) { const off = a[0] === 'off'; if (OS.setPet) OS.setPet(!off); print(off ? 'penguin sent to bed.' : 'penguin is out on the desktop. `tux off` to put it away.', 'c-d'); },
+    penguin(a) { C.tux(a); },
+    mines() { WM.open('mines'); },
+    sudoku() { WM.open('sudoku'); },
+    merge() { WM.open('merge'); },
+    2048() { WM.open('merge'); },
+    blocks() { WM.open('blocks'); },
+    lightsoff() { WM.open('lights'); },
+    four() { WM.open('four'); },
+    reversi() { WM.open('reversi'); },
+    htop() { print('htop: opening System Monitor (no curses in a browser, sorry)', 'c-d'); WM.open('sysmon'); },
+    top() { WM.open('sysmon'); },
+    'gnome-system-monitor'() { WM.open('sysmon'); },
+    'gnome-calculator'() { WM.open('calc'); },
+    'gnome-clocks'() { WM.open('clocks'); },
+    'gnome-calendar'() { WM.open('calendar'); },
+    eog() { WM.open('viewer'); },
+    loupe() { WM.open('viewer'); },
+    cal() { WM.open('calendar'); },
+    bc(a) {
+      if (!a.length) return WM.open('calc');
+      try { print(String(+calc(a.join(' ')).toPrecision(12))); } catch (e) { print('(standard_in) 1: syntax error', 'c-r'); }
+    },
     clear() { out.innerHTML = ''; },
     history() { print(hist.map((h, i) => `${String(i + 1).padStart(4)}  ${esc(h)}`).join('\n')); },
     exit() { WM.close(w); },

@@ -6,6 +6,7 @@ import './apps/index.js';
 import { restoreAccent } from './apps/misc.js';
 import { initShell } from './shell.js';
 import { startSession } from './session.js';
+import { initPet } from './pet.js';
 
 (async () => {
   const bw = document.getElementById('boot-win');
@@ -31,5 +32,6 @@ import { startSession } from './session.js';
   restoreAccent();
   initShell();
   startSession(initial);
+  initPet();
   OS.ready = true;
 })();

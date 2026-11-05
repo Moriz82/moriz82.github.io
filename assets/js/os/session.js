@@ -14,7 +14,7 @@ function mount() {
     <div class="gdm" id="gdm" hidden>
       <div class="gbar"><span></span><span id="g-clk"></span><span class="r">${Y.net}${Y.vol}${Y.bat}${Y.power}</span></div>
       <div class="g-card">
-        <img src="/assets/img/avatar.svg" alt="">
+        <img src="/assets/img/penguin/avatar.png" alt="">
         <div class="nm">${esc(OS.data.site.user)}</div>
         <form class="g-pw" id="g-form"><input id="g-in" type="password" value="guestguestguest" aria-label="Password" readonly><button id="g-go" type="submit" aria-label="Log in">${Y.arrow}</button></form>
         <div class="g-hint" id="g-hint"></div>

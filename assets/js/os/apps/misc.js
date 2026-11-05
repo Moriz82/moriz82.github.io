@@ -28,7 +28,8 @@ export function setAccent(c) {
   root.style.setProperty('--accent-2', `rgb(${lift(r)},${lift(g)},${lift(b)})`);
   root.style.setProperty('--accent-bg', `rgba(${r},${g},${b},.2)`);
 }
-export function restoreAccent() { const a = LS.get('rc-accent'); if (a && /^#[0-9a-f]{6}$/i.test(a)) setAccent(a); }
+export function restoreAccent() { const a = LS.get('rc-accent'); if (a && /^#[0-9a-f]{6}$/i.test(a)) setAccent(a); setWall(LS.get('rc-wall')); }
+export function setWall(v) { if (v === 'penguin') root.dataset.wall = v; else delete root.dataset.wall; }
 
 function loadSansFont() {
   if (document.getElementById('font-sans')) return;
@@ -42,6 +43,7 @@ export function settingsApp(w) {
   w.body.innerHTML = `<div class="pref">
     <div><h3>Accent color</h3><div class="boxed"><div class="acc">${ACCENTS.map(([c, n]) => `<button type="button" data-acc="${c}" title="${n}" aria-label="${n}" style="background:${c}"></button>`).join('')}</div></div></div>
     <div><h3>Reading</h3><ul class="boxed"><li class="row"><span class="tx"><b>Article font</b><span>Body text in the Web app</span></span><div class="seg"><button type="button" data-v="serif">Serif</button><button type="button" data-v="sans">Sans</button></div></li></ul></div>
+    <div><h3>Desktop</h3><ul class="boxed"><li class="row"><span class="tx"><b>Background</b><span>Wallpaper behind the icons</span></span><div class="seg"><button type="button" data-wall="blackarch">BlackArch</button><button type="button" data-wall="penguin">Penguin</button></div></li><li class="row"><span class="tx"><b>Desktop penguin</b><span>Wanders the desktop, naps, types along in the Console</span></span><div class="seg pet-seg"><button type="button" data-pet="on">On</button><button type="button" data-pet="off">Off</button></div></li></ul></div>
     <div><h3>Session</h3><ul class="boxed">
       <li><button class="row" type="button" data-do="reboot"><span class="tx"><b>Replay boot</b><span>GRUB, systemd and the login screen</span></span><span class="chev" aria-hidden="true">›</span></button></li>
       <li><button class="row" type="button" data-do="lock"><span class="tx"><b>Lock screen</b></span><span class="chev" aria-hidden="true">›</span></button></li>
@@ -49,12 +51,18 @@ export function settingsApp(w) {
     </ul></div></div>`;
   const sync = () => {
     $$('[data-acc]', w.body).forEach((b) => b.classList.toggle('on', b.dataset.acc === (LS.get('rc-accent') || '#c80000')));
-    $$('.seg button', w.body).forEach((b) => b.classList.toggle('on', b.dataset.v === (root.dataset.body || 'serif')));
+    $$('.seg button[data-v]', w.body).forEach((b) => b.classList.toggle('on', b.dataset.v === (root.dataset.body || 'serif')));
+    $$('[data-wall]', w.body).forEach((b) => b.classList.toggle('on', b.dataset.wall === (root.dataset.wall || 'blackarch')));
+    $$('[data-pet]', w.body).forEach((b) => b.classList.toggle('on', b.dataset.pet === (LS.get('rc-pet') === 'off' ? 'off' : 'on')));
   };
   w.body.addEventListener('click', (e) => {
     const a = e.target.closest('[data-acc]');
     if (a) { LS.set('rc-accent', a.dataset.acc); setAccent(a.dataset.acc); }
-    const s = e.target.closest('.seg button');
+    const wl = e.target.closest('[data-wall]');
+    if (wl) { LS.set('rc-wall', wl.dataset.wall); setWall(wl.dataset.wall); }
+    const pt = e.target.closest('[data-pet]');
+    if (pt && OS.setPet) OS.setPet(pt.dataset.pet === 'on');
+    const s = e.target.closest('.seg button[data-v]');
     if (s) {
       if (s.dataset.v === 'serif') delete root.dataset.body;
       else { loadSansFont(); root.dataset.body = s.dataset.v; }
