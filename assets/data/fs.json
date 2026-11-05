@@ -1,5 +1,5 @@
 {
-  "built": "2026-11-05T04:19:01.608Z",
+  "built": "2026-11-05T05:04:14.626Z",
   "sections": [
     {
       "id": "blog",
@@ -327,49 +327,49 @@
         "name": "CRTO",
         "full": "Certified Red Team Operator",
         "issuer": "Zero-Point Security",
-        "color": "#a51d2d"
+        "logo": "/assets/img/logos/crto.png"
       },
       {
         "name": "CPTS",
         "full": "Certified Penetration Testing Specialist",
         "issuer": "Hack The Box",
-        "color": "#26a269"
+        "logo": "/assets/img/logos/cpts.png"
       },
       {
         "name": "Security+",
         "full": "CompTIA Security+",
         "issuer": "CompTIA",
-        "color": "#c64600"
+        "logo": "/assets/img/logos/security-plus.png"
       },
       {
         "name": "Network+",
         "full": "CompTIA Network+",
         "issuer": "CompTIA",
-        "color": "#c64600"
+        "logo": "/assets/img/logos/network-plus.png"
       },
       {
         "name": "CCFA",
         "full": "CrowdStrike Certified Falcon Administrator",
         "issuer": "CrowdStrike",
-        "color": "#c01c28"
+        "logo": "/assets/img/logos/ccfa.png"
       },
       {
         "name": "CCFR",
         "full": "CrowdStrike Certified Falcon Responder",
         "issuer": "CrowdStrike",
-        "color": "#c01c28"
+        "logo": "/assets/img/logos/ccfr.png"
       },
       {
         "name": "CCFH",
         "full": "CrowdStrike Certified Falcon Hunter",
         "issuer": "CrowdStrike",
-        "color": "#c01c28"
+        "logo": "/assets/img/logos/ccfh.png"
       },
       {
         "name": "Full House",
         "full": "HTB Mini Pro Lab: Full House",
         "issuer": "Hack The Box",
-        "color": "#26a269"
+        "logo": "/assets/img/logos/htb.png"
       }
     ]
   }
