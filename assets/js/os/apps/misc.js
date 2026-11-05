@@ -7,7 +7,7 @@ import { Y } from '../icons.js';
 const badge = (name, c) => `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3l25 14v30L32 61 7 47V17z" fill="${c}"/><path d="M32 9l20 11.5v23L32 55 12 43.5v-23z" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.5"/><text x="32" y="${name.length > 5 ? 36 : 38}" text-anchor="middle" font-family="Cantarell, sans-serif" font-weight="700" font-size="${name.length > 6 ? 8 : name.length > 4 ? 10 : 12}" fill="#fff">${esc(name)}</text></svg>`;
 
 export function certsApp(w) {
-  w.body.innerHTML = `<div class="certs">${OS.data.site.certs.map((c) => `<div class="cert">${badge(c.name, c.color)}<b>${esc(c.full)}</b><span>${esc(c.issuer)}</span></div>`).join('')}</div>`;
+  w.body.innerHTML = `<div class="certs">${OS.data.site.certs.map((c) => `<div class="cert">${c.logo ? `<span class="cert-art"><img src="${esc(c.logo)}" alt="" width="72" height="72" loading="lazy"></span>` : badge(c.name, c.color || '#3d3846')}<b>${esc(c.full)}</b><span>${esc(c.issuer)}</span></div>`).join('')}</div>`;
 }
 
 const COLORS = { Easy: 'var(--green)', Medium: 'var(--orange)', Hard: 'var(--red)', Insane: 'var(--purple)' };
