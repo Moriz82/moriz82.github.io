@@ -69,7 +69,7 @@
         <h3>Certifications</h3>
         <ul class="boxed">
           {{#each site.certs}}
-          <li class="row"><span class="badge" style="background:{{color}}">{{name}}</span><span class="tx"><b>{{full}}</b><span>{{issuer}}</span></span></li>
+          <li class="row"><span class="cert-logo"><img src="{{logo}}" alt="" width="48" height="48" loading="lazy"></span><span class="tx"><b>{{full}}</b><span>{{issuer}}</span></span></li>
           {{/each}}
         </ul>
       </div>

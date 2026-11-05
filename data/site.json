@@ -26,7 +26,7 @@
       "role": "Falcon Complete Analyst Intern",
       "place": "San Antonio, TX (hybrid)",
       "date": "Jun – Aug 2026",
-      "logo": "/assets/img/crowdstrike.svg",
+      "logo": "/assets/img/logos/crowdstrike.png",
       "bullets": [
         "Designed, built and maintained an AI ticket assistant in Python/Node.js; integrated SOC feedback to guide SOP-based responses and actions, reducing response time by an estimated 50%.",
         "Contributed enhancements to an AI-assisted threat-response tool correlating TTPs, IOCs and telemetry from reviewed detections to support human-reviewed threat-actor attribution.",
@@ -59,7 +59,7 @@
       "role": "Technical Support Advisor",
       "place": "Remote",
       "date": "May 2024 – Jan 2025",
-      "logo": "/assets/img/Apple_logo_black.svg",
+      "logo": "/assets/img/logos/apple.png",
       "bullets": [
         "Troubleshot 30+ daily hardware, software, network and account-security issues; escalated complex cases to specialist teams."
       ]
@@ -92,14 +92,14 @@
     { "result": "2nd place", "name": "UTSA IoT Penetration Testing Competition", "date": "Summer 2025", "logo": "/assets/img/utsa-iot.svg" }
   ],
   "certs": [
-    { "name": "CRTO", "full": "Certified Red Team Operator", "issuer": "Zero-Point Security", "color": "#a51d2d" },
-    { "name": "CPTS", "full": "Certified Penetration Testing Specialist", "issuer": "Hack The Box", "color": "#26a269" },
-    { "name": "Security+", "full": "CompTIA Security+", "issuer": "CompTIA", "color": "#c64600" },
-    { "name": "Network+", "full": "CompTIA Network+", "issuer": "CompTIA", "color": "#c64600" },
-    { "name": "CCFA", "full": "CrowdStrike Certified Falcon Administrator", "issuer": "CrowdStrike", "color": "#c01c28" },
-    { "name": "CCFR", "full": "CrowdStrike Certified Falcon Responder", "issuer": "CrowdStrike", "color": "#c01c28" },
-    { "name": "CCFH", "full": "CrowdStrike Certified Falcon Hunter", "issuer": "CrowdStrike", "color": "#c01c28" },
-    { "name": "Full House", "full": "HTB Mini Pro Lab: Full House", "issuer": "Hack The Box", "color": "#26a269" }
+    { "name": "CRTO", "full": "Certified Red Team Operator", "issuer": "Zero-Point Security", "logo": "/assets/img/logos/crto.png" },
+    { "name": "CPTS", "full": "Certified Penetration Testing Specialist", "issuer": "Hack The Box", "logo": "/assets/img/logos/cpts.png" },
+    { "name": "Security+", "full": "CompTIA Security+", "issuer": "CompTIA", "logo": "/assets/img/logos/security-plus.png" },
+    { "name": "Network+", "full": "CompTIA Network+", "issuer": "CompTIA", "logo": "/assets/img/logos/network-plus.png" },
+    { "name": "CCFA", "full": "CrowdStrike Certified Falcon Administrator", "issuer": "CrowdStrike", "logo": "/assets/img/logos/ccfa.png" },
+    { "name": "CCFR", "full": "CrowdStrike Certified Falcon Responder", "issuer": "CrowdStrike", "logo": "/assets/img/logos/ccfr.png" },
+    { "name": "CCFH", "full": "CrowdStrike Certified Falcon Hunter", "issuer": "CrowdStrike", "logo": "/assets/img/logos/ccfh.png" },
+    { "name": "Full House", "full": "HTB Mini Pro Lab: Full House", "issuer": "Hack The Box", "logo": "/assets/img/logos/htb.png" }
   ],
   "skills": [
     { "area": "Penetration testing", "items": "Web applications, Active Directory, Windows/Linux, vulnerability reporting, adversary emulation and simulation" },
