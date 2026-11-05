@@ -12,7 +12,7 @@ readTime: 13 min read
 points: 80
 tags: [AD, ADCS, KERBEROS]
 classification: CLASSIFIED-WHITE
-summary: NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts `johnathan.j`'s description — a live password. Spray into `ken.w`, coerce + crack to `natalie.a`, Shadow-Creds across `bob.w` → move `Auditor` between OUs → Shadow-Creds `auditor`. Forest Migration OU `GenericAll` + ESC3 Enrollment Agent → `ashley.b` → a scheduled `aCleanup.ps1` reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on `IIS_WEBSERVER$` (a user account, no SPNs) — swap NT hash for the TGT session key, run `S4U2Self+U2U+S4U2Proxy`, impersonate Administrator.
+summary: NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts `johnathan.j`'s description, which contains a live password. Spray into `ken.w`, coerce + crack to `natalie.a`, Shadow-Creds across `bob.w` → move `Auditor` between OUs → Shadow-Creds `auditor`. Forest Migration OU `GenericAll` + ESC3 Enrollment Agent → `ashley.b` → a scheduled `aCleanup.ps1` reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on `IIS_WEBSERVER$` (a user account, no SPNs). Swap its NT hash for the TGT session key, run `S4U2Self+U2U+S4U2Proxy`, impersonate Administrator.
 engagement:
   platform: Hack The Box
   target: hercules.htb
@@ -35,7 +35,7 @@ loadout:
   - { tool: impacket,    purpose: kerberos }
   - { tool: evil-winrm,  purpose: shell }
 remediation:
-  - Never echo LDAP search oracles to clients — a single bit of reflection is an exfil channel
+  - Never echo LDAP search oracles to clients; a single bit of reflection is an exfil channel
   - Validate LDAP input server-side; regex blacklists are broken by double URL-encoding under IIS
   - Scope `GenericWrite` and `WriteAccountRestrictions` ACEs tightly; Shadow Credentials need only `msDS-KeyCredentialLink`
   - Disable ESC3 template enrollment for non-trusted issuance accounts
@@ -45,7 +45,7 @@ remediation:
 
 ::: stage n=1 label="LDAPi" title="Double URL-encode past the regex blacklist."
 
-The `/Login` SSO page rejects `*`, `(`, `)`, `|`, `&`, `=`, `\`, `<`, `>`. But `%` is allowed — and IIS cheerfully URL-decodes {warn:twice}. `%252A` slips through the regex, arrives at the app as `%2A`, decodes to `*`:
+The `/Login` SSO page rejects `*`, `(`, `)`, `|`, `&`, `=`, `\`, `<`, `>`. But `%` is allowed, and IIS URL-decodes {warn:twice}. `%252A` slips through the regex, arrives at the app as `%2A`, decodes to `*`:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ curl -sk 'https://hercules.htb/Login' \
@@ -75,7 +75,7 @@ $ nxc smb dc.hercules.htb -u users.txt \
 [+] hercules.htb\ken.w:[REDACTED]
 :::
 
-Only NTLM-disabled Kerberos, so every subsequent tool needs `-k`. From ken.w, coerce authentication and crack the captured NetNTLMv2 — `natalie.a:[REDACTED]`.
+NTLM is disabled, so subsequent tools need Kerberos with `-k`. From ken.w, coerce authentication and crack the captured NetNTLMv2 to get `natalie.a:[REDACTED]`.
 
 :::
 
@@ -90,7 +90,7 @@ $ certipy-ad shadow auto -u natalie.a@hercules.htb -k \
 [+] NT hash: [REDACTED]
 :::
 
-bob.w has `WRITE` on Security + Web Department OUs. Drag `Auditor` across the fence:
+bob.w has `WRITE` on the Security and Web Department OUs. Move `Auditor`:
 
 ::: terminal title="shell · ldap3 · move OU" lang="python"
 conn.modify_dn(
@@ -143,7 +143,7 @@ $ certipy-ad auth -pfx ashley.b.pfx -dc-ip $IP -domain hercules.htb
 
 ::: stage n=5 label="CLEANUP" title="aCleanup.ps1 fires the ACL reflow → IIS_Administrator live."
 
-ashley.b has a scheduled `aCleanup.ps1` on her desktop that triggers `Password Cleanup` — clears `adminCount` and {warn:re-enables ACL inheritance} across flagged admin objects. After that sweep, IT Support's `GenericAll` on the Forest Migration OU cascades down to `IIS_Administrator`:
+ashley.b has a scheduled `aCleanup.ps1` on her desktop that triggers `Password Cleanup`. It clears `adminCount` and {warn:re-enables ACL inheritance} across flagged admin objects. After that sweep, IT Support's `GenericAll` on the Forest Migration OU cascades down to `IIS_Administrator`:
 
 ::: terminal title="shell · ashley.b@hercules" lang="powershell"
 PS C:\Users\ashley.b\Desktop> .\aCleanup.ps1
@@ -158,7 +158,7 @@ PS> Set-ADAccountPassword -Identity IIS_Administrator `
 
 ::: stage n=6 label="ROOT" title="Tiraniddo RBCD — session-key swap on a non-computer account."
 
-`IIS_WEBSERVER$` is a {red:user} (not a computer), has no SPNs, and lacks `TRUSTED_TO_AUTH_FOR_DELEGATION`. Standard RBCD `S4U2Proxy` fails. The Tiraniddo trick: request a TGT for the account, yank its session key, then {warn:set the account's NT hash to equal that session key}. Now `S4U2Self+U2U+S4U2Proxy` succeeds.
+`IIS_WEBSERVER$` is a {red:user} (not a computer), has no SPNs, and lacks `TRUSTED_TO_AUTH_FOR_DELEGATION`. Standard RBCD `S4U2Proxy` fails. Using the Tiraniddo technique, request a TGT for the account, extract its session key, then {warn:set the account's NT hash to equal that session key}. Now `S4U2Self+U2U+S4U2Proxy` succeeds.
 
 ::: terminal title="shell · impacket · Tiraniddo" lang="bash"
 $ bloodyAD ... set password 'IIS_webserver$' '[REDACTED]'
@@ -184,7 +184,7 @@ $ wmiexec.py -k -no-pass hercules.htb/Administrator@dc.hercules.htb \
 :::
 
 ::: opsec
-Six separate ACL or Kerberos weaknesses, each ordinary on its own — LDAP input reflection, password in description, Shadow Creds, OU move, ESC3, inheritance reflow, and finally a user-account RBCD. None are unusual in isolation. What makes Hercules insane is the scheduling: you need the cleanup script to run before IIS_Administrator's inheritance propagates, and the Tiraniddo session-key swap must precede any TGS request — if the TGT rolls you start over.
+Timing matters here. The cleanup script must run before IIS_Administrator's inheritance propagates. The Tiraniddo session-key swap must also happen before any TGS request; if the TGT rolls, start over.
 :::
 
 :::

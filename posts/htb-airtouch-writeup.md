@@ -45,7 +45,7 @@ remediation:
 
 ::: stage n=1 label="RECON" title="TCP is quiet — UDP is the interesting surface."
 
-TCP scan only shows SSH. Don't stop there: UDP reveals {warn:SNMP on 161}, and the default `public` community string is wide open. `snmpwalk` prints management data that includes the consultant credential:
+The TCP scan only shows SSH. A UDP scan also finds {warn:SNMP on 161}, using the default `public` community string. `snmpwalk` returns management data that includes the consultant credential:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ snmpwalk -v2c -c public 10.129.12.147 | grep -i 'consultant\|pass'
@@ -57,7 +57,7 @@ consultant@airtouch:~$ sudo -l
 (root) NOPASSWD: ALL
 :::
 
-The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: `AirTouch-Internet` (PSK) and `AirTouch-Office` (Enterprise). The path forward is wireless, not wired.
+The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: `AirTouch-Internet` (PSK) and `AirTouch-Office` (Enterprise). The next step is to investigate the wireless networks.
 
 :::
 
@@ -92,7 +92,7 @@ Address on `192.168.3.0/24`. Router lives at `192.168.3.1`.
 
 ::: stage n=3 label="ROUTER" title="Decrypt the captured traffic — ride an admin cookie."
 
-Easy to panic and attack the router's login directly. Smarter move: decrypt what you already captured:
+Before attacking the router login, decrypt the traffic from the capture:
 
 ::: terminal title="shell · airdecap-ng" lang="bash"
 $ airdecap-ng -e AirTouch-Internet -p [REDACTED] \
@@ -118,7 +118,7 @@ $ curl "http://192.168.3.1/uploads/reader.phtml?c=id"
 uid=33(www-data) gid=33(www-data)
 :::
 
-Source review on `login.php` leaks a real account: `user / [REDACTED]`, and that user has passwordless sudo. Root on the router.
+The source of `login.php` contains an account: `user / [REDACTED]`, and that user has passwordless sudo. Root on the router.
 
 `user.txt` lives on the router under `/root/`.
 
@@ -194,7 +194,7 @@ $ cat /etc/hostapd/hostapd_wpe.eap_user
 SSH as `admin` → passwordless sudo → `/root/root.txt`. {ok:Rooted}.
 
 ::: opsec
-The individual issues are straightforward: SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.
+Airtouch moves through three wireless segments. Credentials and files found on each host give access to the next segment.
 :::
 
 :::

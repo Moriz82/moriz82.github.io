@@ -52,7 +52,7 @@ $ nmap -T5 -A api.heal.htb
 |_http-title: Ruby on Rails 7.1.4
 :::
 
-`heal.htb` is the public site, `api.heal.htb` is the Rails backend. Register an account, build a resume, hit **Export as PDF**. The browser downloads `api.heal.htb/download?filename=<uuid>.pdf` behind the scenes.
+`heal.htb` is the public site and `api.heal.htb` is the Rails backend. Register an account, build a resume, and hit **Export as PDF**. The browser downloads `api.heal.htb/download?filename=<uuid>.pdf` behind the scenes.
 
 ::: img src="../assets/img/writeups/htb-heal/01-nmap.png" caption="Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails"
 
@@ -96,13 +96,13 @@ $ hashcat -m 3200 -a 0 hash.txt rockyou.txt
 $2a$12$[BCRYPT-HASH] : [REDACTED]
 :::
 
-SSH as ralph is blocked. The admin panel is on a second vhost: `take-survey.heal.htb/index.php/admin/authentication/sa/login`. Login lands on a {cool:LimeSurvey 6.6.4} admin.
+SSH as ralph is blocked. The admin panel is on a second vhost: `take-survey.heal.htb/index.php/admin/authentication/sa/login`. Logging in opens the {cool:LimeSurvey 6.6.4} admin panel.
 
 :::
 
 ::: stage n=4 label="RCE" title="LimeSurvey 6.6.4 plugin-upload → www-data shell."
 
-Public exploit from `N4s1rl1/Limesurvey-6.6.4-RCE` ships the full chain: CSRF token → login → upload malicious plugin zip → activate → trigger.
+The public exploit `N4s1rl1/Limesurvey-6.6.4-RCE` handles the chain: CSRF token → login → upload malicious plugin zip → activate → trigger.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ python3 exploit.py http://take-survey.heal.htb ralph [REDACTED] 80
@@ -135,7 +135,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 
 ::: stage n=5 label="ROOT" title="Consul is bound to localhost. `service/register` runs as root."
 
-Rifling through `/var/www/limesurvey/application/config/config.php` leaks PostgreSQL creds, but Postgres permissions aren't enough for user pivot. `ss -tuln` is the real find:
+`/var/www/limesurvey/application/config/config.php` contains PostgreSQL credentials, but the permissions are not enough to pivot to the user. Check listening ports with `ss -tuln`:
 
 ::: terminal title="shell · www-data@heal" lang="bash"
 $ ss -tuln

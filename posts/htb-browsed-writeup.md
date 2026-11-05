@@ -40,7 +40,7 @@ remediation:
 
 ::: stage n=1 label="RECON" title="Extension review portal + a hidden Gitea vhost."
 
-Only SSH and HTTP are up. The web app is an extension review platform. Upload a `.zip`, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:
+Only SSH and HTTP are open. The web app reviews extensions: upload a `.zip` and a bot loads it in headless Chrome and takes a screenshot. The upload page shows the command line:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ curl -s http://10.129.244.79/upload.php
@@ -52,13 +52,13 @@ timeout 10s xvfb-run /opt/chrome-linux64/chrome --disable-gpu --no-sandbox \
   http://localhost/ http://browsedinternals.htb
 :::
 
-Two target URLs. A throwaway extension that logs `navigator.userAgent` + `window.location` confirms the bot really visits `browsedinternals.htb`. Pin it in `/etc/hosts`:
+The command contains two target URLs. An extension that logs `navigator.userAgent` and `window.location` confirms the bot visits `browsedinternals.htb`. Add it to `/etc/hosts`:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ echo "10.129.244.79 browsedinternals.htb browsed.htb" | sudo tee -a /etc/hosts
 :::
 
-The internal vhost serves {cool:Gitea}. The public repo `larry/MarkdownPreview` is the interesting one.
+The internal vhost serves {cool:Gitea}. It has a public repo called `larry/MarkdownPreview`.
 
 :::
 
@@ -83,7 +83,7 @@ fi
 
 The trap is `-eq`. Bash arithmetic {warn:evaluates the argument as an expression}, not as a string compare. Passing `arr[$(id)]` triggers command substitution inside the `[[ ]]` context before the numeric compare even runs.
 
-The Flask app binds `127.0.0.1:5000` only. That's the problem the extension sandbox solves for us.
+The Flask app only binds to `127.0.0.1:5000`. The uploaded extension can reach it through the bot.
 
 :::
 
@@ -115,7 +115,7 @@ uid=1000(larry) gid=1000(larry)
 `user.txt` is right there.
 
 ::: tip
-The extension bot is the lift. Your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.
+The extension runs in the bot, which can reach the internal service.
 :::
 
 :::
@@ -185,7 +185,7 @@ uid=1000(larry) gid=1000(larry) euid=0(root)
 {ok:Rooted}.
 
 ::: note title="WHY IT WORKED"
-Python trusts `__pycache__` as long as the header's mtime + size match the source. Those fields are 4-byte little-endian ints at offsets 8 and 12. A writable cache dir is equivalent to writable source, with none of the audit signals of someone editing `.py` files in `/opt/`.
+Python accepts the cached bytecode when the header's mtime and size match the source. Those fields are 4-byte little-endian integers at offsets 8 and 12. A writable cache lets someone change what Python runs without editing the `.py` files in `/opt/`.
 :::
 
 :::

