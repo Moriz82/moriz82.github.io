@@ -1,5 +1,5 @@
 {
-  "built": "2026-11-05T03:59:28.237Z",
+  "built": "2026-11-05T04:19:01.608Z",
   "sections": [
     {
       "id": "blog",
@@ -87,7 +87,7 @@
       "slug": "htb-hercules-writeup",
       "sec": "writeups",
       "date": "2026-02-12",
-      "summary": "NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j's description — a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs) — swap NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.",
+      "summary": "NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j's description, which contains a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs). Swap its NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.",
       "tags": [
         "ad",
         "adcs",

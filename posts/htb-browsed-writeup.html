@@ -87,7 +87,7 @@
 <section class="wp-stage" id="recon" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Recon</div>
 <h2 class="wp-stage-title">Extension review portal + a hidden Gitea vhost.</h2>
-<div class="wp-stage-body"><p>Only SSH and HTTP are up. The web app is an extension review platform. Upload a <code>.zip</code>, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:</p>
+<div class="wp-stage-body"><p>Only SSH and HTTP are open. The web app reviews extensions: upload a <code>.zip</code> and a bot loads it in headless Chrome and takes a screenshot. The upload page shows the command line:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -s http://10.129.244.79/upload.php
@@ -100,14 +100,14 @@
 </div>
 
 
-<p>Two target URLs. A throwaway extension that logs <code>navigator.userAgent</code> + <code>window.location</code> confirms the bot really visits <code>browsedinternals.htb</code>. Pin it in <code>/etc/hosts</code>:</p>
+<p>The command contains two target URLs. An extension that logs <code>navigator.userAgent</code> and <code>window.location</code> confirms the bot visits <code>browsedinternals.htb</code>. Add it to <code>/etc/hosts</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;10.129.244.79 browsedinternals.htb browsed.htb&quot;</span> | sudo <span class="hljs-built_in">tee</span> -a /etc/hosts</code></pre>
 </div>
 
 
-<p>The internal vhost serves <span class="hl-cool">Gitea</span>. The public repo <code>larry/MarkdownPreview</code> is the interesting one.</p>
+<p>The internal vhost serves <span class="hl-cool">Gitea</span>. It has a public repo called <code>larry/MarkdownPreview</code>.</p>
 </div>
 </section>
 
@@ -140,7 +140,7 @@
 
 
 <p>The trap is <code>-eq</code>. Bash arithmetic <span class="hl-warn">evaluates the argument as an expression</span>, not as a string compare. Passing <code>arr[$(id)]</code> triggers command substitution inside the <code>[[ ]]</code> context before the numeric compare even runs.</p>
-<p>The Flask app binds <code>127.0.0.1:5000</code> only. That&#39;s the problem the extension sandbox solves for us.</p>
+<p>The Flask app only binds to <code>127.0.0.1:5000</code>. The uploaded extension can reach it through the bot.</p>
 </div>
 </section>
 
@@ -176,7 +176,7 @@ uid=1000(larry) gid=1000(larry)</code></pre>
 
 
 <p><code>user.txt</code> is right there.</p>
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The extension bot is the lift. Your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The extension runs in the bot, which can reach the internal service.</p>
 </div></aside></div>
 </section>
 
@@ -255,7 +255,7 @@ uid=1000(larry) gid=1000(larry) euid=0(root)
 
 
 <p><span class="hl-ok">Rooted</span>.</p>
-<aside class="wp-callout wp-note"><div class="wp-callout-head">Why it worked</div><div class="wp-callout-body"><p>Python trusts <code>__pycache__</code> as long as the header&#39;s mtime + size match the source. Those fields are 4-byte little-endian ints at offsets 8 and 12. A writable cache dir is equivalent to writable source, with none of the audit signals of someone editing <code>.py</code> files in <code>/opt/</code>.</p>
+<aside class="wp-callout wp-note"><div class="wp-callout-head">Why it worked</div><div class="wp-callout-body"><p>Python accepts the cached bytecode when the header&#39;s mtime and size match the source. Those fields are 4-byte little-endian integers at offsets 8 and 12. A writable cache lets someone change what Python runs without editing the <code>.py</code> files in <code>/opt/</code>.</p>
 </div></aside></div>
 </section>
 

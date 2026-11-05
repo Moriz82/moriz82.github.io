@@ -87,7 +87,7 @@
 <section class="wp-stage" id="recon" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Recon</div>
 <h2 class="wp-stage-title">TCP is quiet — UDP is the interesting surface.</h2>
-<div class="wp-stage-body"><p>TCP scan only shows SSH. Don&#39;t stop there: UDP reveals <span class="hl-warn">SNMP on 161</span>, and the default <code>public</code> community string is wide open. <code>snmpwalk</code> prints management data that includes the consultant credential:</p>
+<div class="wp-stage-body"><p>The TCP scan only shows SSH. A UDP scan also finds <span class="hl-warn">SNMP on 161</span>, using the default <code>public</code> community string. <code>snmpwalk</code> returns management data that includes the consultant credential:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ snmpwalk -v2c -c public 10.129.12.147 | grep -i <span class="hljs-string">&#x27;consultant\|pass&#x27;</span>
@@ -100,7 +100,7 @@ consultant@airtouch:~$ sudo -l
 </div>
 
 
-<p>The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: <code>AirTouch-Internet</code> (PSK) and <code>AirTouch-Office</code> (Enterprise). The path forward is wireless, not wired.</p>
+<p>The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: <code>AirTouch-Internet</code> (PSK) and <code>AirTouch-Office</code> (Enterprise). The next step is to investigate the wireless networks.</p>
 </div>
 </section>
 
@@ -145,7 +145,7 @@ $ dhclient wlan3</code></pre>
 <section class="wp-stage" id="router" data-stage="3">
 <div class="wp-stage-lbl">Stage 3 &middot; Router</div>
 <h2 class="wp-stage-title">Decrypt the captured traffic — ride an admin cookie.</h2>
-<div class="wp-stage-body"><p>Easy to panic and attack the router&#39;s login directly. Smarter move: decrypt what you already captured:</p>
+<div class="wp-stage-body"><p>Before attacking the router login, decrypt the traffic from the capture:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · airdecap-ng</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ airdecap-ng -e AirTouch-Internet -p [REDACTED] \
@@ -169,7 +169,7 @@ uid=33(www-data) gid=33(www-data)</code></pre>
 </div>
 
 
-<p>Source review on <code>login.php</code> leaks a real account: <code>user / [REDACTED]</code>, and that user has passwordless sudo. Root on the router.</p>
+<p>The source of <code>login.php</code> contains an account: <code>user / [REDACTED]</code>, and that user has passwordless sudo. Root on the router.</p>
 <p><code>user.txt</code> lives on the router under <code>/root/</code>.</p>
 </div>
 </section>
@@ -253,7 +253,7 @@ $ <span class="hljs-built_in">cat</span> /etc/hostapd/hostapd_wpe.eap_user
 
 
 <p>SSH as <code>admin</code> → passwordless sudo → <code>/root/root.txt</code>. <span class="hl-ok">Rooted</span>.</p>
-<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>The individual issues are straightforward: SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.</p>
+<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>Airtouch moves through three wireless segments. Credentials and files found on each host give access to the next segment.</p>
 </div></aside></div>
 </section>
 

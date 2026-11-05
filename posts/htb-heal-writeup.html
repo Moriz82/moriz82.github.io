@@ -100,7 +100,7 @@ $ nmap -T5 -A api.heal.htb
 </div>
 
 
-<p><code>heal.htb</code> is the public site, <code>api.heal.htb</code> is the Rails backend. Register an account, build a resume, hit <strong>Export as PDF</strong>. The browser downloads <code>api.heal.htb/download?filename=&lt;uuid&gt;.pdf</code> behind the scenes.</p>
+<p><code>heal.htb</code> is the public site and <code>api.heal.htb</code> is the Rails backend. Register an account, build a resume, and hit <strong>Export as PDF</strong>. The browser downloads <code>api.heal.htb/download?filename=&lt;uuid&gt;.pdf</code> behind the scenes.</p>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-heal/01-nmap.png" alt="Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails" loading="lazy"><figcaption>Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails</figcaption></figure></div>
 </section>
 
@@ -158,7 +158,7 @@ $2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
 </div>
 
 
-<p>SSH as ralph is blocked. The admin panel is on a second vhost: <code>take-survey.heal.htb/index.php/admin/authentication/sa/login</code>. Login lands on a <span class="hl-cool">LimeSurvey 6.6.4</span> admin.</p>
+<p>SSH as ralph is blocked. The admin panel is on a second vhost: <code>take-survey.heal.htb/index.php/admin/authentication/sa/login</code>. Logging in opens the <span class="hl-cool">LimeSurvey 6.6.4</span> admin panel.</p>
 </div>
 </section>
 
@@ -168,7 +168,7 @@ $2a$12$[BCRYPT-HASH] : [REDACTED]</code></pre>
 <section class="wp-stage" id="rce" data-stage="4">
 <div class="wp-stage-lbl">Stage 4 &middot; RCE</div>
 <h2 class="wp-stage-title">LimeSurvey 6.6.4 plugin-upload → www-data shell.</h2>
-<div class="wp-stage-body"><p>Public exploit from <code>N4s1rl1/Limesurvey-6.6.4-RCE</code> ships the full chain: CSRF token → login → upload malicious plugin zip → activate → trigger.</p>
+<div class="wp-stage-body"><p>The public exploit <code>N4s1rl1/Limesurvey-6.6.4-RCE</code> handles the chain: CSRF token → login → upload malicious plugin zip → activate → trigger.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ python3 exploit.py http://take-survey.heal.htb ralph [REDACTED] 80
@@ -206,7 +206,7 @@ uid=33(www-data) gid=33(www-data) <span class="hljs-built_in">groups</span>=33(w
 <section class="wp-stage" id="root" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; Root</div>
 <h2 class="wp-stage-title">Consul is bound to localhost. <code>service/register</code> runs as root.</h2>
-<div class="wp-stage-body"><p>Rifling through <code>/var/www/limesurvey/application/config/config.php</code> leaks PostgreSQL creds, but Postgres permissions aren&#39;t enough for user pivot. <code>ss -tuln</code> is the real find:</p>
+<div class="wp-stage-body"><p><code>/var/www/limesurvey/application/config/config.php</code> contains PostgreSQL credentials, but the permissions are not enough to pivot to the user. Check listening ports with <code>ss -tuln</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · www-data@heal</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ ss -tuln

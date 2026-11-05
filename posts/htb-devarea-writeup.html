@@ -99,7 +99,7 @@
 </div>
 
 
-<p>Anonymous FTP → grab <code>employee-service.jar</code> from <code>/pub</code>:</p>
+<p>Anonymous FTP is enabled. Download <code>employee-service.jar</code> from <code>/pub</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl --user anonymous:anonymous -o employee-service.jar \
@@ -107,7 +107,7 @@
 </div>
 
 
-<p>Decompile. <code>ServerStarter.java</code> binds a SOAP service at <code>http://0.0.0.0:8080/employeeservice</code>, and <code>submitReport</code> takes a <code>Report</code> with a <code>content</code> field.</p>
+<p>Decompile the JAR. <code>ServerStarter.java</code> binds a SOAP service at <code>http://0.0.0.0:8080/employeeservice</code>, and <code>submitReport</code> takes a <code>Report</code> with a <code>content</code> field.</p>
 </div>
 </section>
 
@@ -117,7 +117,7 @@
 <section class="wp-stage" id="lfi" data-stage="2">
 <div class="wp-stage-lbl">Stage 2 &middot; LFI</div>
 <h2 class="wp-stage-title">CVE-2022-46364 — XOP MTOM reference escapes the SOAP body.</h2>
-<div class="wp-stage-body"><p>Apache CXF + Jetty 9.4.27 is vulnerable to MTOM XOP Include abuse: the <code>&lt;xop:Include href=&quot;...&quot;&gt;</code> tag can reference <span class="hl-red">arbitrary <code>file://</code> URIs</span> which CXF happily dereferences server-side.</p>
+<div class="wp-stage-body"><p>Apache CXF + Jetty 9.4.27 is vulnerable to MTOM XOP Include abuse: the <code>&lt;xop:Include href=&quot;...&quot;&gt;</code> tag can reference <span class="hl-red">arbitrary <code>file://</code> URIs</span> which CXF dereferences server-side.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali · CVE-2022-46364</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -s -X POST <span class="hljs-string">&quot;http://10.129.12.147:8080/employeeservice&quot;</span> \
@@ -150,7 +150,7 @@
 </div>
 
 
-<p>Response base64-encodes the file. <code>hoverfly.service</code> exposes the admin credentials baked into <code>ExecStart</code>:</p>
+<p>The response contains the file encoded in base64. <code>hoverfly.service</code> exposes the admin credentials in <code>ExecStart</code>:</p>
 <pre><code class="hljs language-routeros"><span class="hljs-attribute">ExecStart</span>=/opt/HoverFly/hoverfly -<span class="hljs-built_in">add</span> -username admin -password [REDACTED] <span class="hljs-built_in">..</span>.</code></pre>
 <aside class="wp-callout wp-warn"><div class="wp-callout-head">User flag is blocked</div><div class="wp-callout-body"><p><code>employee-service.service</code> has <code>InaccessiblePaths=/home/dev_ryan/user.txt</code>, so the LFI can&#39;t read it. Need a shell as <code>dev_ryan</code>.</p>
 </div></aside></div>
@@ -213,7 +213,7 @@ syswatch-v1.zip</code></pre>
 </div>
 
 
-<p>ACL deny on <code>/opt/syswatch/</code> but a copy of the source lives in <code>dev_ryan</code>&#39;s home. Key findings:</p>
+<p>An ACL blocks access to <code>/opt/syswatch/</code>, but a copy of the source is in <code>dev_ryan</code>&#39;s home:</p>
 <ul>
 <li><code>syswatch.sh</code> sources <code>/opt/syswatch/config/syswatch.conf</code> (root-owned)</li>
 <li><code>syswatch.sh logs &lt;file&gt;</code> accepts symlinks that pass a name regex</li>
@@ -229,7 +229,7 @@ syswatch-v1.zip</code></pre>
 <section class="wp-stage" id="session" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; Session</div>
 <h2 class="wp-stage-title">Flask session forge → pipe injection as syswatch.</h2>
-<div class="wp-stage-body"><p>Secret is readable; forge the session cookie locally:</p>
+<div class="wp-stage-body"><p>The secret is readable, so forge a session cookie locally:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · session forge</span></div>
 <pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-keyword">from</span> itsdangerous <span class="hljs-keyword">import</span> URLSafeTimedSerializer
@@ -261,7 +261,7 @@ requests.post(<span class="hljs-string">&quot;http://127.0.0.1:7777/service-stat
 </div>
 
 
-<p>That runs as <code>syswatch</code>, which has write access to <code>/opt/syswatch/logs/</code> and <code>/opt/syswatch/backup/</code>. Good enough.</p>
+<p>The command runs as <code>syswatch</code>, which has write access to <code>/opt/syswatch/logs/</code> and <code>/opt/syswatch/backup/</code>.</p>
 </div>
 </section>
 

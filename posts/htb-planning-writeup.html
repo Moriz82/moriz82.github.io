@@ -111,7 +111,7 @@ grafana [Status: 302, Size: 29]</code></pre>
 <section class="wp-stage" id="grafana" data-stage="2">
 <div class="wp-stage-lbl">Stage 2 &middot; Grafana</div>
 <h2 class="wp-stage-title">DuckDB SQL plugin → base64 bash → shell.</h2>
-<div class="wp-stage-body"><p>Public exploit <code>nollium/CVE-2024-9264</code> does the whole thing:</p>
+<div class="wp-stage-body"><p>Run the public exploit <code>nollium/CVE-2024-9264</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
@@ -132,7 +132,7 @@ uid=0(root) gid=0(root) <span class="hljs-built_in">groups</span>=0(root)</code>
 </div>
 
 
-<p>Too easy. <code>ls -a / | grep docker</code> → <span class="hl-warn">.dockerenv</span>. Root inside a container isn&#39;t root on the host.</p>
+<p><code>ls -a / | grep docker</code> finds <span class="hl-warn">.dockerenv</span>. The shell is root inside a container, not on the host.</p>
 </div>
 </section>
 
@@ -164,7 +164,7 @@ GF_AUTH_AnonymousEnabled=<span class="hljs-literal">false</span></code></pre>
 
 
 
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>If you find yourself in a container as root, always check <code>env</code> first. Misconfigured containers leak secrets there that nobody thinks to rotate.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>Check <code>env</code> for credentials exposed inside the container.</p>
 </div></aside></div>
 </section>
 
