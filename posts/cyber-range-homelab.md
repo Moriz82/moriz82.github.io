@@ -33,7 +33,7 @@ loadout:
 
 ::: stage n=1 label="HARDWARE" title="A retired Dell R720 and a plan."
 
-Picked up an R720 off eBay — dual Xeon E5-2670v2, 128GB of DDR3 ECC, 8× 2TB SAS. Not fast, but dense and cheap per core. Added a dual-port 10GbE NIC for the storage network.
+Picked up an R720 off eBay: dual Xeon E5-2670v2, 128GB of DDR3 ECC, 8× 2TB SAS. Not fast, but dense and cheap per core. Added a dual-port 10GbE NIC for the storage network.
 
 Noise was the first problem. Stock fans scream at 50%. IPMI fan curve, plus a pair of Noctua NF-A12-25 pulling from the front, dropped it to tolerable for a garage.
 
@@ -61,12 +61,12 @@ Nested virtualization enabled for the Windows AD lab. CPU type set to `host` for
 
 Four VLANs on the Cisco switch:
 
-- {cool:10} — management (Proxmox, iDRAC, switch)
-- {cool:20} — lab internal (targets, pivots)
-- {cool:30} — detonation (malware triage, blackhole-routed)
-- {cool:40} — operator (my box, SIEM)
+- {cool:10}: management (Proxmox, iDRAC, switch)
+- {cool:20}: lab internal (targets, pivots)
+- {cool:30}: detonation (malware triage, blackhole-routed)
+- {cool:40}: operator (my box, SIEM)
 
-pfSense edges routes between operator + lab. VLAN 30 has zero route to anywhere outside — packets die at the firewall.
+pfSense edges routes between operator + lab. VLAN 30 has zero route to anywhere outside; packets die at the firewall.
 
 ::: img src="../assets/img/homelab.jpg" caption="R720 + switch + pfSense · garage lab in production" alt="Homelab server rack"
 

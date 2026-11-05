@@ -54,7 +54,7 @@ async def telemetry(packet: Telemetry, db: Session = Depends(get_db)):
     return {"ok": True, "state": state}
 :::
 
-30-second rolling window smooths out sensor noise. The state classifier is a simple threshold tree — not ML, just engineering.
+30-second rolling window smooths out sensor noise. The state classifier is a simple threshold tree, not ML.
 
 :::
 
@@ -84,7 +84,7 @@ Swift + Spotify SDK handled the catalog pull. The client just renders whatever s
 Target track tempo = {cool:current_bpm ± 10}. Pull top 40 candidates from Spotify's recommendations endpoint, filter by tempo band, pick the highest-rated one we haven't played in the last hour.
 
 ::: note title="WHY IT FELT GOOD"
-The jump from "music is random" to "music tracks your effort" is a small UX change that feels enormous. The algorithm is simple — the effect is the real product.
+The jump from "music is random" to "music tracks your effort" is a small UX change that feels enormous. The algorithm is simple.
 :::
 
 :::

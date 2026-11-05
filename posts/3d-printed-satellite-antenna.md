@@ -32,7 +32,7 @@ loadout:
 
 ::: stage n=1 label="CAD" title="A helical, because linear-polarized gets wrecked by Faraday rotation."
 
-Right-hand circularly polarized. NOAA satellites transmit RHCP, so matching it buys you 3 dB over a linear dipole. Helix geometry — four turns, 0.75λ diameter, 0.25λ pitch. At 137 MHz that's ugly big; at 1.69 GHz it's palm-sized, so GOES is the easier target for a first build.
+Right-hand circularly polarized. NOAA satellites transmit RHCP, so matching it buys you 3 dB over a linear dipole. The helix has four turns, a 0.75λ diameter, and a 0.25λ pitch. At 137 MHz that's ugly big; at 1.69 GHz it's palm-sized, so GOES is the easier target for a first build.
 
 Fusion 360 for the spine, 3mm copper wire wound around a 3D-printed helical jig for repeatability.
 
@@ -40,7 +40,7 @@ Fusion 360 for the spine, 3mm copper wire wound around a 3D-printed helical jig 
 
 ::: stage n=2 label="PRINT" title="PETG, 40% gyroid, because a PLA antenna warps in the Texas sun."
 
-Print time: 14 hours. Four pieces that lap-joint together. Wire channels routed at the exact pitch for the helix — no eyeballing the winding.
+Print time: 14 hours. Four pieces that lap-joint together. Wire channels routed at the exact pitch for the helix, so there is no need to eyeball the winding.
 
 ::: opsec
 PLA will deform at ~55°C. San Antonio attics hit 60°C easy. PETG or ASA only.
@@ -70,7 +70,7 @@ RTL-SDR v3 on a laptop. BiasT-powered LNA at the feedpoint. Gqrx spectrum view, 
 
 ::: img src="../assets/img/antenna.jpg" caption="Finished helical mounted on a TV rotor" alt="3D-printed helical antenna pointing at sky"
 
-Pass prediction with `gpredict`. NOAA-19 gave me a 12-minute window at 42° peak elevation — strong enough for a clean capture.
+Pass prediction with `gpredict`. NOAA-19 gave me a 12-minute window at 42° peak elevation, strong enough for a clean capture.
 
 :::
 
@@ -87,6 +87,6 @@ Saved n19.png (909×1040)
 Visible and IR stripes from the same pass. Frame it, put it on the wall, start planning GOES-16 full-disk capture next.
 
 ::: tip
-Start with NOAA APT at 137 MHz for your first build — the antenna tolerates more error than GOES does at 1.69 GHz. Walk before running.
+Start with NOAA APT at 137 MHz for your first build. The antenna tolerates more error than GOES does at 1.69 GHz.
 :::
 :::

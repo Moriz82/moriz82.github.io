@@ -55,7 +55,7 @@ $ nmap -A -T5 10.129.237.217 --min-rate 2000
 445/tcp   open  microsoft-ds
 :::
 
-The web app is an online course platform. Registering as a {red:teacher} requires manual verification — a {red:student} account works instantly, and students can upload quiz submissions.
+The web app is an online course platform. Registering as a {red:teacher} requires manual verification. A {red:student} account works instantly, and students can upload quiz submissions.
 
 The upload validator allows `.pdf`, `.pptx`, `.xlsx`, and `.zip`. Trying a raw `.php` with a classic payload fails:
 
@@ -110,7 +110,7 @@ Upgrade to a proper shell: Python HTTP server on the attacker, PowerShell IWR pu
 
 ::: stage n=3 label="USER" title="db.php reveals bcrypt dump. Crack to sara.b."
 
-Hunting around `C:\xampp\htdocs\certificate.htb` turns up `db.php` — a PDO connection string with the `certificate_webapp_user` credentials for `Certificate_WEBAPP_DB`.
+Hunting around `C:\xampp\htdocs\certificate.htb` turns up `db.php`, which contains a PDO connection string with the `certificate_webapp_user` credentials for `Certificate_WEBAPP_DB`.
 
 A one-liner `dump.php` runs `SELECT * FROM users` and prints every row to the browser. The table yields handles, emails, and a {red:$2y$04$...} bcrypt hash per user.
 
@@ -207,7 +207,7 @@ $ evil-winrm -i 10.129.237.215 -u Administrator -H [NT HASH]
 {ok:NT AUTHORITY\SYSTEM}. Rooted.
 
 ::: opsec
-The wild-goose chase on this box is a `WS-01_PktMon.pcap` under Sara.B's folder that cracks to `Lion.SK` — legitimate creds, WinRM access, no useful privileges. Don't burn an hour on it like I did.
+The wild-goose chase on this box is a `WS-01_PktMon.pcap` under Sara.B's folder that cracks to `Lion.SK`. The credentials are valid and allow WinRM access, but have no useful privileges. Don't burn an hour on it like I did.
 :::
 
 :::

@@ -11,7 +11,7 @@ readTime: 10 min read
 points: 45
 tags: [CHROME, BASH, PYCACHE]
 classification: CLASSIFIED-WHITE
-summary: Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to `localhost` — abuse that to hit a Flask app with a Bash arithmetic-eval bug (`arr[$(…)]`) and land as `larry`. Root comes from a `sudo`-allowed Python tool whose `__pycache__` is mode 777 — drop a poisoned `.pyc` and SUID bash.
+summary: Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to `localhost`. Use that to hit a Flask app with a Bash arithmetic-eval bug (`arr[$(…)]`) and land as `larry`. Root comes from a `sudo`-allowed Python tool whose `__pycache__` is mode 777. Drop a poisoned `.pyc` and SUID bash.
 engagement:
   platform: Hack The Box
   target: browsed.htb
@@ -32,7 +32,7 @@ loadout:
   - { tool: nc,        purpose: listener }
   - { tool: python3.12, purpose: pyc-forge }
 remediation:
-  - Never treat localhost as a privacy boundary — sandboxed automation routes trust back in
+  - Never treat localhost as a privacy boundary; sandboxed automation routes trust back in
   - Use `[[ "$1" -eq 0 ]]` only on values already validated as numeric (or switch to `string == "0"`)
   - Remove passwordless `sudo` on scripts that import from world-writable paths
   - Chmod `__pycache__` directories to 755 at minimum; audit before shipping
@@ -40,7 +40,7 @@ remediation:
 
 ::: stage n=1 label="RECON" title="Extension review portal + a hidden Gitea vhost."
 
-Only SSH and HTTP are up. The web app is an extension review platform — upload a `.zip`, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:
+Only SSH and HTTP are up. The web app is an extension review platform. Upload a `.zip`, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:
 
 ::: terminal title="shell · operator@kali" lang="bash"
 $ curl -s http://10.129.244.79/upload.php
@@ -81,7 +81,7 @@ if [[ "$1" -eq 0 ]]; then
 fi
 :::
 
-The trap is `-eq`. Bash arithmetic {warn:evaluates the argument as an expression} — not a string compare. Passing `arr[$(id)]` triggers command substitution inside the `[[ ]]` context before the numeric compare even runs.
+The trap is `-eq`. Bash arithmetic {warn:evaluates the argument as an expression}, not as a string compare. Passing `arr[$(id)]` triggers command substitution inside the `[[ ]]` context before the numeric compare even runs.
 
 The Flask app binds `127.0.0.1:5000` only. That's the problem the extension sandbox solves for us.
 
@@ -115,7 +115,7 @@ uid=1000(larry) gid=1000(larry)
 `user.txt` is right there.
 
 ::: tip
-The extension bot is the lift — your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.
+The extension bot is the lift. Your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.
 :::
 
 :::
