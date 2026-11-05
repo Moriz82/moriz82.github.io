@@ -24,6 +24,24 @@ for (const file of fs.readdirSync(PARTIALS_DIR)) {
   if (!file.endsWith('.hbs')) continue;
   Handlebars.registerPartial(path.basename(file, '.hbs'), fs.readFileSync(path.join(PARTIALS_DIR, file), 'utf8'));
 }
+// Cache-busting: every script and stylesheet gets ?v=<content hash>. Module imports are
+// relative, so an import map points each module URL at its versioned copy.
+const crypto = require('crypto');
+const ASSET_V = {};
+(function hashAssets(dir) {
+  if (!fs.existsSync(path.join(ROOT, dir))) return;
+  for (const e of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+    const rel = `${dir}/${e.name}`;
+    if (e.isDirectory()) hashAssets(rel);
+    else if (/\.(js|css)$/.test(e.name)) ASSET_V['/' + rel] = crypto.createHash('sha1').update(fs.readFileSync(path.join(ROOT, rel))).digest('hex').slice(0, 10);
+  }
+})('assets/js/os');
+for (const f of ['os.css', 'article.css', 'blocks.css']) if (fs.existsSync(path.join(ROOT, 'assets/css', f))) ASSET_V[`/assets/css/${f}`] = crypto.createHash('sha1').update(fs.readFileSync(path.join(ROOT, 'assets/css', f))).digest('hex').slice(0, 10);
+const versioned = (u) => (ASSET_V[u] ? `${u}?v=${ASSET_V[u]}` : u);
+Handlebars.registerHelper('asset', (u) => new Handlebars.SafeString(versioned(u)));
+const IMPORT_MAP = JSON.stringify({ imports: Object.fromEntries(Object.keys(ASSET_V).filter((u) => u.endsWith('.js')).map((u) => [u, versioned(u)])) });
+Handlebars.registerHelper('importmap', () => new Handlebars.SafeString(IMPORT_MAP.replace(/</g, '\\u003c')));
+
 const tpl = {};
 for (const file of fs.readdirSync(TEMPLATES_DIR)) {
   if (!file.endsWith('.hbs')) continue;

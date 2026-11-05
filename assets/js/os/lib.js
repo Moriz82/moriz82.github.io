@@ -16,7 +16,7 @@ export const isMobile = () => root.classList.contains('mobile');
 export const inOverview = () => root.classList.contains('ov');
 
 export async function loadData() {
-  const res = await fetch('/assets/data/fs.json');
+  const res = await fetch('/assets/data/fs.json', { cache: 'no-cache' });
   if (!res.ok) throw new Error(`fs.json ${res.status}`);
   OS.data = await res.json();
   return OS.data;

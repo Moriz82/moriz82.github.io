@@ -54,7 +54,7 @@ svg { display: block; }
 .qs { right: max(6px, env(safe-area-inset-right, 0px)); width: min(360px, calc(100vw - 12px)); display: grid; gap: 12px; }
 .qs-top { display: flex; justify-content: space-between; align-items: center; }
 .qs-top .who { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dim); }
-.qs-top .who img { width: 26px; height: 26px; border-radius: 50%; }
+.qs-top .who img { width: 26px; height: 26px; border-radius: 50%; background: #1d1d20; object-fit: cover; }
 .qs-top .acts { display: flex; gap: 6px; }
 .rb { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--card); }
 .rb:hover { background: var(--card-2); }
@@ -565,7 +565,7 @@ kbd, .kbd { font: 12px var(--mono); padding: 2px 7px; border-radius: 6px; backgr
 .gdm .gbar .r { justify-self: end; display: flex; gap: 12px; }
 .gdm .gbar svg { width: 15px; height: 15px; }
 .g-card { display: grid; justify-items: center; gap: 14px; }
-.g-card img { width: 128px; height: 128px; border-radius: 50%; }
+.g-card img { width: 128px; height: 128px; border-radius: 50%; background: #1d1d20; object-fit: cover; }
 .g-card .nm { font-size: 22px; font-weight: 700; }
 .g-pw { display: flex; align-items: center; gap: 8px; }
 .g-pw input { width: min(260px, 70vw); height: 38px; border-radius: 9px; border: 0; background: rgba(255,255,255,.1); padding: 0 12px; outline: none; letter-spacing: .2em; }

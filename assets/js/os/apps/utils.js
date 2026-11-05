@@ -223,7 +223,7 @@ export function sysmonApp(w) {
 }
 
 /* ── Image Viewer ──────────────────────────── */
-const EXTRA_IMGS = ['/assets/img/homelab.jpg', '/assets/img/antenna.jpg', '/assets/img/melody.jpg', '/assets/img/blackarch.svg', '/assets/img/avatar.svg', '/assets/img/penguin/avatar.png', '/assets/img/penguin/icon.png', '/assets/img/penguin/wallpaper-penguin.webp'];
+const EXTRA_IMGS = ['/assets/img/homelab.jpg', '/assets/img/antenna.jpg', '/assets/img/melody.jpg', '/assets/img/blackarch.svg', '/assets/img/penguin/avatar.png', '/assets/img/penguin/icon.png', '/assets/img/penguin/wallpaper-penguin.webp'];
 export const imageList = () => {
   const fromPosts = posts().filter((p) => p.sec === 'writeups').map((p) => `/assets/img/writeups/${p.slug.replace(/-writeup$/, '')}.png`);
   const extra = (OS.data.images || []).concat(EXTRA_IMGS);
