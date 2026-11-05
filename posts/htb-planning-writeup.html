@@ -122,7 +122,7 @@ grafana [Status: 302, Size: 29]</code></pre>
 </div>
 
 
-<p>Listener catches a shell — and it&#39;s root:</p>
+<p>The listener catches a root shell:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · root@container</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ nc -lvnp 4444
@@ -154,7 +154,7 @@ GF_AUTH_AnonymousEnabled=<span class="hljs-literal">false</span></code></pre>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-planning/03-env-leak.png" alt="Plaintext GF_SECURITY_ADMIN_PASSWORD sitting in container env" loading="lazy"><figcaption>Plaintext GF_SECURITY_ADMIN_PASSWORD sitting in container env</figcaption></figure>
 
 
-<p>Grabbing <code>/etc/passwd</code> on the host via LFI was unnecessary — <code>ssh enzo@planning.htb</code> with the <code>GF_SECURITY_ADMIN_PASSWORD</code> just works:</p>
+<p>Grabbing <code>/etc/passwd</code> on the host via LFI was unnecessary. <code>ssh enzo@planning.htb</code> with the <code>GF_SECURITY_ADMIN_PASSWORD</code> just works:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · enzo@planning</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">enzo@planning:~$ <span class="hljs-built_in">cat</span> user.txt
@@ -208,7 +208,7 @@ $ <span class="hljs-built_in">cat</span> /home/enzo/root.txt
 
 
 
-<aside class="wp-callout wp-note"><div class="wp-callout-head">Report note</div><div class="wp-callout-body"><p>For a real engagement I would have replaced <code>root</code>&#39;s password or symlinked <code>/bin/bash</code> with the SUID bit — copy-and-chmod&#39;ing a single file is the polite lab version.</p>
+<aside class="wp-callout wp-note"><div class="wp-callout-head">Report note</div><div class="wp-callout-body"><p>For a real engagement I would have replaced <code>root</code>&#39;s password or symlinked <code>/bin/bash</code> with the SUID bit. Copying and chmodding a single file is the lab version.</p>
 </div></aside></div>
 </section>
 

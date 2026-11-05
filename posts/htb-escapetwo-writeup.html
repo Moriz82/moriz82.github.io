@@ -118,7 +118,7 @@ LDAP  Administrator  Guest  krbtgt  michael  ryan  oscar  sql_svc  rose  ca_svc<
 <section class="wp-stage" id="creds" data-stage="2">
 <div class="wp-stage-lbl">Stage 2 &middot; Creds</div>
 <h2 class="wp-stage-title"><code>Accounting Department</code> share → corrupt <code>.xlsx</code> leaks XML creds.</h2>
-<div class="wp-stage-body"><p><code>smbclient -L</code> lists an <code>Accounting Department</code> share readable by rose. Two spreadsheets: <code>accounting_2024.xlsx</code> and <code>accounts.xlsx</code>. Both open corrupted in Excel — but <code>.xlsx</code> is just a zip of XML.</p>
+<div class="wp-stage-body"><p><code>smbclient -L</code> lists an <code>Accounting Department</code> share readable by rose. Two spreadsheets: <code>accounting_2024.xlsx</code> and <code>accounts.xlsx</code>. Both open corrupted in Excel, but <code>.xlsx</code> is just a zip of XML.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ smbclient <span class="hljs-string">&quot;//10.10.11.51/Accounting Department&quot;</span> -U rose
@@ -133,7 +133,7 @@ $ <span class="hljs-built_in">cat</span> accounts/xl/sharedStrings.xml
 </div>
 
 
-<p>The most interesting leak is <span class="hl-red"><a href="mailto:sa@sequel.htb">sa@sequel.htb</a></span> — the MSSQL <code>sa</code> login.</p>
+<p>The most interesting leak is <span class="hl-red"><a href="mailto:sa@sequel.htb">sa@sequel.htb</a></span>, the MSSQL <code>sa</code> login.</p>
 <figure class="wp-img"><img src="/assets/img/writeups/htb-escapetwo/02-xlsx-xml.png" alt="accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb" loading="lazy"><figcaption>accounts.xlsx is just a zip — sharedStrings.xml leaks sa@sequel.htb</figcaption></figure></div>
 </section>
 
@@ -217,7 +217,7 @@ $ dacledit.py -action write -rights FullControl \
 </div>
 
 
-<p>Enumerate the 34 templates — <code>DunderMifflinAuthentication</code> is the deliberately-weakened one. Grab a ticket for <code>ca_svc</code>, forge a certificate for <span class="hl-red"><a href="mailto:administrator@sequel.htb">administrator@sequel.htb</a></span>:</p>
+<p>Enumerate the 34 templates. <code>DunderMifflinAuthentication</code> is the deliberately-weakened one. Grab a ticket for <code>ca_svc</code>, forge a certificate for <span class="hl-red"><a href="mailto:administrator@sequel.htb">administrator@sequel.htb</a></span>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · ryan · certipy</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ KRB5CCNAME=<span class="hljs-variable">$PWD</span>/ca_svc.ccache certipy-ad template -k \

@@ -99,7 +99,7 @@
 </div>
 
 
-<p>The web app is an online course platform. Registering as a <span class="hl-red">teacher</span> requires manual verification — a <span class="hl-red">student</span> account works instantly, and students can upload quiz submissions.</p>
+<p>The web app is an online course platform. Registering as a <span class="hl-red">teacher</span> requires manual verification. A <span class="hl-red">student</span> account works instantly, and students can upload quiz submissions.</p>
 <p>The upload validator allows <code>.pdf</code>, <code>.pptx</code>, <code>.xlsx</code>, and <code>.zip</code>. Trying a raw <code>.php</code> with a classic payload fails:</p>
 <aside class="wp-callout wp-warn"><div class="wp-callout-head">400 bad request</div><div class="wp-callout-body"><p>The request you sent contains bad or malicious content (Invalid MIME type).</p>
 </div></aside>
@@ -161,7 +161,7 @@ certificate\xamppuser</code></pre>
 <section class="wp-stage" id="user" data-stage="3">
 <div class="wp-stage-lbl">Stage 3 &middot; User</div>
 <h2 class="wp-stage-title">db.php reveals bcrypt dump. Crack to sara.b.</h2>
-<div class="wp-stage-body"><p>Hunting around <code>C:\xampp\htdocs\certificate.htb</code> turns up <code>db.php</code> — a PDO connection string with the <code>certificate_webapp_user</code> credentials for <code>Certificate_WEBAPP_DB</code>.</p>
+<div class="wp-stage-body"><p>Hunting around <code>C:\xampp\htdocs\certificate.htb</code> turns up <code>db.php</code>, which contains a PDO connection string with the <code>certificate_webapp_user</code> credentials for <code>Certificate_WEBAPP_DB</code>.</p>
 <p>A one-liner <code>dump.php</code> runs <code>SELECT * FROM users</code> and prints every row to the browser. The table yields handles, emails, and a <span class="hl-red">$2y$04$...</span> bcrypt hash per user.</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
@@ -273,7 +273,7 @@ $ evil-winrm -i 10.129.237.215 -u Administrator -H [NT HASH]
 
 
 <p><span class="hl-ok">NT AUTHORITY\SYSTEM</span>. Rooted.</p>
-<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>The wild-goose chase on this box is a <code>WS-01_PktMon.pcap</code> under Sara.B&#39;s folder that cracks to <code>Lion.SK</code> — legitimate creds, WinRM access, no useful privileges. Don&#39;t burn an hour on it like I did.</p>
+<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>The wild-goose chase on this box is a <code>WS-01_PktMon.pcap</code> under Sara.B&#39;s folder that cracks to <code>Lion.SK</code>. The credentials are valid and allow WinRM access, but have no useful privileges. Don&#39;t burn an hour on it like I did.</p>
 </div></aside></div>
 </section>
 

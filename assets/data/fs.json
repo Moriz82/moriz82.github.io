@@ -1,5 +1,5 @@
 {
-  "built": "2026-11-05T03:46:44.028Z",
+  "built": "2026-11-05T03:55:24.274Z",
   "sections": [
     {
       "id": "blog",
@@ -123,7 +123,7 @@
       "slug": "htb-browsed-writeup",
       "sec": "writeups",
       "date": "2025-08-18",
-      "summary": "Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost — abuse that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777 — drop a poisoned .pyc and SUID bash.",
+      "summary": "Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost. Use that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777. Drop a poisoned .pyc and SUID bash.",
       "tags": [
         "chrome",
         "bash",

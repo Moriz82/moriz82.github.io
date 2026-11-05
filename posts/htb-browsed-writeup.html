@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HTB Browsed · Will DeDominico</title>
-<meta name="description" content="Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost — abuse that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777 — drop a poisoned .pyc and SUID bash.">
+<meta name="description" content="Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost. Use that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777. Drop a poisoned .pyc and SUID bash.">
 <link rel="canonical" href="https://blog.divineintellect.cc/posts/htb-browsed-writeup.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="HTB Browsed · Will DeDominico">
-<meta property="og:description" content="Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost — abuse that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777 — drop a poisoned .pyc and SUID bash.">
+<meta property="og:description" content="Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to localhost. Use that to hit a Flask app with a Bash arithmetic-eval bug (arr[$(…)]) and land as larry. Root comes from a sudo-allowed Python tool whose __pycache__ is mode 777. Drop a poisoned .pyc and SUID bash.">
 <meta property="og:url" content="https://blog.divineintellect.cc/posts/htb-browsed-writeup.html">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/assets/img/blackarch.svg" type="image/svg+xml">
@@ -77,7 +77,7 @@
     <header class="art-h">
       <div>
         <h1>HTB Browsed</h1>
-        <p class="lede">Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to <code>localhost</code> — abuse that to hit a Flask app with a Bash arithmetic-eval bug (<code>arr[$(…)]</code>) and land as <code>larry</code>. Root comes from a <code>sudo</code>-allowed Python tool whose <code>__pycache__</code> is mode 777 — drop a poisoned <code>.pyc</code> and SUID bash.</p>
+        <p class="lede">Extension review portal runs uploaded Chrome extensions inside a headless browser that talks to <code>localhost</code>. Use that to hit a Flask app with a Bash arithmetic-eval bug (<code>arr[$(…)]</code>) and land as <code>larry</code>. Root comes from a <code>sudo</code>-allowed Python tool whose <code>__pycache__</code> is mode 777. Drop a poisoned <code>.pyc</code> and SUID bash.</p>
       </div>
       <img class="art-av" src="/assets/img/writeups/avatars/htb-browsed.png" alt="" width="72" height="72">
     </header>
@@ -87,7 +87,7 @@
 <section class="wp-stage" id="recon" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Recon</div>
 <h2 class="wp-stage-title">Extension review portal + a hidden Gitea vhost.</h2>
-<div class="wp-stage-body"><p>Only SSH and HTTP are up. The web app is an extension review platform — upload a <code>.zip</code>, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:</p>
+<div class="wp-stage-body"><p>Only SSH and HTTP are up. The web app is an extension review platform. Upload a <code>.zip</code>, their bot loads it in a headless Chrome and screenshots the result. The upload page even tells you the command line:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · operator@kali</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ curl -s http://10.129.244.79/upload.php
@@ -139,7 +139,7 @@
 </div>
 
 
-<p>The trap is <code>-eq</code>. Bash arithmetic <span class="hl-warn">evaluates the argument as an expression</span> — not a string compare. Passing <code>arr[$(id)]</code> triggers command substitution inside the <code>[[ ]]</code> context before the numeric compare even runs.</p>
+<p>The trap is <code>-eq</code>. Bash arithmetic <span class="hl-warn">evaluates the argument as an expression</span>, not as a string compare. Passing <code>arr[$(id)]</code> triggers command substitution inside the <code>[[ ]]</code> context before the numeric compare even runs.</p>
 <p>The Flask app binds <code>127.0.0.1:5000</code> only. That&#39;s the problem the extension sandbox solves for us.</p>
 </div>
 </section>
@@ -176,7 +176,7 @@ uid=1000(larry) gid=1000(larry)</code></pre>
 
 
 <p><code>user.txt</code> is right there.</p>
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The extension bot is the lift — your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The extension bot is the lift. Your payload runs in a process that already has routes to internal services nobody else can reach. Always profile what an automation worker can actually talk to.</p>
 </div></aside></div>
 </section>
 
@@ -274,7 +274,7 @@ uid=1000(larry) gid=1000(larry) euid=0(root)
         <ol class="kc"><li><a href="#recon"><span class="n">1</span><span><span class="s">Recon</span><span class="sub">upload portal + internal vhost</span></span></a></li><li><a href="#source"><span class="n">2</span><span><span class="s">Source</span><span class="sub">gitea repo to bash -eq bug</span></span></a></li><li><a href="#foothold"><span class="n">3</span><span><span class="s">Foothold</span><span class="sub">malicious chrome extension</span></span></a></li><li><a href="#user"><span class="n">4</span><span><span class="s">User</span><span class="sub">shell as larry</span></span></a></li><li class="goal"><a href="#root"><span class="n">5</span><span><span class="s">Root</span><span class="sub">pycache poisoning</span></span></a></li></ol>
       </section>
       <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>nmap</dt><dd>recon</dd><dt>curl</dt><dd>http</dd><dt>git</dt><dd>source</dd><dt>zip</dt><dd>package</dd><dt>nc</dt><dd>listener</dd><dt>python3.12</dt><dd>pyc-forge</dd></dl></section>
-      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never treat localhost as a privacy boundary — sandboxed automation routes trust back in</li><li>Use <code>[[ &quot;$1&quot; -eq 0 ]]</code> only on values already validated as numeric (or switch to <code>string == &quot;0&quot;</code>)</li><li>Remove passwordless <code>sudo</code> on scripts that import from world-writable paths</li><li>Chmod <code>__pycache__</code> directories to 755 at minimum; audit before shipping</li></ul></section>
+      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never treat localhost as a privacy boundary; sandboxed automation routes trust back in</li><li>Use <code>[[ &quot;$1&quot; -eq 0 ]]</code> only on values already validated as numeric (or switch to <code>string == &quot;0&quot;</code>)</li><li>Remove passwordless <code>sudo</code> on scripts that import from world-writable paths</li><li>Chmod <code>__pycache__</code> directories to 755 at minimum; audit before shipping</li></ul></section>
     </div>
   </details>
 </div>

@@ -101,7 +101,7 @@ Server: Mirth-Connect/4.4.0</code></pre>
 </div>
 
 
-<p>Mirth 4.4.0 lines up with <span class="hl-red">CVE-2023-43208</span> — an unauthenticated XStream deserialization flaw on <code>/api/users</code>.</p>
+<p>Mirth 4.4.0 lines up with <span class="hl-red">CVE-2023-43208</span>, an unauthenticated XStream deserialization flaw on <code>/api/users</code>.</p>
 </div>
 </section>
 
@@ -126,7 +126,7 @@ uid=1000(mirth) gid=1000(mirth) <span class="hljs-built_in">groups</span>=1000(m
 </div>
 
 
-<p>Shell lands as <code>mirth</code>. No flag here — user flag is under <code>sedric</code>.</p>
+<p>Shell lands as <code>mirth</code>. There is no flag here. The user flag is under <code>sedric</code>.</p>
 </div>
 </section>
 
@@ -152,7 +152,7 @@ sedric   [PBKDF2-SHA256 HASH]</code></pre>
 
 
 <p>The hash is the NextGen 4.4.0 format: <code>PBKDF2WithHmacSHA256</code> at <span class="hl-warn">600,000 iterations</span>, base64-packed with the salt in front. A short Python cracker against <code>rockyou.txt</code> lands <code>[REDACTED]</code>.</p>
-<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The 600,000 iteration count lines up with OWASP&#39;s 2023 guidance — which is why naïve crackers mis-fingerprint this as a weaker mode. Read the Mirth 4.4.0 upgrade guide, don&#39;t guess the mode.</p>
+<aside class="wp-callout wp-tip"><div class="wp-callout-head">Tip</div><div class="wp-callout-body"><p>The 600,000 iteration count lines up with OWASP&#39;s 2023 guidance, which is why naïve crackers mis-fingerprint this as a weaker mode. Read the Mirth 4.4.0 upgrade guide, don&#39;t guess the mode.</p>
 </div></aside></div>
 </section>
 
@@ -207,7 +207,7 @@ req = urllib.request.Request(
 </div>
 
 
-<p>Response echoes the file contents — <code>/root/root.txt</code> as root. Rooted.</p>
+<p>Response echoes the contents of <code>/root/root.txt</code> as root. Rooted.</p>
 <aside class="wp-callout wp-note"><div class="wp-callout-head">Why it worked</div><div class="wp-callout-body"><p>Rendering user input through an f-string path is a double-trap: the template itself is evaluated, and any <code>{expr}</code> inside is evaluated as Python. Regex allow-lists can&#39;t stop <code>open(...).read()</code> when parens and quotes are permitted.</p>
 </div></aside></div>
 </section>
@@ -227,7 +227,7 @@ req = urllib.request.Request(
         <ol class="kc"><li><a href="#recon"><span class="n">1</span><span><span class="s">Recon</span><span class="sub">mirth 4.4.0 exposed</span></span></a></li><li><a href="#foothold"><span class="n">2</span><span><span class="s">Foothold</span><span class="sub">CVE-2023-43208 unauth RCE</span></span></a></li><li><a href="#creds"><span class="n">3</span><span><span class="s">Creds</span><span class="sub">mirth.properties to mariadb</span></span></a></li><li><a href="#user"><span class="n">4</span><span><span class="s">User</span><span class="sub">pbkdf2-600k crack to sedric</span></span></a></li><li class="goal"><a href="#root"><span class="n">5</span><span><span class="s">Root</span><span class="sub">local notifier SSTI</span></span></a></li></ol>
       </section>
       <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>nmap</dt><dd>recon</dd><dt>curl</dt><dd>exploit</dd><dt>mysql</dt><dd>db</dd><dt>python3</dt><dd>pbkdf2</dd><dt>sshpass</dt><dd>auth</dd></dl></section>
-      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Patch Mirth Connect past 4.4.1 (CVE-2023-43208 XStream deserialization)</li><li>Don&#39;t ship plaintext DB creds in <code>mirth.properties</code> — use a secret store</li><li>Never render user-controlled templates through Python&#39;s f-string path, even behind a regex allow-list</li><li>Bind internal services (notifier on :54321) to loopback only and require auth</li></ul></section>
+      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Patch Mirth Connect past 4.4.1 (CVE-2023-43208 XStream deserialization)</li><li>Don&#39;t ship plaintext DB creds in <code>mirth.properties</code>; use a secret store</li><li>Never render user-controlled templates through Python&#39;s f-string path, even behind a regex allow-list</li><li>Bind internal services (notifier on :54321) to loopback only and require auth</li></ul></section>
     </div>
   </details>
 </div>

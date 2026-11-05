@@ -152,7 +152,7 @@
 
 <p>Response base64-encodes the file. <code>hoverfly.service</code> exposes the admin credentials baked into <code>ExecStart</code>:</p>
 <pre><code class="hljs language-routeros"><span class="hljs-attribute">ExecStart</span>=/opt/HoverFly/hoverfly -<span class="hljs-built_in">add</span> -username admin -password [REDACTED] <span class="hljs-built_in">..</span>.</code></pre>
-<aside class="wp-callout wp-warn"><div class="wp-callout-head">User flag is blocked</div><div class="wp-callout-body"><p><code>employee-service.service</code> has <code>InaccessiblePaths=/home/dev_ryan/user.txt</code> — the LFI can&#39;t read it. Need a shell as <code>dev_ryan</code>.</p>
+<aside class="wp-callout wp-warn"><div class="wp-callout-head">User flag is blocked</div><div class="wp-callout-body"><p><code>employee-service.service</code> has <code>InaccessiblePaths=/home/dev_ryan/user.txt</code>, so the LFI can&#39;t read it. Need a shell as <code>dev_ryan</code>.</p>
 </div></aside></div>
 </section>
 
@@ -289,7 +289,7 @@ $ <span class="hljs-built_in">ln</span> -sf b.log           /opt/syswatch/logs/a
 </div>
 
 
-<p><code>a.log</code> passes the regex (target <code>b.log</code> is name-safe), resolves to <code>$LOG_DIR/b.log</code>, then <code>cat</code> follows the inner symlink to <code>/root/root.txt</code> — all under sudo. <span class="hl-ok">Rooted</span>.</p>
+<p><code>a.log</code> passes the regex (target <code>b.log</code> is name-safe), resolves to <code>$LOG_DIR/b.log</code>, then <code>cat</code> follows the inner symlink to <code>/root/root.txt</code>, all under sudo. <span class="hl-ok">Rooted</span>.</p>
 <aside class="wp-callout wp-note"><div class="wp-callout-head">Why it worked</div><div class="wp-callout-body"><p>Name-validation without path resolution is a classic TOCTOU-adjacent bug: the validator and the consumer are looking at different things. <code>cat</code> follows symlinks by default; only the outer name was ever checked. <code>readlink -f</code> on the full target before <code>cat</code> would have caught it.</p>
 </div></aside></div>
 </section>
@@ -309,7 +309,7 @@ $ <span class="hljs-built_in">ln</span> -sf b.log           /opt/syswatch/logs/a
         <ol class="kc"><li><a href="#recon"><span class="n">1</span><span><span class="s">Recon</span><span class="sub">ftp anon + soap</span></span></a></li><li><a href="#lfi"><span class="n">2</span><span><span class="s">LFI</span><span class="sub">CVE-2022-46364 XOP read</span></span></a></li><li><a href="#rce"><span class="n">3</span><span><span class="s">RCE</span><span class="sub">hoverfly middleware</span></span></a></li><li><a href="#user"><span class="n">4</span><span><span class="s">User</span><span class="sub">ssh as dev_ryan</span></span></a></li><li><a href="#pivot"><span class="n">5</span><span><span class="s">Pivot</span><span class="sub">flask secret forge + pipe injection</span></span></a></li><li class="goal"><a href="#root"><span class="n">6</span><span><span class="s">Root</span><span class="sub">double symlink + sudo cat</span></span></a></li></ol>
       </section>
       <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>nmap</dt><dd>recon</dd><dt>curl</dt><dd>http</dd><dt>cfr</dt><dd>jar-decompile</dd><dt>python3</dt><dd>session-forge</dd><dt>itsdangerous</dt><dd>sign</dd><dt>ssh</dt><dd>auth</dd></dl></section>
-      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Disable anonymous FTP</li><li>Upgrade Apache CXF past 3.5.5 / 3.4.10 (CVE-2022-46364) and Hoverfly past 1.11.3 (CVE-2025-54123)</li><li>Don&#39;t ship <code>SECRET_KEY</code> in a world-readable env file</li><li>Regex allow-lists are not command sanitizers — use argv arrays, never <code>shell=True</code></li><li>Never <code>cat</code> a symlink-followed path under a sudo-allowed script</li></ul></section>
+      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Disable anonymous FTP</li><li>Upgrade Apache CXF past 3.5.5 / 3.4.10 (CVE-2022-46364) and Hoverfly past 1.11.3 (CVE-2025-54123)</li><li>Don&#39;t ship <code>SECRET_KEY</code> in a world-readable env file</li><li>Regex allow-lists are not command sanitizers; use argv arrays, never <code>shell=True</code></li><li>Never <code>cat</code> a symlink-followed path under a sudo-allowed script</li></ul></section>
     </div>
   </details>
 </div>

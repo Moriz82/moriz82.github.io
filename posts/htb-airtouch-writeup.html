@@ -100,7 +100,7 @@ consultant@airtouch:~$ sudo -l
 </div>
 
 
-<p>The consultant host has three wireless interfaces and a network diagram labelling two SSIDs — <code>AirTouch-Internet</code> (PSK) and <code>AirTouch-Office</code> (Enterprise). The path forward is wireless, not wired.</p>
+<p>The consultant host has three wireless interfaces and a network diagram labelling two SSIDs: <code>AirTouch-Internet</code> (PSK) and <code>AirTouch-Office</code> (Enterprise). The path forward is wireless, not wired.</p>
 </div>
 </section>
 
@@ -182,10 +182,10 @@ uid=33(www-data) gid=33(www-data)</code></pre>
 <h2 class="wp-stage-title">The router hoards certs — impersonate the enterprise AP.</h2>
 <div class="wp-stage-body"><p>As root on the router:</p>
 <ul>
-<li><code>/root/certs-backup/</code> — CA cert + private key for the enterprise AP</li>
-<li><code>/root/send_certs.sh</code> — <span class="hl-red">remote / [REDACTED]</span> for the management host</li>
+<li><code>/root/certs-backup/</code>: CA cert + private key for the enterprise AP</li>
+<li><code>/root/send_certs.sh</code>: <span class="hl-red">remote / [REDACTED]</span> for the management host</li>
 </ul>
-<p>The management host isn&#39;t reachable from the internet segment. Need office-WiFi access first, which means capturing and cracking a PEAP/MSCHAPv2 exchange. Office runs 5 GHz channel 44 — don&#39;t waste time attacking 2.4 GHz.</p>
+<p>The management host isn&#39;t reachable from the internet segment. Need office-WiFi access first, which means capturing and cracking a PEAP/MSCHAPv2 exchange. Office runs 5 GHz channel 44, so don&#39;t waste time attacking 2.4 GHz.</p>
 <p>Stand up <code>eaphammer</code> as a rogue AP using the stolen certs and capture someone&#39;s authentication:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · eaphammer</span></div>
@@ -210,7 +210,7 @@ r4ulcl:[REDACTED]</code></pre>
 </div>
 
 
-<p>Build a <code>wpa_supplicant</code> conf and join the office net — <span class="hl-warn">single backslash</span> in the identity string, not double:</p>
+<p>Build a <code>wpa_supplicant</code> conf and join the office net using a <span class="hl-warn">single backslash</span> in the identity string, not double:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · office wpa_supplicant</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">network={
@@ -240,7 +240,7 @@ $ dhclient wlan5</code></pre>
 <section class="wp-stage" id="root" data-stage="5">
 <div class="wp-stage-lbl">Stage 5 &middot; Root</div>
 <h2 class="wp-stage-title">hostapd_wpe.eap_user is world-readable.</h2>
-<div class="wp-stage-body"><p>SSH to management as <code>remote</code> with the creds from <code>send_certs.sh</code>. <code>remote</code> has no sudo — but the hostapd file used by the WPE patch ships with cleartext users and is <code>0644</code>:</p>
+<div class="wp-stage-body"><p>SSH to management as <code>remote</code> with the creds from <code>send_certs.sh</code>. <code>remote</code> has no sudo, but the hostapd file used by the WPE patch ships with cleartext users and is <code>0644</code>:</p>
 <div class="wp-term">
 <div class="wp-term-head"><span class="t-title">shell · remote@airtouch-mgmt</span></div>
 <pre class="wp-term-body"><code class="hljs language-bash">$ <span class="hljs-built_in">ls</span> -l /etc/hostapd/hostapd_wpe.eap_user
@@ -253,7 +253,7 @@ $ <span class="hljs-built_in">cat</span> /etc/hostapd/hostapd_wpe.eap_user
 
 
 <p>SSH as <code>admin</code> → passwordless sudo → <code>/root/root.txt</code>. <span class="hl-ok">Rooted</span>.</p>
-<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>None of these issues are individually complicated — SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.</p>
+<aside class="wp-opsec"><div class="wp-opsec-head">OPSEC note</div><div class="wp-opsec-body"><p>The individual issues are straightforward: SNMP community=public, WPA2-PSK in rockyou, client-side role cookie, extension filter bypass, cleartext creds in a script, world-readable config. What makes Airtouch is the chain itself: three wireless segments with trust pivoting through credentials you pick up on each prior host. Good practice for real WLAN engagements.</p>
 </div></aside></div>
 </section>
 
@@ -272,7 +272,7 @@ $ <span class="hljs-built_in">cat</span> /etc/hostapd/hostapd_wpe.eap_user
         <ol class="kc"><li><a href="#recon"><span class="n">1</span><span><span class="s">Recon</span><span class="sub">snmp community&#x3D;public</span></span></a></li><li><a href="#wpa2"><span class="n">2</span><span><span class="s">Wpa2</span><span class="sub">deauth + aircrack</span></span></a></li><li><a href="#router"><span class="n">3</span><span><span class="s">Router</span><span class="sub">cookie role + .phtml RCE</span></span></a></li><li><a href="#wpa-e"><span class="n">4</span><span><span class="s">Wpa-e</span><span class="sub">peap mschapv2 crack</span></span></a></li><li class="goal"><a href="#root"><span class="n">5</span><span><span class="s">Root</span><span class="sub">hostapd_wpe.eap_user</span></span></a></li></ol>
       </section>
       <section class="rc"><h3>Loadout</h3><dl class="lo"><dt>nmap</dt><dd>recon</dd><dt>snmpwalk</dt><dd>enum</dd><dt>airmon-ng</dt><dd>wifi</dd><dt>airodump-ng</dt><dd>capture</dd><dt>aireplay-ng</dt><dd>deauth</dd><dt>aircrack-ng</dt><dd>crack</dd><dt>airdecap-ng</dt><dd>decrypt</dd><dt>eaphammer</dt><dd>enterprise</dd><dt>hashcat</dt><dd>crack</dd><dt>wpa_supplicant</dt><dd>assoc</dd></dl></section>
-      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never leave SNMP with the <code>public</code> community string — it leaks config + service accounts</li><li>Don&#39;t store WPA-Enterprise certs + management creds together on a pivot box</li><li>Reject client-side role cookies — authoritative roles live server-side</li><li>File-upload validation on magic bytes, not extension (<code>.phtml</code> still hits the PHP handler)</li><li>Restrict <code>hostapd_wpe.eap_user</code> to <code>0600 root:root</code></li></ul></section>
+      <section class="rc"><h3>Remediation</h3><ul class="rem"><li>Never leave SNMP with the <code>public</code> community string; it leaks config + service accounts</li><li>Don&#39;t store WPA-Enterprise certs + management creds together on a pivot box</li><li>Reject client-side role cookies; authoritative roles live server-side</li><li>File-upload validation on magic bytes, not extension (<code>.phtml</code> still hits the PHP handler)</li><li>Restrict <code>hostapd_wpe.eap_user</code> to <code>0600 root:root</code></li></ul></section>
     </div>
   </details>
 </div>

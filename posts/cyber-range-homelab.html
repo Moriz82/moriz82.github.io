@@ -87,7 +87,7 @@
 <section class="wp-stage" id="hardware" data-stage="1">
 <div class="wp-stage-lbl">Stage 1 &middot; Hardware</div>
 <h2 class="wp-stage-title">A retired Dell R720 and a plan.</h2>
-<div class="wp-stage-body"><p>Picked up an R720 off eBay — dual Xeon E5-2670v2, 128GB of DDR3 ECC, 8× 2TB SAS. Not fast, but dense and cheap per core. Added a dual-port 10GbE NIC for the storage network.</p>
+<div class="wp-stage-body"><p>Picked up an R720 off eBay: dual Xeon E5-2670v2, 128GB of DDR3 ECC, 8× 2TB SAS. Not fast, but dense and cheap per core. Added a dual-port 10GbE NIC for the storage network.</p>
 <p>Noise was the first problem. Stock fans scream at 50%. IPMI fan curve, plus a pair of Noctua NF-A12-25 pulling from the front, dropped it to tolerable for a garage.</p>
 </div>
 </section>
@@ -124,12 +124,12 @@ DNS EXT:           12.01 ms</code></pre>
 <h2 class="wp-stage-title">VLANs and a Cisco 3560-X so the lab can&#39;t talk to anything important.</h2>
 <div class="wp-stage-body"><p>Four VLANs on the Cisco switch:</p>
 <ul>
-<li><span class="hl-cool">10</span> — management (Proxmox, iDRAC, switch)</li>
-<li><span class="hl-cool">20</span> — lab internal (targets, pivots)</li>
-<li><span class="hl-cool">30</span> — detonation (malware triage, blackhole-routed)</li>
-<li><span class="hl-cool">40</span> — operator (my box, SIEM)</li>
+<li><span class="hl-cool">10</span>: management (Proxmox, iDRAC, switch)</li>
+<li><span class="hl-cool">20</span>: lab internal (targets, pivots)</li>
+<li><span class="hl-cool">30</span>: detonation (malware triage, blackhole-routed)</li>
+<li><span class="hl-cool">40</span>: operator (my box, SIEM)</li>
 </ul>
-<p>pfSense edges routes between operator + lab. VLAN 30 has zero route to anywhere outside — packets die at the firewall.</p>
+<p>pfSense edges routes between operator + lab. VLAN 30 has zero route to anywhere outside; packets die at the firewall.</p>
 <figure class="wp-img"><img src="/assets/img/homelab.jpg" alt="Homelab server rack" loading="lazy"><figcaption>R720 + switch + pfSense · garage lab in production</figcaption></figure></div>
 </section>
 
